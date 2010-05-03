@@ -3,7 +3,7 @@
 //  Drag
 //
 //  Created by Zac White on 4/20/10.
-//  Copyright Gravity Mobile 2010. All rights reserved.
+//  Copyright Zac White 2010. All rights reserved.
 //
 
 #import "AppDelegate_Phone.h"

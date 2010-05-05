@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F3616117E9E2200B72C00 /* DKDragViewController.m */; };
 		11DF18E3117EA17B00233A48 /* DKDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18E2117EA17B00233A48 /* DKDragView.m */; };
-		11DF18EA117EA62800233A48 /* DKDraggableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18E9117EA62800233A48 /* DKDraggableView.m */; };
 		11DF18ED117EA66E00233A48 /* DKDragDropServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18EC117EA66E00233A48 /* DKDragDropServer.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -26,8 +25,6 @@
 		111F3616117E9E2200B72C00 /* DKDragViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragViewController.m; sourceTree = "<group>"; };
 		11DF18E1117EA17B00233A48 /* DKDragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragView.h; sourceTree = "<group>"; };
 		11DF18E2117EA17B00233A48 /* DKDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragView.m; sourceTree = "<group>"; };
-		11DF18E8117EA62800233A48 /* DKDraggableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDraggableView.h; sourceTree = "<group>"; };
-		11DF18E9117EA62800233A48 /* DKDraggableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDraggableView.m; sourceTree = "<group>"; };
 		11DF18EB117EA66E00233A48 /* DKDragDropServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragDropServer.h; sourceTree = "<group>"; };
 		11DF18EC117EA66E00233A48 /* DKDragDropServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragDropServer.m; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -100,8 +97,6 @@
 			children = (
 				111F3615117E9E2200B72C00 /* DKDragViewController.h */,
 				111F3616117E9E2200B72C00 /* DKDragViewController.m */,
-				11DF18E8117EA62800233A48 /* DKDraggableView.h */,
-				11DF18E9117EA62800233A48 /* DKDraggableView.m */,
 				11DF18E1117EA17B00233A48 /* DKDragView.h */,
 				11DF18E2117EA17B00233A48 /* DKDragView.m */,
 				11DF18EB117EA66E00233A48 /* DKDragDropServer.h */,
@@ -197,7 +192,6 @@
 				2860E32E111B888700E27156 /* AppDelegate_Pad.m in Sources */,
 				111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */,
 				11DF18E3117EA17B00233A48 /* DKDragView.m in Sources */,
-				11DF18EA117EA62800233A48 /* DKDraggableView.m in Sources */,
 				11DF18ED117EA66E00233A48 /* DKDragDropServer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

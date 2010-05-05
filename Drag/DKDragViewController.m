@@ -8,6 +8,7 @@
 
 #import "DKDragViewController.h"
 
+#import "DKDragDropServer.h"
 #import "DKDragView.h"
 
 @implementation DKDragViewController
@@ -30,6 +31,9 @@
 	NSLog(@"frame: %@", NSStringFromCGRect(self.view.frame));
 	
 	DKDragView *dragView = [[DKDragView alloc] initWithFrame:CGRectMake(100, 100, 400, 100)];
+	
+	[[DKDragDropServer sharedServer] markViewAsDraggable:dragView];
+	
 	[self.view addSubview:dragView];
 	NSLog(@"dragFrame: %@", NSStringFromCGRect(dragView.frame));
 	[dragView release];

@@ -9,11 +9,13 @@
 
 #import "DKDragDropServer.h"
 
+#import <QuartzCore/QuartzCore.h>
+
 static DKDragDropServer *sharedInstance = nil;
 
 @implementation DKDragDropServer
 
-@synthesize dragWindowVisible;
+@synthesize dragWindowVisible, dragWindow;
 
 #pragma mark -
 #pragma mark Singleton
@@ -59,29 +61,59 @@ static DKDragDropServer *sharedInstance = nil;
 }
 
 #pragma mark -
+#pragma mark Marking Views
+
+- (void)markViewAsDraggable:(UIView *)draggableView {
+	//maybe add to hash table?
+	// Initialization code
+	UILongPressGestureRecognizer *tapHoldRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_handleLongPress:)];
+	tapHoldRecognizer.cancelsTouchesInView = YES;
+	[draggableView addGestureRecognizer:tapHoldRecognizer];
+	[tapHoldRecognizer release];
+}
+
+- (void)_handleLongPress:(UIGestureRecognizer *)sender {
+	//let the drag server know our frame and that we want to start dragging.
+	NSLog(@"DRAG: %@", NSStringFromCGPoint([sender locationInView:[[sender view] window]]));
+	[self moveDragWindowForView:[sender view] toPoint:[sender locationInView:[[sender view] window]]];
+}
+
+- (UIImage *)_generateImageForDragFromView:(UIView *)theView {
+	UIGraphicsBeginImageContext(theView.bounds.size);
+	
+	[theView.layer renderInContext:UIGraphicsGetCurrentContext()];
+	UIImage *resultingImage = UIGraphicsGetImageFromCurrentImageContext();
+	
+	UIGraphicsEndImageContext();
+	
+	return resultingImage;
+}
+
+#pragma mark -
 #pragma mark Window Creation
 
-- (void)displayDragWindowForDragView:(UIView<DKDraggableViewProtocol> *)draggableView {
+- (void)moveDragWindowForView:(UIView *)draggableView toPoint:(CGPoint)point {
 	
-	if (self.dragWindowVisible) {
-		//we already have a window visisble...multitouch support coming soon?
-		return;
+	if (!self.dragWindow) {
+		//grab the image.
+		UIImage *dragImage = [self _generateImageForDragFromView:draggableView];
+		
+		CGPoint viewPositionInWindow = [draggableView convertPoint:draggableView.frame.origin toView:[draggableView window]];
+		self.dragWindow = [[[UIWindow alloc] initWithFrame:CGRectMake(viewPositionInWindow.x, viewPositionInWindow.y, dragImage.size.width, dragImage.size.height)] autorelease];
+		UIImageView *dragImageView = [[UIImageView alloc] initWithFrame:self.dragWindow.bounds];
+		dragImageView.image = dragImage;
+		
+		[self.dragWindow addSubview:dragImageView];
+		[dragImageView release];
+		
+		self.dragWindowVisible = YES;
+		[self.dragWindow makeKeyAndVisible];
+		
+		NSLog(@"dragWindow: %@", self.dragWindow);
 	}
 	
-	//grab the image.
-	UIImage *dragImage = [draggableView _generateImageForDrag];
-	
-	CGPoint viewPositionInWindow = [draggableView convertPoint:draggableView.frame.origin toView:[draggableView window]];
-	UIWindow *dragWindow = [[UIWindow alloc] initWithFrame:CGRectMake(viewPositionInWindow.x, viewPositionInWindow.y, dragImage.size.width, dragImage.size.height)];
-	UIImageView *dragImageView = [[UIImageView alloc] initWithFrame:dragWindow.bounds];
-	dragImageView.image = dragImage;
-	
-	dragWindow.alpha = .7;
-	
-	self.dragWindowVisible = YES;
-	
-	[dragWindow makeKeyAndVisible];
-	NSLog(@"made window: %@ visible", dragWindow);
+	self.dragWindow.frame = CGRectMake(point.x, point.y, self.dragWindow.frame.size.width, self.dragWindow.frame.size.height);
+	NSLog(@"dragWindowFrame: %@", NSStringFromCGRect(self.dragWindow.frame));
 }
 
 @end

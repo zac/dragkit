@@ -8,15 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
-#import "DKDraggableView.h"
-
 @interface DKDragDropServer : NSObject {
+	UIWindow *dragWindow;
 	BOOL dragWindowVisible;
 }
 
 @property (nonatomic) BOOL dragWindowVisible;
+@property (nonatomic, retain) UIWindow *dragWindow;
 
-- (void)displayDragWindowForDragView:(UIView<DKDraggableViewProtocol> *)draggableView;
+- (void)markViewAsDraggable:(UIView *)draggableView;
+
+- (void)moveDragWindowForView:(UIView *)draggableView toPoint:(CGPoint)point;
 
 + (id)sharedServer;
 

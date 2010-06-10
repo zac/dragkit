@@ -3,6 +3,10 @@ output/*
 *.pbxuser
 *.mode1v3
 
+# hm, what are these... :)
+project.xcworkspace/
+xcuserdata/
+
 # old skool
 .svn
 

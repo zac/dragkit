@@ -31,8 +31,10 @@
 	NSLog(@"frame: %@", NSStringFromCGRect(self.view.frame));
 	
 	DKDragView *dragView = [[DKDragView alloc] initWithFrame:CGRectMake(100, 100, 400, 100)];
+	dragView.topLabel.text = @"Testing!!";
+	dragView.bottomLabel.text = @"1.2.3.";
 	
-	[[DKDragDropServer sharedServer] markViewAsDraggable:dragView];
+	[[DKDragDropServer sharedServer] markViewAsDraggable:dragView forDrag:@"MainDrag" withDataSource:self];
 	
 	[self.view addSubview:dragView];
 	NSLog(@"dragFrame: %@", NSStringFromCGRect(dragView.frame));

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F3616117E9E2200B72C00 /* DKDragViewController.m */; };
+		113B2E3A11C020470049A3F4 /* DKDragGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 113B2E3911C020470049A3F4 /* DKDragGestureRecognizer.m */; };
 		11DF18E3117EA17B00233A48 /* DKDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18E2117EA17B00233A48 /* DKDragView.m */; };
 		11DF18ED117EA66E00233A48 /* DKDragDropServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18EC117EA66E00233A48 /* DKDragDropServer.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -23,6 +24,8 @@
 /* Begin PBXFileReference section */
 		111F3615117E9E2200B72C00 /* DKDragViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragViewController.h; sourceTree = "<group>"; };
 		111F3616117E9E2200B72C00 /* DKDragViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragViewController.m; sourceTree = "<group>"; };
+		113B2E3811C020470049A3F4 /* DKDragGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragGestureRecognizer.h; sourceTree = "<group>"; };
+		113B2E3911C020470049A3F4 /* DKDragGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragGestureRecognizer.m; sourceTree = "<group>"; };
 		11DF18E1117EA17B00233A48 /* DKDragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragView.h; sourceTree = "<group>"; };
 		11DF18E2117EA17B00233A48 /* DKDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragView.m; sourceTree = "<group>"; };
 		11DF18EB117EA66E00233A48 /* DKDragDropServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragDropServer.h; sourceTree = "<group>"; };
@@ -101,6 +104,8 @@
 				11DF18E2117EA17B00233A48 /* DKDragView.m */,
 				11DF18EB117EA66E00233A48 /* DKDragDropServer.h */,
 				11DF18EC117EA66E00233A48 /* DKDragDropServer.m */,
+				113B2E3811C020470049A3F4 /* DKDragGestureRecognizer.h */,
+				113B2E3911C020470049A3F4 /* DKDragGestureRecognizer.m */,
 				2860E32A111B888700E27156 /* iPad */,
 				2860E324111B887F00E27156 /* iPhone */,
 				28EEBF621118D79A00187D67 /* Shared */,
@@ -193,6 +198,7 @@
 				111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */,
 				11DF18E3117EA17B00233A48 /* DKDragView.m in Sources */,
 				11DF18ED117EA66E00233A48 /* DKDragDropServer.m in Sources */,
+				113B2E3A11C020470049A3F4 /* DKDragGestureRecognizer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

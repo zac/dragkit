@@ -20,9 +20,29 @@
 	self.topLabel = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
 	self.bottomLabel = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
 	
-	self.backgroundColor = [UIColor redColor];
+	//self.backgroundColor = [UIColor redColor];
+	
+	[self addSubview:self.thumbnailView];
+	[self addSubview:self.topLabel];
+	[self addSubview:self.bottomLabel];
 	
 	return self;
+}
+
+#define MARGIN 10
+
+- (void)layoutSubviews {
+	[super layoutSubviews];
+	
+	int thumbnailWidth = self.frame.size.height - MARGIN * 2;
+	
+	self.thumbnailView.frame = CGRectMake(MARGIN, MARGIN, thumbnailWidth, thumbnailWidth);
+	
+	[self.topLabel sizeToFit];
+	self.topLabel.frame = CGRectMake(MARGIN + thumbnailWidth, MARGIN, MARGIN * 3 + (self.frame.size.width - thumbnailWidth), self.topLabel.frame.size.height);
+	
+	[self.bottomLabel sizeToFit];
+	self.bottomLabel.frame = CGRectMake(MARGIN + thumbnailWidth, CGRectGetMaxY(self.topLabel.frame), MARGIN * 3 + (self.frame.size.width - thumbnailWidth), self.bottomLabel.frame.size.height);
 }
 
 /*

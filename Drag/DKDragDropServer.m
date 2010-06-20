@@ -13,6 +13,16 @@
 
 static DKDragDropServer *sharedInstance = nil;
 
+@interface DKDragDropServer (DKPrivate)
+
+- (void)dk_handleLongPress:(UIGestureRecognizer *)sender;
+- (UIImage *)dk_generateImageForDragFromView:(UIView *)theView;
+- (void)dk_displayDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point;
+- (void)dk_moveDragViewToPoint:(CGPoint)point;
+
+@end
+
+
 @implementation DKDragDropServer
 
 @synthesize draggedView, originalView;
@@ -71,7 +81,10 @@ static DKDragDropServer *sharedInstance = nil;
 - (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource {
 	//maybe add to hash table?
 	// Initialization code
-	DKDragGestureRecognizer *dragRecognizer = [[DKDragGestureRecognizer alloc] initWithDragDelegate:self];
+	
+	UILongPressGestureRecognizer *dragRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
+	dragRecognizer.minimumPressDuration = 0.1;
+	dragRecognizer.numberOfTapsRequired = 1;
 	
 	[draggableView addGestureRecognizer:dragRecognizer];
 	[dragRecognizer release];
@@ -82,38 +95,66 @@ static DKDragDropServer *sharedInstance = nil;
 }
 
 #pragma mark -
-#pragma mark Drag Delgeate Callbacks
+#pragma mark Dragging Callback
 
-- (void)dragRecognizer:(DKDragGestureRecognizer *)recognizer touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-	// assign the current view to the dragging view.
-	self.originalView = [recognizer view];
-}
+CGPoint touchOffset;
 
-- (void)dragRecognizer:(DKDragGestureRecognizer *)recognizer touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-	CGPoint newPoint = [[touches anyObject] locationInView:[[recognizer view] window]];
-	NSLog(@"moving to point: %@", NSStringFromCGPoint(newPoint));
-	[self moveDragViewForView:self.originalView toPoint:newPoint];
-}
-
-- (void)dragRecognizer:(DKDragGestureRecognizer *)recognizer touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-	// if the view is within a drop zone, animate to the drop zone.
-	// else, cancel.
-	
-	// for now just cancel.
-	[self cancelDrag];
-}
-
-- (void)dragRecognizer:(DKDragGestureRecognizer *)recognizer touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-	// cancel the drag.
-	[self cancelDrag];
-}
-
-- (void)_handleLongPress:(UIGestureRecognizer *)sender {
+- (void)dk_handleLongPress:(UIGestureRecognizer *)sender {
 	//let the drag server know our frame and that we want to start dragging.
-	NSLog(@"GESTURE OVER: %@", sender);
+	
+	CGPoint touchPoint = [sender locationInView:[self.originalView window]];
+	CGPoint viewPosition;
+	
+	switch ([sender state]) {
+		case UIGestureRecognizerStateBegan:
+			
+			NSLog(@"began");
+			// create the necessary view and animate it.
+			
+			self.originalView = [sender view];
+			
+			CGPoint viewOrigin = [[self.originalView superview] convertPoint:self.originalView.frame.origin toView:[self.originalView window]];
+			
+			touchOffset = CGPointMake(touchPoint.x - viewOrigin.x, touchPoint.y - viewOrigin.y);
+			
+			NSLog(@"touch: %@ view: %@", NSStringFromCGPoint(touchPoint), NSStringFromCGPoint(viewOrigin));
+			
+			[self dk_displayDragViewForView:self.originalView atPoint:touchPoint];
+			
+			break;
+		case UIGestureRecognizerStateChanged:
+			
+			// move the view to any point the sender is.
+			// check for drop zones and light them up if necessary.
+			
+			viewPosition = CGPointMake(touchPoint.x - touchOffset.x, touchPoint.y - touchOffset.y);
+			
+			[self dk_moveDragViewToPoint:viewPosition];
+			
+			break;
+		case UIGestureRecognizerStateRecognized:
+			
+			NSLog(@"recognized");
+			// the user has let go.
+			// TODO: actually drop if on drop zone.
+			[self cancelDrag];
+			
+			break;
+		case UIGestureRecognizerStateCancelled:
+			
+			NSLog(@"cancelled");
+			// something happened and we need to cancel.
+			[self cancelDrag];
+			
+			break;
+		default:
+			break;
+	}
 }
 
-- (UIImage *)_generateImageForDragFromView:(UIView *)theView {
+//we are going to zoom from this image to the normal view for the content type.
+
+- (UIImage *)dk_generateImageForDragFromView:(UIView *)theView {
 	UIGraphicsBeginImageContext(theView.bounds.size);
 	
 	[theView.layer renderInContext:UIGraphicsGetCurrentContext()];
@@ -127,15 +168,23 @@ static DKDragDropServer *sharedInstance = nil;
 #pragma mark -
 #pragma mark Drag View Creation
 
-- (void)moveDragViewForView:(UIView *)draggableView toPoint:(CGPoint)point {
+- (void)dk_displayDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point {
 	if (!self.draggedView) {
-		NSLog(@"creating view with view: %@", draggableView);
+		NSLog(@"creating view with view: %@ at point: %@", draggableView, NSStringFromCGPoint(point));
 		
 		//grab the image.
-		UIImage *dragImage = [self _generateImageForDragFromView:draggableView];
+		UIImage *dragImage = [self dk_generateImageForDragFromView:draggableView];
 		
-		CGPoint viewPositionInWindow = [self.draggedView convertPoint:self.draggedView.frame.origin toView:[self.draggedView window]];
-		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake(viewPositionInWindow.x, viewPositionInWindow.y, dragImage.size.width, dragImage.size.height)] autorelease];
+		CGPoint originalViewOrigin = [[draggableView superview] convertPoint:draggableView.frame.origin toView:[draggableView window]];
+		
+		NSLog(@"converted point: %@ to: %@", NSStringFromCGPoint(draggableView.frame.origin), NSStringFromCGPoint(originalViewOrigin));
+		
+		//transition from the dragImage to our view.
+		
+		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake(originalViewOrigin.x,
+																	 originalViewOrigin.y,
+																	 dragImage.size.width,
+																	 dragImage.size.height)] autorelease];
 		
 		UIImageView *dragImageView = [[UIImageView alloc] initWithFrame:self.draggedView.bounds];
 		dragImageView.image = dragImage;
@@ -143,26 +192,29 @@ static DKDragDropServer *sharedInstance = nil;
 		[self.draggedView addSubview:dragImageView];
 		[dragImageView release];
 		
-		[[self.draggedView window] addSubview:self.draggedView];
+		[[draggableView window] addSubview:self.draggedView];
+		
+		//TODO: Animate on screen.
 	}
+}
+
+- (void)dk_moveDragViewToPoint:(CGPoint)point {
 	
-	if (point.x <= 0) {
-		[self cancelDrag];
-		return;
+	if (!self.draggedView) {
+		NSLog(@"ERROR: No drag view.");
 	}
 	
 	self.draggedView.frame = CGRectMake(point.x, point.y, self.draggedView.frame.size.width, self.draggedView.frame.size.height);
-	
 }
 
 - (void)cancelDrag {
 	//cancel the window by animating it back to its location.
 	
-	CGPoint originalLocation = [self.originalView convertPoint:self.originalView.center toView:[self.originalView window]];
+	CGPoint originalLocation = [[self.originalView superview] convertPoint:self.originalView.center toView:[self.originalView window]];
 	
 	[UIView beginAnimations:@"SnapBack" context:nil];
 	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
-	[UIView setAnimationDuration:.5];
+	[UIView setAnimationDuration:.3];
 	[UIView setAnimationDelegate:self];
 	[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
 	

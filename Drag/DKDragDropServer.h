@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import "DKDragGestureRecognizer.h"
-
 @protocol DKDragDataProvider
 
 //array of types supported by view.
@@ -29,7 +27,7 @@
 
 @end
 
-@interface DKDragDropServer : NSObject <DKDragGestureRecognizerDelegate> {
+@interface DKDragDropServer : NSObject {
 	UIView *draggedView;
 	UIView *originalView;
 }
@@ -45,7 +43,5 @@
 /* Optional parameter for drag identification. */
 - (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource;
 - (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDropDelegate> *)dropDelegate;
-
-- (void)moveDragViewForView:(UIView *)draggableView toPoint:(CGPoint)point;
 
 @end

@@ -23,6 +23,18 @@
 }
 */
 
+#pragma mark -
+#pragma mark DKDragDataProvider Methods
+
+//array of types supported by view.
+- (NSArray *)typesForView:(UIView *)dragView {
+	return nil;
+}
+
+//request the data from the view.
+- (NSData *)dataForType:(NSString *)type forView:(UIView *)dragView {
+	return nil;
+}
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {

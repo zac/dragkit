@@ -20,7 +20,7 @@
 	self.topLabel = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
 	self.bottomLabel = [[[UILabel alloc] initWithFrame:CGRectZero] autorelease];
 	
-	//self.backgroundColor = [UIColor redColor];
+	self.backgroundColor = [UIColor redColor];
 	
 	[self addSubview:self.thumbnailView];
 	[self addSubview:self.topLabel];

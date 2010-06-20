@@ -25,7 +25,7 @@ static DKDragDropServer *sharedInstance = nil;
 
 @implementation DKDragDropServer
 
-@synthesize draggedView, originalView;
+@synthesize draggedView, originalView, drawerVisibilityLevel;
 
 #pragma mark -
 #pragma mark Singleton
@@ -79,7 +79,7 @@ static DKDragDropServer *sharedInstance = nil;
 
 /* Optional parameter for drag identification. */
 - (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource {
-	//maybe add to hash table?
+	// maybe add to hash table?
 	// Initialization code
 	
 	UILongPressGestureRecognizer *dragRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
@@ -100,7 +100,7 @@ static DKDragDropServer *sharedInstance = nil;
 CGSize touchOffset;
 
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender {
-	//let the drag server know our frame and that we want to start dragging.
+	// let the drag server know our frame and that we want to start dragging.
 	
 	CGPoint touchPoint = [sender locationInView:[self.originalView window]];
 	CGPoint viewPosition;
@@ -117,6 +117,8 @@ CGSize touchOffset;
 			CGPoint position = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
 			
 			[self dk_displayDragViewForView:self.originalView atPoint:position];
+			
+			self.drawerVisibilityLevel = DKDrawerVisibilityLevelPeeking;
 			
 			break;
 		case UIGestureRecognizerStateChanged:
@@ -149,7 +151,12 @@ CGSize touchOffset;
 	}
 }
 
-//we are going to zoom from this image to the normal view for the content type.
+- (void)setDrawerVisibilityLevel:(DKDrawerVisibilityLevel)newLevel {
+	NSLog(@"changing visibility level: %d", newLevel);
+	drawerVisibilityLevel = newLevel;
+}
+
+// we are going to zoom from this image to the normal view for the content type.
 
 - (UIImage *)dk_generateImageForDragFromView:(UIView *)theView {
 	UIGraphicsBeginImageContext(theView.bounds.size);
@@ -169,14 +176,12 @@ CGSize touchOffset;
 	if (!self.draggedView) {
 		NSLog(@"creating view with view: %@ at point: %@", draggableView, NSStringFromCGPoint(point));
 		
-		//grab the image.
+		// grab the image.
 		UIImage *dragImage = [self dk_generateImageForDragFromView:draggableView];
 		
-		//transition from the dragImage to our view.
+		// transition from the dragImage to our view.
 		
 		UIImage *background = [UIImage imageNamed:@"drag_view_background.png"];
-		
-		//CGPoint originalViewOrigin = [[self.originalView superview] convertPoint:self.originalView.frame.origin toView:[self.originalView window]];
 		
 		// create our drag view where we want it.
 		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake(point.x,
@@ -208,8 +213,6 @@ CGSize touchOffset;
 															heightRatio);
 		
 		
-		//originally the large size.
-		//will animate down.
 		UIImageView *dragImageView = [[UIImageView alloc] initWithFrame:self.draggedView.bounds];
 		dragImageView.image = background;
 		
@@ -230,7 +233,7 @@ CGSize touchOffset;
 		[UIView setAnimationDelegate:self];
 		[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
 		
-		//snap it to normal.
+		// snap it to normal.
 		self.draggedView.transform = CGAffineTransformIdentity;
 		
 		dragImageView.alpha = 1.0;
@@ -240,9 +243,6 @@ CGSize touchOffset;
 		
 		[dragImageView release];
 		[originalImageView release];
-		
-		
-		//TODO: Animate on screen.
 	}
 }
 
@@ -250,13 +250,14 @@ CGSize touchOffset;
 	
 	if (!self.draggedView) {
 		NSLog(@"ERROR: No drag view.");
+		return;
 	}
 	
 	self.draggedView.frame = CGRectMake(point.x, point.y, self.draggedView.frame.size.width, self.draggedView.frame.size.height);
 }
 
 - (void)cancelDrag {
-	//cancel the window by animating it back to its location.
+	// cancel the window by animating it back to its location.
 	
 	CGPoint originalLocation = [[self.originalView superview] convertPoint:self.originalView.center toView:[self.originalView window]];
 	
@@ -266,15 +267,17 @@ CGSize touchOffset;
 	[UIView setAnimationDelegate:self];
 	[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
 	
-	//go back to original size.
+	// go back to original size.
 	
-	//move back to original location.
+	// move back to original location.
 	self.draggedView.center = originalLocation;
 	
-	//fade out.
+	// fade out.
 	self.draggedView.alpha = 0.5;
 	
 	[UIView commitAnimations];
+	
+	self.drawerVisibilityLevel = DKDrawerVisibilityLevelHidden;
 }
 
 - (void)cancelAnimationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {

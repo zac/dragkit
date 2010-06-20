@@ -27,9 +27,17 @@
 
 @end
 
+typedef enum {
+	DKDrawerVisibilityLevelHidden,
+	DKDrawerVisibilityLevelPeeking,
+	DKDrawerVisibilityLevelVisible,
+} DKDrawerVisibilityLevel;
+
 @interface DKDragDropServer : NSObject {
 	UIView *draggedView;
 	UIView *originalView;
+	
+	DKDrawerVisibilityLevel drawerVisibilityLevel;
 }
 
 + (id)sharedServer;
@@ -38,6 +46,7 @@
 
 @property (nonatomic, retain) UIView *draggedView;
 @property (nonatomic, retain) UIView *originalView;
+@property (nonatomic) DKDrawerVisibilityLevel drawerVisibilityLevel;
 
 - (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource;
 /* Optional parameter for drag identification. */

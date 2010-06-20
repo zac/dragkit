@@ -97,7 +97,7 @@ static DKDragDropServer *sharedInstance = nil;
 #pragma mark -
 #pragma mark Dragging Callback
 
-CGPoint touchOffset;
+CGSize touchOffset;
 
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender {
 	//let the drag server know our frame and that we want to start dragging.
@@ -108,18 +108,15 @@ CGPoint touchOffset;
 	switch ([sender state]) {
 		case UIGestureRecognizerStateBegan:
 			
-			NSLog(@"began");
 			// create the necessary view and animate it.
 			
 			self.originalView = [sender view];
 			
-			CGPoint viewOrigin = [[self.originalView superview] convertPoint:self.originalView.frame.origin toView:[self.originalView window]];
+			touchOffset = CGSizeMake(104, 39);
 			
-			touchOffset = CGPointMake(touchPoint.x - viewOrigin.x, touchPoint.y - viewOrigin.y);
+			CGPoint position = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
 			
-			NSLog(@"touch: %@ view: %@", NSStringFromCGPoint(touchPoint), NSStringFromCGPoint(viewOrigin));
-			
-			[self dk_displayDragViewForView:self.originalView atPoint:touchPoint];
+			[self dk_displayDragViewForView:self.originalView atPoint:position];
 			
 			break;
 		case UIGestureRecognizerStateChanged:
@@ -127,7 +124,7 @@ CGPoint touchOffset;
 			// move the view to any point the sender is.
 			// check for drop zones and light them up if necessary.
 			
-			viewPosition = CGPointMake(touchPoint.x - touchOffset.x, touchPoint.y - touchOffset.y);
+			viewPosition = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
 			
 			[self dk_moveDragViewToPoint:viewPosition];
 			
@@ -175,24 +172,75 @@ CGPoint touchOffset;
 		//grab the image.
 		UIImage *dragImage = [self dk_generateImageForDragFromView:draggableView];
 		
-		CGPoint originalViewOrigin = [[draggableView superview] convertPoint:draggableView.frame.origin toView:[draggableView window]];
-		
-		NSLog(@"converted point: %@ to: %@", NSStringFromCGPoint(draggableView.frame.origin), NSStringFromCGPoint(originalViewOrigin));
-		
 		//transition from the dragImage to our view.
 		
-		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake(originalViewOrigin.x,
-																	 originalViewOrigin.y,
-																	 dragImage.size.width,
-																	 dragImage.size.height)] autorelease];
+		UIImage *background = [UIImage imageNamed:@"drag_view_background.png"];
 		
+		//CGPoint originalViewOrigin = [[self.originalView superview] convertPoint:self.originalView.frame.origin toView:[self.originalView window]];
+		
+		// create our drag view where we want it.
+		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake(point.x,
+																	 point.y,
+																	 background.size.width,
+																	 background.size.height)] autorelease];
+		
+		// then apply a translate and a scale to make it the size/location of the original view.
+		
+		// remove the offset.
+		CGPoint translationPoint = [[self.originalView window] convertPoint:CGPointMake(point.x + touchOffset.width, point.y + touchOffset.height)
+																	 toView:self.originalView];
+		
+		// add back in the offset.
+		translationPoint.x = translationPoint.x - touchOffset.width;
+		translationPoint.y = translationPoint.y - touchOffset.height;
+		
+		NSLog(@"translate: %@", NSStringFromCGPoint(translationPoint));
+		
+		float widthRatio = self.originalView.frame.size.width / self.draggedView.frame.size.width;
+		float heightRatio = self.originalView.frame.size.height / self.draggedView.frame.size.height;
+		
+		float widthDiff = self.originalView.frame.size.width - self.draggedView.frame.size.width;
+		float heightDiff = self.originalView.frame.size.height - self.draggedView.frame.size.height;
+		
+		self.draggedView.transform = CGAffineTransformMakeTranslation(-translationPoint.x + widthDiff / 2.0, -translationPoint.y + heightDiff / 2.0);
+		self.draggedView.transform = CGAffineTransformScale(self.draggedView.transform,
+															widthRatio,
+															heightRatio);
+		
+		
+		//originally the large size.
+		//will animate down.
 		UIImageView *dragImageView = [[UIImageView alloc] initWithFrame:self.draggedView.bounds];
-		dragImageView.image = dragImage;
+		dragImageView.image = background;
+		
+		UIImageView *originalImageView = [[UIImageView alloc] initWithFrame:self.draggedView.bounds];
+		originalImageView.image = dragImage;
 		
 		[self.draggedView addSubview:dragImageView];
-		[dragImageView release];
+		[self.draggedView addSubview:originalImageView];
+		
+		originalImageView.alpha = 1.0;
+		dragImageView.alpha = 0.0;
 		
 		[[draggableView window] addSubview:self.draggedView];
+		
+		[UIView beginAnimations:@"ResizeDragView" context:originalImageView];
+		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+		[UIView setAnimationDuration:0.3];
+		[UIView setAnimationDelegate:self];
+		[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
+		
+		//snap it to normal.
+		self.draggedView.transform = CGAffineTransformIdentity;
+		
+		dragImageView.alpha = 1.0;
+		originalImageView.alpha = 0.0;
+		
+		[UIView commitAnimations];
+		
+		[dragImageView release];
+		[originalImageView release];
+		
 		
 		//TODO: Animate on screen.
 	}
@@ -213,7 +261,7 @@ CGPoint touchOffset;
 	CGPoint originalLocation = [[self.originalView superview] convertPoint:self.originalView.center toView:[self.originalView window]];
 	
 	[UIView beginAnimations:@"SnapBack" context:nil];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
 	[UIView setAnimationDuration:.3];
 	[UIView setAnimationDelegate:self];
 	[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
@@ -229,9 +277,14 @@ CGPoint touchOffset;
 	[UIView commitAnimations];
 }
 
-- (void)cancelAnimationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {	
-	[self.draggedView removeFromSuperview];
-	self.draggedView = nil;
+- (void)cancelAnimationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {
+	
+	if ([animationID isEqualToString:@"SnapBack"]) {
+		[self.draggedView removeFromSuperview];
+		self.draggedView = nil;
+	} else if ([animationID isEqualToString:@"ResizeDragView"]) {
+		[(UIView *)context removeFromSuperview];
+	}
 }
 
 @end

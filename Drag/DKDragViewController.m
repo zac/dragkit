@@ -55,13 +55,30 @@
 	
 	UIView *otherView = [[UIView alloc] initWithFrame:CGRectMake(100, 500, 400, 100)];
 	otherView.backgroundColor = [UIColor yellowColor];
+	
+	[[DKDragDropServer sharedServer] markViewAsDropTarget:otherView withDelegate:self];
+	
 	[self.view addSubview:otherView];
 	NSLog(@"otherFrame: %@", NSStringFromCGRect(otherView.frame));
 	[otherView release];
 	
 }
 
+- (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type {
+	return YES;
+}
 
+- (void)dragDidEnterTargetView:(UIView *)targetView {
+	
+}
+
+- (void)dragDidLeaveTargetView:(UIView *)targetView {
+	
+}
+
+- (void)dropCompletedOnTargetView:(UIView *)targetView withView:(UIView *)view {
+	
+}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Overriden to allow any orientation.

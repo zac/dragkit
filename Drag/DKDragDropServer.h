@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "DKDrawerViewController.h"
+
 @protocol DKDragDataProvider
 
 //array of types supported by view.
@@ -22,7 +24,8 @@
 
 //if any of these return YES for the type, the server does its drop drawing.
 - (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type;
-- (void)dragIsWithinTargetView:(UIView *)targetView;
+- (void)dragDidEnterTargetView:(UIView *)targetView;
+- (void)dragDidLeaveTargetView:(UIView *)targetView;
 - (void)dropCompletedOnTargetView:(UIView *)targetView withView:(UIView *)view;
 
 @end
@@ -37,7 +40,12 @@ typedef enum {
 	UIView *draggedView;
 	UIView *originalView;
 	
+	DKDrawerViewController *drawerController;
+	
 	DKDrawerVisibilityLevel drawerVisibilityLevel;
+	
+	// arrays that store the targets and delegates.
+	NSMutableArray *dk_dropTargets;
 }
 
 + (id)sharedServer;
@@ -46,6 +54,9 @@ typedef enum {
 
 @property (nonatomic, retain) UIView *draggedView;
 @property (nonatomic, retain) UIView *originalView;
+
+@property (nonatomic, retain) DKDrawerViewController *drawerController;
+
 @property (nonatomic) DKDrawerVisibilityLevel drawerVisibilityLevel;
 
 - (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource;

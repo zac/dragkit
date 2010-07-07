@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1100210F11D04A640046072D /* DKDrawerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1100210E11D04A640046072D /* DKDrawerCell.m */; };
+		110021D311D053E70046072D /* DKApplicationRegistration.m in Sources */ = {isa = PBXBuildFile; fileRef = 110021D211D053E70046072D /* DKApplicationRegistration.m */; };
 		111F001611CDE11D004AED24 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 111F001511CDE11D004AED24 /* QuartzCore.framework */; };
 		111F011D11CE2756004AED24 /* DKDropTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F011C11CE2756004AED24 /* DKDropTarget.m */; };
 		111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F3616117E9E2200B72C00 /* DKDragViewController.m */; };
@@ -34,6 +36,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1100210D11D04A640046072D /* DKDrawerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDrawerCell.h; sourceTree = "<group>"; };
+		1100210E11D04A640046072D /* DKDrawerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDrawerCell.m; sourceTree = "<group>"; };
+		110021D111D053E70046072D /* DKApplicationRegistration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKApplicationRegistration.h; sourceTree = "<group>"; };
+		110021D211D053E70046072D /* DKApplicationRegistration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKApplicationRegistration.m; sourceTree = "<group>"; };
 		111F001511CDE11D004AED24 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		111F011B11CE2756004AED24 /* DKDropTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDropTarget.h; sourceTree = "<group>"; };
 		111F011C11CE2756004AED24 /* DKDropTarget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDropTarget.m; sourceTree = "<group>"; };
@@ -62,6 +68,7 @@
 		111FFFD511CDDDCF004AED24 /* UIColor+AQGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+AQGridView.m"; path = "../AQGridView/Classes/UIColor+AQGridView.m"; sourceTree = SOURCE_ROOT; };
 		117462A011CD95C300BAD1D9 /* drag_view_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = drag_view_background.png; sourceTree = "<group>"; };
 		117462A111CD95C300BAD1D9 /* drag_view_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "drag_view_background@2x.png"; sourceTree = "<group>"; };
+		11AB612811D1C8BA00D13C90 /* DragKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DragKit.h; sourceTree = "<group>"; };
 		11DF18E1117EA17B00233A48 /* DKDragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragView.h; sourceTree = "<group>"; };
 		11DF18E2117EA17B00233A48 /* DKDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragView.m; sourceTree = "<group>"; };
 		11DF18EB117EA66E00233A48 /* DKDragDropServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragDropServer.h; sourceTree = "<group>"; };
@@ -172,6 +179,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				11AB612811D1C8BA00D13C90 /* DragKit.h */,
 				111F3615117E9E2200B72C00 /* DKDragViewController.h */,
 				111F3616117E9E2200B72C00 /* DKDragViewController.m */,
 				11DF18E1117EA17B00233A48 /* DKDragView.h */,
@@ -180,6 +188,10 @@
 				111FFFAE11CDDC72004AED24 /* DKDrawerViewController.m */,
 				11DF18EB117EA66E00233A48 /* DKDragDropServer.h */,
 				11DF18EC117EA66E00233A48 /* DKDragDropServer.m */,
+				1100210D11D04A640046072D /* DKDrawerCell.h */,
+				1100210E11D04A640046072D /* DKDrawerCell.m */,
+				110021D111D053E70046072D /* DKApplicationRegistration.h */,
+				110021D211D053E70046072D /* DKApplicationRegistration.m */,
 				111F011B11CE2756004AED24 /* DKDropTarget.h */,
 				111F011C11CE2756004AED24 /* DKDropTarget.m */,
 				2860E32A111B888700E27156 /* iPad */,
@@ -287,6 +299,8 @@
 				111FFFDC11CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.m in Sources */,
 				111FFFDD11CDDDCF004AED24 /* UIColor+AQGridView.m in Sources */,
 				111F011D11CE2756004AED24 /* DKDropTarget.m in Sources */,
+				1100210F11D04A640046072D /* DKDrawerCell.m in Sources */,
+				110021D311D053E70046072D /* DKApplicationRegistration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,6 +340,7 @@
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
@@ -341,6 +356,7 @@
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1;

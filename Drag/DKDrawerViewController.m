@@ -8,6 +8,8 @@
 
 #import "DKDrawerViewController.h"
 
+#import "DKDrawerCell.h"
+
 @implementation DKDrawerViewController
 
 @synthesize gridView;
@@ -36,10 +38,11 @@
 	
 	UIView *contentView = [[UIView alloc] initWithFrame:CGRectZero];
 	
-	contentView.backgroundColor = [UIColor redColor];
-	
 	self.gridView = [[[AQGridView alloc] initWithFrame:CGRectZero] autorelease];
+	self.gridView.backgroundColor = [UIColor redColor];
 	self.gridView.dataSource = self;
+	
+	self.gridView.resizesCellWidthToFit = NO;
 	
 	self.gridView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
 	
@@ -47,6 +50,17 @@
 	self.view = contentView;
 	[contentView release];
 }
+
+- (void)viewWillAppear:(BOOL)animated {
+	[super viewWillAppear:animated];
+	
+	[self.gridView reloadData];
+}
+
+- (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type { return YES; }
+- (void)dragDidEnterTargetView:(UIView *)targetView { NSLog(@"enter: %@", targetView); }
+- (void)dragDidLeaveTargetView:(UIView *)targetView { NSLog(@"leave: %@", targetView); }
+- (void)dropCompletedOnTargetView:(UIView *)targetView withView:(UIView *)theView { NSLog(@"completed drop of %@ on %@.", theView, targetView); }
 
 #pragma mark -
 #pragma mark AQGridView Data Source
@@ -58,9 +72,10 @@
 - (AQGridViewCell *) gridView: (AQGridView *) theGridView cellForItemAtIndex: (NSUInteger) index {
 	static NSString *CellIdentifier = @"Cell";
     
-    AQGridViewCell *cell = [theGridView dequeueReusableCellWithIdentifier:CellIdentifier];
+	DKDrawerCell *cell = (DKDrawerCell *)[theGridView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[[AQGridViewCell alloc] initWithFrame:CGRectMake(0, 0, 100, 100) reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[[DKDrawerCell alloc] initWithFrame:CGRectMake(0, 0, 50, 50) reuseIdentifier:CellIdentifier] autorelease];
+		[[DKDragDropServer sharedServer] markViewAsDropTarget:cell withDelegate:self];
     }
     
 	cell.backgroundColor = [UIColor grayColor];

@@ -21,7 +21,7 @@
 
 @property (nonatomic, retain) UIView *dropView;
 @property (nonatomic, assign) NSObject<DKDropDelegate> *dropDelegate;
-@property (nonatomic) CGRect frameInWindow;
+@property (nonatomic, readonly) CGRect frameInWindow;
 
 @property (nonatomic) BOOL containsDragView;
 

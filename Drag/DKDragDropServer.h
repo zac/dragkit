@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "DKDrawerViewController.h"
+//#import "DKDragDropServer+Registration.h"
 
 @protocol DKDragDataProvider
 
@@ -36,9 +36,13 @@ typedef enum {
 	DKDrawerVisibilityLevelVisible,
 } DKDrawerVisibilityLevel;
 
+@class DKDrawerViewController;
+
 @interface DKDragDropServer : NSObject {
 	UIView *draggedView;
 	UIView *originalView;
+	
+	UIWindow *_mainAppWindow;
 	
 	DKDrawerViewController *drawerController;
 	
@@ -49,6 +53,11 @@ typedef enum {
 }
 
 + (id)sharedServer;
+
+//application registration.
+- (void)registerApplicationWithTypes:(NSArray *)types;
+- (NSArray *)registeredApplications;
+- (UIPasteboard *)pasteboardAddedToManifest;
 
 - (void)cancelDrag;
 

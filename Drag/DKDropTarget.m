@@ -10,23 +10,20 @@
 
 
 @implementation DKDropTarget
-@synthesize dropView, dropDelegate, frameInWindow, containsDragView;
+
+@synthesize dropView, dropDelegate, containsDragView;
+@dynamic frameInWindow;
 
 - (id)init {
 	if (!(self = [super init])) return nil;
 	
-	self.frameInWindow = CGRectZero;
 	self.containsDragView = NO;
 	
 	return self;
 }
 
 - (CGRect)frameInWindow {
-	if (CGRectEqualToRect(frameInWindow, CGRectZero)) {
-		frameInWindow = [[self.dropView superview] convertRect:self.dropView.frame toView:[self.dropView window]];
-	}
-	
-	return frameInWindow;
+	return [[self.dropView superview] convertRect:self.dropView.frame toView:[self.dropView window]];
 }
 
 - (void)dealloc {

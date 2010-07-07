@@ -8,9 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+#import "DKDragDropServer.h"
+
 #import "AQGridView.h"
 
-@interface DKDrawerViewController : UIViewController <AQGridViewDataSource> {
+@interface DKDrawerViewController : UIViewController <AQGridViewDataSource, DKDropDelegate> {
 	AQGridView *gridView;
 }
 

@@ -17,6 +17,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
 	
+	[[DKDragDropServer sharedServer] registerApplicationWithTypes:nil];
+	
     // Override point for customization after application launch
 	
 	DKDragViewController *dragViewController = [[DKDragViewController alloc] initWithNibName:nil bundle:nil];

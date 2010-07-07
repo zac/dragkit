@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import "DKDragdropServer.h"
+#import "DKDragDropServer.h"
 
 @interface DKDragViewController : UIViewController <DKDragDataProvider, DKDropDelegate> {
 

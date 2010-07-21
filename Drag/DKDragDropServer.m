@@ -43,6 +43,7 @@ static DKDragDropServer *sharedInstance = nil;
 
 + (void)initialize {
 	if (!sharedInstance) {
+		//TODO: Check for plist entries for supported types.
 		[[self alloc] init];
 	}
 }
@@ -50,6 +51,10 @@ static DKDragDropServer *sharedInstance = nil;
 + (id)sharedServer {
 	//already created by +initialize
 	return sharedInstance;
+}
+
++ (NSString *)versionString {
+	return @"1.0";
 }
 
 + (id)allocWithZone:(NSZone *)zone {
@@ -104,14 +109,49 @@ static DKDragDropServer *sharedInstance = nil;
 	
 	UIPasteboard *registrationPasteboard = [self pasteboardAddedToManifest];
 	
-	NSData *registrationData = [NSKeyedArchiver archivedDataWithRootObject:[DKApplicationRegistration registrationWithDragTypes:types]];
+	DKApplicationRegistration *appRegistration = [DKApplicationRegistration registrationWithDragTypes:types];
+	
+	NSData *registrationData = [NSKeyedArchiver archivedDataWithRootObject:appRegistration];
 	
 	[registrationPasteboard setData:registrationData forPasteboardType:@"dragkit.registration"];
 }
 
 - (NSArray *)registeredApplications {
 	//returns all registered applications.
-	return nil;
+	
+	// add the suite name.
+	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"DragKit"];
+	
+	// we definitely should have this.
+	NSDictionary *manifest = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"dragkit-manifest"];
+	
+	NSAssert(manifest, @"Expected a DragKit manifest to already be created.");
+	
+	NSMutableArray *registeredApplications = [NSMutableArray array];
+	
+	for (NSString *bundleIdentifier in manifest) {
+		
+		if ([bundleIdentifier isEqualToString:[[NSBundle mainBundle] bundleIdentifier]]) {
+			continue;
+		}
+		
+		NSString *pasteboardName = [manifest objectForKey:bundleIdentifier];
+		
+		UIPasteboard *registrationPasteboard = [UIPasteboard pasteboardWithName:pasteboardName create:NO];
+		if (registrationPasteboard) {
+			
+			NSData *pasteboardData = [registrationPasteboard dataForPasteboardType:@"dragkit.registration"];
+			
+			DKApplicationRegistration *appRegistration = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
+			[registeredApplications addObject:appRegistration];
+		} else {
+			//TODO: Update the manifest and remove that key/value.
+		}
+	}
+	
+	[[NSUserDefaults standardUserDefaults] removeSuiteNamed:@"DragKit"];
+	
+	return registeredApplications;
 }
 
 - (UIPasteboard *)pasteboardAddedToManifest {
@@ -120,21 +160,23 @@ static DKDragDropServer *sharedInstance = nil;
 	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"DragKit"];
 	
 	//check to see if the manifest has been created yet.
-	BOOL manifestCreated = [[NSUserDefaults standardUserDefaults] boolForKey:@"dragkit-manifestCreated"];
-	if (manifestCreated) {
-		NSString *pasteboardName = [[NSUserDefaults standardUserDefaults] stringForKey:[NSString stringWithFormat:@"dragkit-registration-pasteboard:%@", [[NSBundle mainBundle] bundleIdentifier]]];
-		return [UIPasteboard pasteboardWithName:pasteboardName create:NO];
+	
+	//TODO: probably change to an array at some point.
+	NSDictionary *manifest = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"dragkit-manifest"];
+	
+	UIPasteboard *pasteboard = nil;
+	if (!manifest) {
+		
+		pasteboard = [UIPasteboard pasteboardWithUniqueName];
+		pasteboard.persistent = YES;
+		
+		NSDictionary *singleEntry = [NSDictionary dictionaryWithObject:pasteboard.name forKey:[[NSBundle mainBundle] bundleIdentifier]];
+		
+		[[NSUserDefaults standardUserDefaults] setObject:singleEntry forKey:@"dragkit-manifest"];
+	} else {
+		NSString *pasteboardName = [manifest objectForKey:[[NSBundle mainBundle] bundleIdentifier]];
+		pasteboard = [UIPasteboard pasteboardWithName:pasteboardName create:NO];
 	}
-	
-	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"dragkit-manifestCreated"];
-	
-	UIPasteboard *pasteboard = [UIPasteboard pasteboardWithUniqueName];
-	pasteboard.persistent = YES;
-	
-	NSString *keyName = [NSString stringWithFormat:@"dragkit-registration-pasteboard:%@", [[NSBundle mainBundle] bundleIdentifier]];
-	
-	//add a preference for the pasteboard name that holds the registration object.
-	[[NSUserDefaults standardUserDefaults] setObject:pasteboard.name forKey:keyName];
 	
 	[[NSUserDefaults standardUserDefaults] removeSuiteNamed:@"DragKit"];
 	

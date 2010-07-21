@@ -17,7 +17,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
 	
-	[[DKDragDropServer sharedServer] registerApplicationWithTypes:nil];
+	[[DKDragDropServer sharedServer] registerApplicationWithTypes:[NSArray arrayWithObject:@"public.image"]];
 	
     // Override point for customization after application launch
 	

@@ -13,9 +13,13 @@
 #import "AQGridView.h"
 
 @interface DKDrawerViewController : UIViewController <AQGridViewDataSource, DKDropDelegate> {
+	
+	NSArray *supportedApplications;
+	
 	AQGridView *gridView;
 }
 
+@property (nonatomic, retain) NSArray *supportedApplications;
 @property (nonatomic, retain) AQGridView *gridView;
 
 @end

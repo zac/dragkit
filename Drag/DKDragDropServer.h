@@ -53,6 +53,7 @@ typedef enum {
 }
 
 + (id)sharedServer;
++ (NSString *)versionString;
 
 //application registration.
 - (void)registerApplicationWithTypes:(NSArray *)types;

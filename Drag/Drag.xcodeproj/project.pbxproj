@@ -138,6 +138,32 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		11E6EFD611F6A06A00F1F29C /* DragKit */ = {
+			isa = PBXGroup;
+			children = (
+				11AB612811D1C8BA00D13C90 /* DragKit.h */,
+				11DF18EB117EA66E00233A48 /* DKDragDropServer.h */,
+				11DF18EC117EA66E00233A48 /* DKDragDropServer.m */,
+				110021D111D053E70046072D /* DKApplicationRegistration.h */,
+				110021D211D053E70046072D /* DKApplicationRegistration.m */,
+				111F011B11CE2756004AED24 /* DKDropTarget.h */,
+				111F011C11CE2756004AED24 /* DKDropTarget.m */,
+				11E6EFD911F6A08D00F1F29C /* Drawer */,
+			);
+			name = DragKit;
+			sourceTree = "<group>";
+		};
+		11E6EFD911F6A08D00F1F29C /* Drawer */ = {
+			isa = PBXGroup;
+			children = (
+				111FFFAD11CDDC72004AED24 /* DKDrawerViewController.h */,
+				111FFFAE11CDDC72004AED24 /* DKDrawerViewController.m */,
+				1100210D11D04A640046072D /* DKDrawerCell.h */,
+				1100210E11D04A640046072D /* DKDrawerCell.m */,
+			);
+			name = Drawer;
+			sourceTree = "<group>";
+		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -179,21 +205,11 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				11AB612811D1C8BA00D13C90 /* DragKit.h */,
 				111F3615117E9E2200B72C00 /* DKDragViewController.h */,
 				111F3616117E9E2200B72C00 /* DKDragViewController.m */,
 				11DF18E1117EA17B00233A48 /* DKDragView.h */,
 				11DF18E2117EA17B00233A48 /* DKDragView.m */,
-				111FFFAD11CDDC72004AED24 /* DKDrawerViewController.h */,
-				111FFFAE11CDDC72004AED24 /* DKDrawerViewController.m */,
-				11DF18EB117EA66E00233A48 /* DKDragDropServer.h */,
-				11DF18EC117EA66E00233A48 /* DKDragDropServer.m */,
-				1100210D11D04A640046072D /* DKDrawerCell.h */,
-				1100210E11D04A640046072D /* DKDrawerCell.m */,
-				110021D111D053E70046072D /* DKApplicationRegistration.h */,
-				110021D211D053E70046072D /* DKApplicationRegistration.m */,
-				111F011B11CE2756004AED24 /* DKDropTarget.h */,
-				111F011C11CE2756004AED24 /* DKDropTarget.m */,
+				11E6EFD611F6A06A00F1F29C /* DragKit */,
 				2860E32A111B888700E27156 /* iPad */,
 				2860E324111B887F00E27156 /* iPhone */,
 				28EEBF621118D79A00187D67 /* Shared */,

@@ -12,12 +12,12 @@
 
 @implementation DKDrawerViewController
 
-@synthesize gridView;
+@synthesize gridView, supportedApplications;
 
 - (id)init {
 	if (!(self = [super initWithNibName:nil bundle:nil])) return nil;
 	
-	
+	self.supportedApplications = [[DKDragDropServer sharedServer] registeredApplications];
 	
 	return self;
 }
@@ -66,7 +66,7 @@
 #pragma mark AQGridView Data Source
 
 - (NSUInteger) numberOfItemsInGridView: (AQGridView *) theGridView {
-	return 5;
+	return [self.supportedApplications count];
 }
 
 - (AQGridViewCell *) gridView: (AQGridView *) theGridView cellForItemAtIndex: (NSUInteger) index {

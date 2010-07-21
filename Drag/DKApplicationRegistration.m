@@ -8,6 +8,7 @@
 
 #import "DKApplicationRegistration.h"
 
+#import "DKDragDropServer.h"
 
 @implementation DKApplicationRegistration
 
@@ -31,10 +32,12 @@
 	for (NSString *iconPath in iconNames) {
 		//read each icon in and determine the size.
 		NSString *fullPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:iconPath];
+		NSLog(@"full: %@", fullPath);
 	}
 	
 	appRegistration.iconPrerendered = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIPrerenderedIcon"] boolValue];
 	appRegistration.supportedDragTypes = dragTypes;
+	appRegistration.frameworkVersion = [DKDragDropServer versionString];
 	
 	return [appRegistration autorelease];
 }
@@ -49,7 +52,7 @@
 	self.icon57 = [coder decodeObjectForKey:@"icon57"];
 	
 	self.iconPrerendered = [[coder decodeObjectForKey:@"iconPrerendered"] boolValue];
-	
+	self.frameworkVersion = [coder decodeObjectForKey:@"frameworkVersion"];
 	self.supportedDragTypes = [coder decodeObjectForKey:@"supportedDragTypes"];
 	
 	return self;
@@ -61,6 +64,7 @@
 	[coder encodeObject:UIImagePNGRepresentation(self.icon57) forKey:@"icon57"];
 	
 	[coder encodeObject:[NSNumber numberWithBool:self.iconPrerendered] forKey:@"iconPrerendered"];
+	[coder encodeObject:self.frameworkVersion forKey:@"frameworkVersion"];
 	[coder encodeObject:self.supportedDragTypes forKey:@"supportedDragTypes"];
 }
 

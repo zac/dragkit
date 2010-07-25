@@ -128,7 +128,7 @@ static DKDragDropServer *sharedInstance = nil;
 	NSAssert(manifest, @"Expected a DragKit manifest to already be created.");
 	
 	NSMutableArray *registeredApplications = [NSMutableArray array];
-	
+	NSMutableArray *keysToDelete = [NSMutableArray array];
 	for (NSString *bundleIdentifier in manifest) {
 		
 		if ([bundleIdentifier isEqualToString:[[NSBundle mainBundle] bundleIdentifier]]) {
@@ -145,9 +145,14 @@ static DKDragDropServer *sharedInstance = nil;
 			DKApplicationRegistration *appRegistration = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
 			[registeredApplications addObject:appRegistration];
 		} else {
-			//TODO: Update the manifest and remove that key/value.
+			[keysToDelete addObject:bundleIdentifier];
 		}
 	}
+	
+	NSMutableDictionary *fixedDictionary = [NSMutableDictionary dictionaryWithDictionary:manifest];
+	[fixedDictionary removeObjectsForKeys:keysToDelete];
+	
+	[[NSUserDefaults standardUserDefaults] setObject:fixedDictionary forKey:@"dragkit-manifest"];
 	
 	[[NSUserDefaults standardUserDefaults] removeSuiteNamed:@"DragKit"];
 	

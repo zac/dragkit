@@ -21,6 +21,7 @@
 	
 	self.supportedApplications = [[DKDragDropServer sharedServer] registeredApplications];
 	self.externalApplications = [NSMutableArray array];
+	
 	return self;
 }
 

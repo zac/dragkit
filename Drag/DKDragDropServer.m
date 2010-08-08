@@ -122,6 +122,8 @@ static DKDragDropServer *sharedInstance = nil;
 	
 	NSData *registrationData = [NSKeyedArchiver archivedDataWithRootObject:appRegistration];
 	
+	NSLog(@"data: %@", registrationData);
+	
 	[registrationPasteboard setData:registrationData forPasteboardType:@"dragkit.registration"];
 }
 
@@ -154,6 +156,8 @@ static DKDragDropServer *sharedInstance = nil;
 			DKApplicationRegistration *appRegistration = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
 			[registeredApplications addObject:appRegistration];
 		} else {
+			// we don't have a registered pasteboard.
+			// the app must have been deleted.
 			[keysToDelete addObject:bundleIdentifier];
 		}
 	}
@@ -179,7 +183,7 @@ static DKDragDropServer *sharedInstance = nil;
 	NSDictionary *manifest = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"dragkit-manifest"];
 	
 	UIPasteboard *pasteboard = nil;
-	if (!manifest) {
+	if (!manifest || ![manifest objectForKey:[[NSBundle mainBundle] bundleIdentifier]]) {
 		
 		pasteboard = [UIPasteboard pasteboardWithUniqueName];
 		pasteboard.persistent = YES;
@@ -189,7 +193,7 @@ static DKDragDropServer *sharedInstance = nil;
 		[[NSUserDefaults standardUserDefaults] setObject:singleEntry forKey:@"dragkit-manifest"];
 	} else {
 		NSString *pasteboardName = [manifest objectForKey:[[NSBundle mainBundle] bundleIdentifier]];
-		pasteboard = [UIPasteboard pasteboardWithName:pasteboardName create:NO];
+		pasteboard = [UIPasteboard pasteboardWithName:pasteboardName create:YES];
 	}
 	
 	[[NSUserDefaults standardUserDefaults] removeSuiteNamed:@"DragKit"];
@@ -299,9 +303,6 @@ CGSize touchOffset;
 				
 				// de-highlight the view.
 				[self dk_setView:droppedTarget.dropView highlighted:NO animated:YES];
-				
-				// rehide the drawer.
-				self.drawerVisibilityLevel = DKDrawerVisibilityLevelHidden;
 				
 			} else {
 				[self cancelDrag];
@@ -642,6 +643,9 @@ CGSize touchOffset;
 	if ([animationID isEqualToString:@"SnapBack"] || [animationID isEqualToString:@"DropSuck"]) {
 		[self.draggedView removeFromSuperview];
 		self.draggedView = nil;
+		
+		self.drawerVisibilityLevel = DKDrawerVisibilityLevelHidden;
+		
 	} else if ([animationID isEqualToString:@"ResizeDragView"]) {
 		[(UIView *)context removeFromSuperview];
 	}

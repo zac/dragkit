@@ -33,9 +33,13 @@ typedef enum {
 @interface DKExternalApplicationRegistration : DKApplicationRegistration {
 	NSString *peerID;
 	DKExternalApplicaionState currentState;
+	
+	NSObject<DKExternalApplicationRegistrationDelegate> *delegate;
 }
 
 @property (nonatomic, copy) NSString *peerID;
 @property DKExternalApplicaionState currentState;
+
+@property (nonatomic, assign) NSObject<DKExternalApplicationRegistrationDelegate> *delegate;
 
 @end

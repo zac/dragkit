@@ -289,6 +289,11 @@ CGSize touchOffset;
 			if (droppedTarget) {
 				CGPoint centerOfView = [[droppedTarget.dropView superview] convertPoint:droppedTarget.dropView.center toView:[self dk_mainAppWindow]];
 				
+				// TODO: Fix this message.
+				if ([droppedTarget.dropDelegate respondsToSelector:@selector(dropCompletedOnTargetView:withView:)]) {
+					[droppedTarget.dropDelegate dropCompletedOnTargetView:droppedTarget.dropView withView:nil];
+				}
+				
 				// collapse the drag view into the drop view.
 				[self dk_collapseDragViewAtPoint:centerOfView];
 				
@@ -440,11 +445,11 @@ CGSize touchOffset;
 		if (CGRectContainsPoint(target.frameInWindow, point)) {
 			//message the target.
 			
-			//TODO: Make the DKDropTarget message the view?
-			
 			[self dk_setView:target.dropView highlighted:YES animated:YES];
 			
-			if (!target.containsDragView) [target.dropDelegate dragDidEnterTargetView:target.dropView];
+			if (!target.containsDragView && [target.dropDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
+				[target.dropDelegate dragDidEnterTargetView:target.dropView];
+			}
 			
 			target.containsDragView = YES;
 			
@@ -453,7 +458,9 @@ CGSize touchOffset;
 			
 			[self dk_setView:target.dropView highlighted:NO animated:YES];
 			
-			if (target.containsDragView) [target.dropDelegate dragDidLeaveTargetView:target.dropView];
+			if (target.containsDragView && [target.dropDelegate respondsToSelector:@selector(dragDidLeaveTargetView:)]) {
+				[target.dropDelegate dragDidLeaveTargetView:target.dropView];
+			}
 			
 			target.containsDragView = NO;
 		}

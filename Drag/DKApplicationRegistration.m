@@ -14,7 +14,7 @@
 
 @synthesize icon114, icon72, icon57, iconPrerendered;
 @synthesize frameworkVersion;
-@synthesize supportedDragTypes;
+@synthesize urlScheme, supportedDragTypes;
 
 + (DKApplicationRegistration *)registrationWithDragTypes:(NSArray *)dragTypes {
 	
@@ -36,8 +36,10 @@
 	}
 	
 	appRegistration.iconPrerendered = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIPrerenderedIcon"] boolValue];
-	appRegistration.supportedDragTypes = dragTypes;
 	appRegistration.frameworkVersion = [DKDragDropServer versionString];
+	appRegistration.supportedDragTypes = dragTypes;
+	
+	appRegistration.urlScheme = [NSString stringWithFormat:@"x-drag-%@", [[NSBundle mainBundle] bundleIdentifier]];
 	
 	return [appRegistration autorelease];
 }
@@ -54,6 +56,7 @@
 	self.iconPrerendered = [[coder decodeObjectForKey:@"iconPrerendered"] boolValue];
 	self.frameworkVersion = [coder decodeObjectForKey:@"frameworkVersion"];
 	self.supportedDragTypes = [coder decodeObjectForKey:@"supportedDragTypes"];
+	self.urlScheme = [coder decodeObjectForKey:@"urlScheme"];
 	
 	return self;
 }
@@ -66,6 +69,7 @@
 	[coder encodeObject:[NSNumber numberWithBool:self.iconPrerendered] forKey:@"iconPrerendered"];
 	[coder encodeObject:self.frameworkVersion forKey:@"frameworkVersion"];
 	[coder encodeObject:self.supportedDragTypes forKey:@"supportedDragTypes"];
+	[coder encodeObject:self.urlScheme forKey:@"urlScheme"];
 }
 
 - (void)dealloc {
@@ -77,6 +81,8 @@
 	self.frameworkVersion = nil;
 	
 	self.supportedDragTypes = nil;
+	
+	self.urlScheme = nil;
 	
 	[super dealloc];
 }

@@ -14,6 +14,7 @@
 #import "DKDrawerViewController.h"
 
 #import "DKApplicationRegistration.h"
+#import "DKExternalApplicationRegistration.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -79,6 +80,14 @@ static DKDragDropServer *sharedInstance = nil;
 													 selector:@selector(dk_handleURL:)
 														 name:UIApplicationDidFinishLaunchingNotification
 													   object:nil];
+			
+			dk_externalApplications = [[NSMutableDictionary alloc] init];
+			
+			dk_gameKitSession = [[GKSession alloc] initWithSessionID:@"DragKitSession" displayName:[[UIDevice currentDevice] name] sessionMode:GKSessionModePeer];
+			dk_gameKitSession.delegate = self;
+			
+			//start advertising immediately.
+			dk_gameKitSession.available = YES;
 		}
 		
 		//Assign sharedInstance here so that we don't end up with multiple instances if a caller calls +alloc/-init without going through +sharedInstance.
@@ -279,7 +288,16 @@ CGSize touchOffset;
 			
 			if (droppedTarget) {
 				CGPoint centerOfView = [[droppedTarget.dropView superview] convertPoint:droppedTarget.dropView.center toView:[self dk_mainAppWindow]];
+				
+				// collapse the drag view into the drop view.
 				[self dk_collapseDragViewAtPoint:centerOfView];
+				
+				// de-highlight the view.
+				[self dk_setView:droppedTarget.dropView highlighted:NO animated:YES];
+				
+				// rehide the drawer.
+				self.drawerVisibilityLevel = DKDrawerVisibilityLevelHidden;
+				
 			} else {
 				[self cancelDrag];
 			}
@@ -343,9 +361,58 @@ CGSize touchOffset;
 }
 
 #pragma mark -
+#pragma mark GameKit Session Delegate
+
+- (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state {
+	// update the state of the item in the drawer to reflect the new state.
+	NSLog(@"peer: %@ didChangeState: %d", state);
+	
+	if (state == GKPeerStateAvailable) {
+		
+		DKExternalApplicationRegistration *externalApp = [dk_externalApplications objectForKey:peerID];
+		
+		if (!externalApp) {
+			// create the application and insert it into our dictionary.
+			externalApp = [[DKExternalApplicationRegistration alloc] init];
+			externalApp.peerID = peerID;
+			
+			// the state is idle for now until we get more registration information.
+			externalApp.currentState = DKExternalApplicaionStateIdle;
+		}
+	} else if (state == GKPeerStateUnavailable) {
+		
+		NSLog(@"Device became unavailable: %@", peerID);
+		
+		// the device became unavailable.
+		[[dk_externalApplications objectForKey:peerID] setCurrentState:DKExternalApplicaionStateDisconnected];
+		[dk_externalApplications removeObjectForKey:peerID];
+	}
+}
+
+- (void)session:(GKSession *)session didReceiveConnectionRequestFromPeer:(NSString *)peerID {
+	// a peer wants to connect.
+	NSError *error = nil;
+	BOOL connectionAccepted = [session acceptConnectionFromPeer:peerID error:&error];
+	
+	if (!connectionAccepted) {
+		//could not accept connection.
+		NSLog(@"Could not accept connection: %@", error);
+	}
+}
+
+- (void)session:(GKSession *)session connectionWithPeerFailed:(NSString *)peerID withError:(NSError *)error {
+	// some error occurred while trying to connect to peer.
+	NSLog(@"Couldn't connect with peer %@: %@", peerID, error);
+}
+
+- (void)session:(GKSession *)session didFailWithError:(NSError *)error {
+	NSLog(@"Session failed: %@", error);
+}
+
+#pragma mark -
 #pragma mark URL Open Handlers
 
-// DragKit URLs look like so: x-appname://?dkpasteboard=23402349343&type=image.png
+// DragKit URLs look like so: x-drag-com.zacwhite.appname://?dkpasteboard=23402349343&type=image.png
 
 - (void)dk_handleURL:(NSNotification *)notification {
 	//handle the URL!
@@ -577,6 +644,9 @@ CGSize touchOffset;
 	
 	[dk_dropTargets release];
 	[_mainAppWindow release];
+	
+	[dk_externalApplications release];
+	[dk_gameKitSession release];
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	

@@ -7,7 +7,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>x-drag</string>
+				<string>x-drag-com.zacwhite.${PRODUCT_NAME:rfc1034identifier}</string>
 			</array>
 			<key>CFBundleURLName</key>
 			<string>com.zacwhite.${PRODUCT_NAME:rfc1034identifier}</string>

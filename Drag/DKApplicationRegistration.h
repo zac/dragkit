@@ -23,6 +23,9 @@
 	//true if the icon is pre-rendered.
 	BOOL iconPrerendered;
 	
+	//the url scheme to launch this app.
+	NSString *urlScheme;
+	
 	//an array of supported drag types.
 	NSArray *supportedDragTypes;
 }
@@ -34,6 +37,7 @@
 @property (nonatomic, retain) UIImage *icon57;
 @property (nonatomic, copy) NSString *frameworkVersion;
 @property (nonatomic) BOOL iconPrerendered;
+@property (nonatomic, copy) NSString *urlScheme;
 @property (nonatomic, copy) NSArray *supportedDragTypes;
 
 @end

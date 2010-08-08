@@ -15,11 +15,13 @@
 @interface DKDrawerViewController : UIViewController <AQGridViewDataSource, DKDropDelegate> {
 	
 	NSArray *supportedApplications;
+	NSMutableArray *externalApplications;
 	
 	AQGridView *gridView;
 }
 
 @property (nonatomic, retain) NSArray *supportedApplications;
+@property (nonatomic, retain) NSMutableArray *externalApplications;
 @property (nonatomic, retain) AQGridView *gridView;
 
 @end

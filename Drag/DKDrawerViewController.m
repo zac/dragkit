@@ -10,29 +10,27 @@
 
 #import "DKDrawerCell.h"
 
+#import "DKApplicationRegistration.h"
+
 @implementation DKDrawerViewController
 
-@synthesize gridView, supportedApplications;
+@synthesize gridView, supportedApplications, externalApplications;
 
 - (id)init {
 	if (!(self = [super initWithNibName:nil bundle:nil])) return nil;
 	
 	self.supportedApplications = [[DKDragDropServer sharedServer] registeredApplications];
-	
+	self.externalApplications = [NSMutableArray array];
 	return self;
 }
 
-/*
- // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
-        // Custom initialization
-    }
-    return self;
+- (void)addExternalApplication:(DKApplicationRegistration *)external {
+	[self.externalApplications addObject:external];
+	
+	NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange([self.supportedApplications count] + [self.externalApplications count] - 1, 1)];
+	[self.gridView insertItemsAtIndices:indexSet withAnimation:AQGridViewItemAnimationFade];
 }
-*/
 
-// Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView {
 	[super loadView];
 	
@@ -66,7 +64,7 @@
 #pragma mark AQGridView Data Source
 
 - (NSUInteger) numberOfItemsInGridView: (AQGridView *) theGridView {
-	return [self.supportedApplications count];
+	return [self.supportedApplications count] + [self.externalApplications count];
 }
 
 - (AQGridViewCell *) gridView: (AQGridView *) theGridView cellForItemAtIndex: (NSUInteger) index {
@@ -78,27 +76,19 @@
 		[[DKDragDropServer sharedServer] markViewAsDropTarget:cell withDelegate:self];
     }
     
-	cell.backgroundColor = [UIColor grayColor];
+	DKApplicationRegistration *appRegistration = nil;
+	if (index < [self.supportedApplications count]) {
+		appRegistration = [self.supportedApplications objectAtIndex:index];
+		cell.backgroundColor = [UIColor grayColor];
+	} else {
+		appRegistration = [self.externalApplications objectAtIndex:index - [self.supportedApplications count]];
+		cell.backgroundColor = [UIColor greenColor];
+	}
+	
 	cell.selectionStyle = AQGridViewCellSelectionStyleGlow;
 	
     return cell;
 }
-
-
-/*
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {
-    [super viewDidLoad];
-}
-*/
-
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-*/
 
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.

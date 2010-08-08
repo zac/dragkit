@@ -7,8 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
-//#import "DKDragDropServer+Registration.h"
+#import <GameKit/GameKit.h>
 
 @protocol DKDragDataProvider
 
@@ -38,7 +37,7 @@ typedef enum {
 
 @class DKDrawerViewController;
 
-@interface DKDragDropServer : NSObject {
+@interface DKDragDropServer : NSObject <GKSessionDelegate> {
 	UIView *draggedView;
 	UIView *originalView;
 	
@@ -47,6 +46,12 @@ typedef enum {
 	DKDrawerViewController *drawerController;
 	
 	DKDrawerVisibilityLevel drawerVisibilityLevel;
+	
+	// the GameKit session.
+	GKSession *dk_gameKitSession;
+	
+	// the external application registrations keyed with the peerID from GameKit.
+	NSMutableDictionary *dk_externalApplications;
 	
 	// arrays that store the targets and delegates.
 	NSMutableArray *dk_dropTargets;

@@ -18,6 +18,8 @@
 
 #import <QuartzCore/QuartzCore.h>
 
+#import <objc/runtime.h>
+
 static DKDragDropServer *sharedInstance = nil;
 
 @interface DKDragDropServer (DKPrivate)
@@ -102,16 +104,16 @@ static DKDragDropServer *sharedInstance = nil;
 }
 
 - (UIWindow *)dk_mainAppWindow {
-	if (_mainAppWindow) return _mainAppWindow;
+	if (dk_mainAppWindow) return dk_mainAppWindow;
 	
 	//TODO: Better logic to determine the app window.
-	_mainAppWindow = [[[UIApplication sharedApplication] keyWindow] retain];
+	dk_mainAppWindow = [[[UIApplication sharedApplication] keyWindow] retain];
 	
-	if (!_mainAppWindow) {
+	if (!dk_mainAppWindow) {
 		NSLog(@"UH OH! TOO SOON!");
 	}
 	
-	return _mainAppWindow;
+	return dk_mainAppWindow;
 }
 
 - (void)registerApplicationWithTypes:(NSArray *)types {
@@ -204,12 +206,12 @@ static DKDragDropServer *sharedInstance = nil;
 #pragma mark -
 #pragma mark Marking Views
 
-- (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource {
-    [self markViewAsDraggable:draggableView forDrag:nil withDataSource:dropDataSource];
-}
+// the key for our associated object.
+static char dragKey;
+static char contextKey;
 
 /* Optional parameter for drag identification. */
-- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource {
+- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource context:(void *)context {
 	// maybe add to hash table?
 	// Initialization code
 	
@@ -219,9 +221,15 @@ static DKDragDropServer *sharedInstance = nil;
 	
 	[draggableView addGestureRecognizer:dragRecognizer];
 	[dragRecognizer release];
+	
+	// use associated objects to attach our drag identifier.
+	objc_setAssociatedObject(draggableView, &dragKey, dragID, OBJC_ASSOCIATION_COPY_NONATOMIC);
+	
+	// use associated objects to attach our context.
+	objc_setAssociatedObject(draggableView, &contextKey, context, OBJC_ASSOCIATION_ASSIGN);
 }
 
-- (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDropDelegate> *)dropDelegate {
+- (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDragDelegate> *)dropDelegate {
 	
 	DKDropTarget *dropTarget = [[DKDropTarget alloc] init];
 	dropTarget.dropView = dropView;
@@ -229,6 +237,25 @@ static DKDragDropServer *sharedInstance = nil;
 	
 	[dk_dropTargets addObject:dropTarget];
 	[dropTarget release];
+}
+
+- (void)unmarkViewAsDraggable:(UIView *)draggableView {
+	// clear our associated objects.
+	objc_setAssociatedObject(draggableView, &dragKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+	objc_setAssociatedObject(draggableView, &contextKey, nil, OBJC_ASSOCIATION_ASSIGN);		
+}
+
+- (void)unmarkDropTarget:(UIView *)dropView {
+	
+	DKDropTarget *targetToRemove = nil;
+	for (DKDropTarget *target in dk_dropTargets) {
+		if (dropView == target.dropView) {
+			targetToRemove = target;
+			break;
+		}
+	}
+	
+	[dk_dropTargets removeObject:targetToRemove];
 }
 
 #pragma mark -
@@ -294,8 +321,13 @@ CGSize touchOffset;
 				CGPoint centerOfView = [[droppedTarget.dropView superview] convertPoint:droppedTarget.dropView.center toView:[self dk_mainAppWindow]];
 				
 				// TODO: Fix this message.
-				if ([droppedTarget.dropDelegate respondsToSelector:@selector(dropCompletedOnTargetView:withView:)]) {
-					[droppedTarget.dropDelegate dropCompletedOnTargetView:droppedTarget.dropView withView:nil];
+				if ([droppedTarget.dropDelegate respondsToSelector:@selector(drag:completedOnTargetView:context:)]) {
+					
+					//grab the associated objects.
+					NSString *dropIdentifier = objc_getAssociatedObject([sender view], &dragKey);
+					void *dropContext = objc_getAssociatedObject([sender view], &contextKey);
+					
+					[droppedTarget.dropDelegate drag:dropIdentifier completedOnTargetView:droppedTarget.dropView context:dropContext];
 				}
 				
 				// collapse the drag view into the drop view.
@@ -654,7 +686,7 @@ CGSize touchOffset;
 - (void)dealloc {
 	
 	[dk_dropTargets release];
-	[_mainAppWindow release];
+	[dk_mainAppWindow release];
 	
 	[dk_externalApplications release];
 	[dk_gameKitSession release];

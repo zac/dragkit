@@ -12,7 +12,7 @@
 
 #import "AQGridView.h"
 
-@interface DKDrawerViewController : UIViewController <AQGridViewDataSource, DKDropDelegate> {
+@interface DKDrawerViewController : UIViewController <AQGridViewDataSource, DKDragDelegate> {
 	
 	NSArray *supportedApplications;
 	NSMutableArray *externalApplications;

@@ -19,13 +19,13 @@
 
 @end
 
-@protocol DKDropDelegate
+@protocol DKDragDelegate
 
 //if any of these return YES for the type, the server does its drop drawing.
 - (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type;
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
-- (void)dropCompletedOnTargetView:(UIView *)targetView withView:(UIView *)view;
+- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView context:(void *)context;
 
 @end
 
@@ -41,11 +41,17 @@ typedef enum {
 	UIView *draggedView;
 	UIView *originalView;
 	
-	UIWindow *_mainAppWindow;
-	
 	DKDrawerViewController *drawerController;
 	
 	DKDrawerVisibilityLevel drawerVisibilityLevel;
+	
+@private
+	
+	// the drop targets dictionary with associated data.
+	NSMutableDictionary *dk_dropTargetsDictionary;
+	
+	// the pointer to the main app window.
+	UIWindow *dk_mainAppWindow;
 	
 	// the GameKit session.
 	GKSession *dk_gameKitSession;
@@ -74,9 +80,10 @@ typedef enum {
 
 @property (nonatomic) DKDrawerVisibilityLevel drawerVisibilityLevel;
 
-- (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource;
+//- (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource context:(void *)context;
 /* Optional parameter for drag identification. */
-- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource;
-- (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDropDelegate> *)dropDelegate;
+- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource context:(void *)context;
+- (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDragDelegate> *)dropDelegate;
+
 
 @end

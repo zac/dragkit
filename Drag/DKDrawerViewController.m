@@ -56,10 +56,24 @@
 	[self.gridView reloadData];
 }
 
-- (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type { return YES; }
-- (void)dragDidEnterTargetView:(UIView *)targetView { NSLog(@"enter: %@", targetView); }
-- (void)dragDidLeaveTargetView:(UIView *)targetView { NSLog(@"leave: %@", targetView); }
-- (void)dropCompletedOnTargetView:(UIView *)targetView withView:(UIView *)theView { NSLog(@"completed drop of %@ on %@.", theView, targetView); }
+#pragma mark -
+#pragma mark Drag Delegate
+
+- (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type {
+	return YES;
+}
+
+- (void)dragDidEnterTargetView:(UIView *)targetView {
+	NSLog(@"enter: %@", targetView);
+}
+
+- (void)dragDidLeaveTargetView:(UIView *)targetView {
+	NSLog(@"leave: %@", targetView);
+}
+
+- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView context:(void *)context {
+	NSLog(@"completed drop of %@ on %@.", targetView);
+}
 
 #pragma mark -
 #pragma mark AQGridView Data Source

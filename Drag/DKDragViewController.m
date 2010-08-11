@@ -45,7 +45,7 @@
 	dragView.topLabel.text = @"Testing!!";
 	dragView.bottomLabel.text = @"1.2.3.";
 	
-	[[DKDragDropServer sharedServer] markViewAsDraggable:dragView forDrag:@"MainDrag" withDataSource:self];
+	[[DKDragDropServer sharedServer] markViewAsDraggable:dragView forDrag:@"MainDrag" withDataSource:self context:nil];
 	
 	[self.view addSubview:dragView];
 	NSLog(@"dragFrame: %@", NSStringFromCGRect(dragView.frame));
@@ -75,8 +75,8 @@
 	
 }
 
-- (void)dropCompletedOnTargetView:(UIView *)targetView withView:(UIView *)view {
-	
+- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView context:(void *)context {
+	NSLog(@"drag: %@ completedOnTargetView:%@ context:%p", dropID, targetView, context);
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {

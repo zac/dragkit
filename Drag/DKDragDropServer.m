@@ -35,6 +35,11 @@ static DKDragDropServer *sharedInstance = nil;
 - (DKDropTarget *)dk_dropTargetHitByPoint:(CGPoint)point;
 - (void)dk_collapseDragViewAtPoint:(CGPoint)point;
 
+// GameKit
+
+// GameKit data handling.
+- (void)receiveData:(NSData *)data fromPeer:(NSString *)peer inSession:(GKSession *)session context:(void *)context;
+
 @end
 
 @implementation DKDragDropServer
@@ -85,8 +90,13 @@ static DKDragDropServer *sharedInstance = nil;
 			
 			dk_externalApplications = [[NSMutableDictionary alloc] init];
 			
-			dk_gameKitSession = [[GKSession alloc] initWithSessionID:@"DragKitSession" displayName:[[UIDevice currentDevice] name] sessionMode:GKSessionModePeer];
+			NSString *deviceName = [[UIDevice currentDevice] name];
+			NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
+			dk_gameKitSession = [[GKSession alloc] initWithSessionID:@"DragKitSession"
+														 displayName:[NSString stringWithFormat:@"%@ (%@)", deviceName, appName]
+														 sessionMode:GKSessionModePeer];
 			dk_gameKitSession.delegate = self;
+			[dk_gameKitSession setDataReceiveHandler:self withContext:nil];
 			
 			//start advertising immediately.
 			dk_gameKitSession.available = YES;
@@ -123,8 +133,6 @@ static DKDragDropServer *sharedInstance = nil;
 	DKApplicationRegistration *appRegistration = [DKApplicationRegistration registrationWithDragTypes:types];
 	
 	NSData *registrationData = [NSKeyedArchiver archivedDataWithRootObject:appRegistration];
-	
-	NSLog(@"data: %@", registrationData);
 	
 	[registrationPasteboard setData:registrationData forPasteboardType:@"dragkit.registration"];
 }
@@ -403,7 +411,7 @@ CGSize touchOffset;
 
 - (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state {
 	// update the state of the item in the drawer to reflect the new state.
-	NSLog(@"peer: %@ didChangeState: %d", state);
+	NSLog(@"peer: %@ didChangeState: %d", peerID, state);
 	
 	if (state == GKPeerStateAvailable) {
 		
@@ -415,8 +423,12 @@ CGSize touchOffset;
 			externalApp.peerID = peerID;
 			
 			// the state is idle for now until we get more registration information.
-			externalApp.currentState = DKExternalApplicaionStateIdle;
+			externalApp.currentState = DKExternalApplicaionStateUnregistered;
+			
+			NSLog(@"display: %@", [dk_gameKitSession displayNameForPeer:peerID]);
 		}
+	} else if (state == GKPeerStateConnected) {
+		// send something!
 	} else if (state == GKPeerStateUnavailable) {
 		
 		NSLog(@"Device became unavailable: %@", peerID);
@@ -429,6 +441,9 @@ CGSize touchOffset;
 
 - (void)session:(GKSession *)session didReceiveConnectionRequestFromPeer:(NSString *)peerID {
 	// a peer wants to connect.
+	
+	NSLog(@"peer: %@ wants to connect");
+	
 	NSError *error = nil;
 	BOOL connectionAccepted = [session acceptConnectionFromPeer:peerID error:&error];
 	
@@ -445,6 +460,12 @@ CGSize touchOffset;
 
 - (void)session:(GKSession *)session didFailWithError:(NSError *)error {
 	NSLog(@"Session failed: %@", error);
+}
+
+
+- (void)receiveData:(NSData *)data fromPeer:(NSString *)peer inSession:(GKSession *)session context:(void *)context {
+	//got data!
+	NSLog(@"peer %@ gave data: %@", peer, data);
 }
 
 #pragma mark -

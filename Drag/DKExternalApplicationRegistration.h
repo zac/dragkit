@@ -11,7 +11,7 @@
 #import "DKApplicationRegistration.h"
 
 typedef enum {
-	DKExternalApplicaionStateIdle,
+	DKExternalApplicaionStateUnregistered,
 	DKExternalApplicaionStateRegistered,
 	DKExternalApplicaionStateTransferring,
 	DKExternalApplicaionStateDisconnected,

@@ -11,21 +11,18 @@
 
 @protocol DKDragDataProvider
 
-//array of types supported by view.
-- (NSArray *)typesForView:(UIView *)dragView;
-
-//request the data from the view.
-- (NSData *)dataForType:(NSString *)type forView:(UIView *)dragView;
+// request the data from the view.
+- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 
 @end
 
 @protocol DKDragDelegate
 
-//if any of these return YES for the type, the server does its drop drawing.
+// if any of these return YES for the type, the server does its drop drawing.
 - (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type;
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
-- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView context:(void *)context;
+- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard context:(void *)context;
 
 @end
 
@@ -35,7 +32,7 @@ typedef enum {
 	DKDrawerVisibilityLevelVisible,
 } DKDrawerVisibilityLevel;
 
-@class DKDrawerViewController;
+@class DKDrawerViewController, DKHoldingAreaViewController;
 
 @interface DKDragDropServer : NSObject <GKSessionDelegate> {
 	UIView *draggedView;
@@ -46,6 +43,9 @@ typedef enum {
 	DKDrawerVisibilityLevel drawerVisibilityLevel;
 	
 @private
+	
+	// the modal view that comes up when we have a drag.
+	DKHoldingAreaViewController *dk_holdingAreaViewController;
 	
 	// the drop targets dictionary with associated data.
 	NSMutableDictionary *dk_dropTargetsDictionary;
@@ -66,7 +66,7 @@ typedef enum {
 + (id)sharedServer;
 + (NSString *)versionString;
 
-//application registration.
+// application registration.
 - (void)registerApplicationWithTypes:(NSArray *)types;
 - (NSArray *)registeredApplications;
 - (UIPasteboard *)pasteboardAddedToManifest;
@@ -80,10 +80,12 @@ typedef enum {
 
 @property (nonatomic) DKDrawerVisibilityLevel drawerVisibilityLevel;
 
-//- (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource context:(void *)context;
-/* Optional parameter for drag identification. */
-- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource context:(void *)context;
-- (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDragDelegate> *)dropDelegate;
+// the API for marking a view as draggable or a drop target.
+- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource context:(void *)context;
+- (void)markViewAsDropTarget:(UIView *)dropView forTypes:(NSArray *)types withDelegate:(NSObject <DKDragDelegate> *)dropDelegate;
 
+// unmarking views
+- (void)unmarkViewAsDraggable:(UIView *)draggableView;
+- (void)unmarkDropTarget:(UIView *)dropView;
 
 @end

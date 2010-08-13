@@ -71,8 +71,10 @@
 	NSLog(@"leave: %@", targetView);
 }
 
-- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView context:(void *)context {
-	NSLog(@"completed drop of %@ on %@.", targetView);
+- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard context:(void *)context {
+	NSLog(@"completed drop %@ on %@ with %@.", dropID, targetView, dragPasteboard);
+	//take our pasteboard and make it persistent.
+	//launch the appropriate application using our url scheme with the persistent pasteboard's name as a parameter.
 }
 
 #pragma mark -
@@ -88,7 +90,6 @@
 	DKDrawerCell *cell = (DKDrawerCell *)[theGridView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[[DKDrawerCell alloc] initWithFrame:CGRectMake(0, 0, 50, 50) reuseIdentifier:CellIdentifier] autorelease];
-		[[DKDragDropServer sharedServer] markViewAsDropTarget:cell withDelegate:self];
     }
     
 	DKApplicationRegistration *appRegistration = nil;
@@ -99,6 +100,9 @@
 		appRegistration = [self.externalApplications objectAtIndex:index - [self.supportedApplications count]];
 		cell.backgroundColor = [UIColor greenColor];
 	}
+	
+	[[DKDragDropServer sharedServer] unmarkDropTarget:cell];
+	[[DKDragDropServer sharedServer] markViewAsDropTarget:cell forTypes:appRegistration.supportedDragTypes withDelegate:self];
 	
 	cell.selectionStyle = AQGridViewCellSelectionStyleGlow;
 	

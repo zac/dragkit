@@ -12,7 +12,9 @@
 
 @interface DKDropTarget : NSObject {
 	UIView *dropView;
-	NSObject<DKDragDelegate> *dropDelegate;
+	NSObject<DKDragDelegate> *dragDelegate;
+	
+	NSArray *acceptedTypes;
 	
 	CGRect frameInWindow;
 	
@@ -20,8 +22,10 @@
 }
 
 @property (nonatomic, retain) UIView *dropView;
-@property (nonatomic, assign) NSObject<DKDragDelegate> *dropDelegate;
+@property (nonatomic, assign) NSObject<DKDragDelegate> *dragDelegate;
 @property (nonatomic, readonly) CGRect frameInWindow;
+
+@property (nonatomic, copy) NSArray *acceptedTypes;
 
 @property (nonatomic) BOOL containsDragView;
 

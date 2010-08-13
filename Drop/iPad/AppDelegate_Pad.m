@@ -8,6 +8,8 @@
 
 #import "AppDelegate_Pad.h"
 
+#import "DropViewController.h"
+
 @implementation AppDelegate_Pad
 
 @synthesize window;
@@ -16,6 +18,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
 	
     // Override point for customization after application launch
+	
+	DropViewController *dropViewController = [[DropViewController alloc] initWithNibName:@"DropViewController" bundle:nil];
+	[window addSubview:dropViewController.view];
 	
     [window makeKeyAndVisible];
 	

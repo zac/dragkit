@@ -21,6 +21,7 @@
 		111FFFDB11CDDDCF004AED24 /* AQGridViewUpdateItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFD111CDDDCF004AED24 /* AQGridViewUpdateItem.m */; };
 		111FFFDC11CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFD311CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.m */; };
 		111FFFDD11CDDDCF004AED24 /* UIColor+AQGridView.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFD511CDDDCF004AED24 /* UIColor+AQGridView.m */; };
+		112284CE1214D5C0007165D3 /* DKHoldingAreaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 112284CD1214D5C0007165D3 /* DKHoldingAreaViewController.m */; };
 		1150E4B3120E40C6008902F8 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1150E4B2120E40C6008902F8 /* GameKit.framework */; };
 		1150E4EE120E4E56008902F8 /* DKExternalApplicationRegistration.m in Sources */ = {isa = PBXBuildFile; fileRef = 1150E4ED120E4E56008902F8 /* DKExternalApplicationRegistration.m */; };
 		117462A211CD95C300BAD1D9 /* drag_view_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 117462A011CD95C300BAD1D9 /* drag_view_background.png */; };
@@ -68,6 +69,8 @@
 		111FFFD311CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSIndexSet+AQIsSetContiguous.m"; path = "../AQGridView/Classes/NSIndexSet+AQIsSetContiguous.m"; sourceTree = SOURCE_ROOT; };
 		111FFFD411CDDDCF004AED24 /* UIColor+AQGridView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+AQGridView.h"; path = "../AQGridView/Classes/UIColor+AQGridView.h"; sourceTree = SOURCE_ROOT; };
 		111FFFD511CDDDCF004AED24 /* UIColor+AQGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+AQGridView.m"; path = "../AQGridView/Classes/UIColor+AQGridView.m"; sourceTree = SOURCE_ROOT; };
+		112284CC1214D5C0007165D3 /* DKHoldingAreaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKHoldingAreaViewController.h; sourceTree = "<group>"; };
+		112284CD1214D5C0007165D3 /* DKHoldingAreaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKHoldingAreaViewController.m; sourceTree = "<group>"; };
 		1150E4B2120E40C6008902F8 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		1150E4EC120E4E56008902F8 /* DKExternalApplicationRegistration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKExternalApplicationRegistration.h; sourceTree = "<group>"; };
 		1150E4ED120E4E56008902F8 /* DKExternalApplicationRegistration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKExternalApplicationRegistration.m; sourceTree = "<group>"; };
@@ -150,6 +153,8 @@
 				11AB612811D1C8BA00D13C90 /* DragKit.h */,
 				11DF18EB117EA66E00233A48 /* DKDragDropServer.h */,
 				11DF18EC117EA66E00233A48 /* DKDragDropServer.m */,
+				112284CC1214D5C0007165D3 /* DKHoldingAreaViewController.h */,
+				112284CD1214D5C0007165D3 /* DKHoldingAreaViewController.m */,
 				110021D111D053E70046072D /* DKApplicationRegistration.h */,
 				110021D211D053E70046072D /* DKApplicationRegistration.m */,
 				1150E4EC120E4E56008902F8 /* DKExternalApplicationRegistration.h */,
@@ -327,6 +332,7 @@
 				1100210F11D04A640046072D /* DKDrawerCell.m in Sources */,
 				110021D311D053E70046072D /* DKApplicationRegistration.m in Sources */,
 				1150E4EE120E4E56008902F8 /* DKExternalApplicationRegistration.m in Sources */,
+				112284CE1214D5C0007165D3 /* DKHoldingAreaViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,7 +11,7 @@
 
 @implementation DKDropTarget
 
-@synthesize dropView, dropDelegate, containsDragView;
+@synthesize dropView, dragDelegate, containsDragView, acceptedTypes;
 @dynamic frameInWindow;
 
 - (id)init {
@@ -29,7 +29,7 @@
 - (void)dealloc {
 	
 	self.dropView = nil;
-	self.dropDelegate = nil;
+	self.dragDelegate = nil;
 	
 	[super dealloc];
 }

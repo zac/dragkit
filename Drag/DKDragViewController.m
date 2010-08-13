@@ -25,13 +25,13 @@
 #pragma mark -
 #pragma mark DKDragDataProvider Methods
 
-//array of types supported by view.
-- (NSArray *)typesForView:(UIView *)dragView {
-	return nil;
-}
-
 //request the data from the view.
-- (NSData *)dataForType:(NSString *)type forView:(UIView *)dragView {
+- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context {
+	
+	if ([type isEqualToString:@"public.text"]) {
+		return [@"Testing 1,2,3" dataUsingEncoding:NSUTF8StringEncoding];
+	}
+	
 	return nil;
 }
 
@@ -55,7 +55,7 @@
 	UIView *otherView = [[UIView alloc] initWithFrame:CGRectMake(100, 500, 400, 100)];
 	otherView.backgroundColor = [UIColor yellowColor];
 	
-	[[DKDragDropServer sharedServer] markViewAsDropTarget:otherView withDelegate:self];
+	[[DKDragDropServer sharedServer] markViewAsDropTarget:otherView forTypes:[NSArray arrayWithObject:@"public.text"] withDelegate:self];
 	
 	[self.view addSubview:otherView];
 	NSLog(@"otherFrame: %@", NSStringFromCGRect(otherView.frame));
@@ -75,8 +75,10 @@
 	
 }
 
-- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView context:(void *)context {
-	NSLog(@"drag: %@ completedOnTargetView:%@ context:%p", dropID, targetView, context);
+- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard context:(void *)context {
+	NSLog(@"drag: %@ completedOnTargetView:%@ dragPasteboard:%@ context:%p", dropID, targetView, dragPasteboard, context);
+	NSString *text = [[NSString alloc] initWithData:[dragPasteboard dataForPasteboardType:@"public.text"] encoding:NSUTF8StringEncoding];
+	NSLog(@"data: %@", text);
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {

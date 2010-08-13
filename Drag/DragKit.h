@@ -8,7 +8,6 @@
  */
 
 #import "DKDragDropServer.h"
-#import "DKDragDropServer+Registration.h"
 #import "DKDrawerViewController.h"
 #import "DKDropTarget.h"
 #import "DKDrawerCell.h"

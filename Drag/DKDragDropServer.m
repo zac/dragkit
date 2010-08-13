@@ -217,10 +217,9 @@ static DKDragDropServer *sharedInstance = nil;
 // the key for our associated object.
 static char dragKey;
 static char contextKey;
+static char dataProviderKey;
 
-/* Optional parameter for drag identification. */
-- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dropDataSource context:(void *)context {
-	// maybe add to hash table?
+- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource context:(void *)context {
 	// Initialization code
 	
 	UILongPressGestureRecognizer *dragRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
@@ -235,13 +234,17 @@ static char contextKey;
 	
 	// use associated objects to attach our context.
 	objc_setAssociatedObject(draggableView, &contextKey, context, OBJC_ASSOCIATION_ASSIGN);
+	
+	// attach the drag delegate.
+	objc_setAssociatedObject(draggableView, &dataProviderKey, dragDataSource, OBJC_ASSOCIATION_ASSIGN);
 }
 
-- (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDragDelegate> *)dropDelegate {
+- (void)markViewAsDropTarget:(UIView *)dropView forTypes:(NSArray *)types withDelegate:(NSObject <DKDragDelegate> *)dropDelegate {
 	
 	DKDropTarget *dropTarget = [[DKDropTarget alloc] init];
 	dropTarget.dropView = dropView;
-	dropTarget.dropDelegate = dropDelegate;
+	dropTarget.dragDelegate = dropDelegate;
+	dropTarget.acceptedTypes = types;
 	
 	[dk_dropTargets addObject:dropTarget];
 	[dropTarget release];
@@ -250,7 +253,8 @@ static char contextKey;
 - (void)unmarkViewAsDraggable:(UIView *)draggableView {
 	// clear our associated objects.
 	objc_setAssociatedObject(draggableView, &dragKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
-	objc_setAssociatedObject(draggableView, &contextKey, nil, OBJC_ASSOCIATION_ASSIGN);		
+	objc_setAssociatedObject(draggableView, &contextKey, nil, OBJC_ASSOCIATION_ASSIGN);
+	objc_setAssociatedObject(draggableView, &dataProviderKey, nil, OBJC_ASSOCIATION_ASSIGN);
 }
 
 - (void)unmarkDropTarget:(UIView *)dropView {
@@ -263,7 +267,7 @@ static char contextKey;
 		}
 	}
 	
-	[dk_dropTargets removeObject:targetToRemove];
+	if (targetToRemove) [dk_dropTargets removeObject:targetToRemove];
 }
 
 #pragma mark -
@@ -328,14 +332,25 @@ CGSize touchOffset;
 			if (droppedTarget) {
 				CGPoint centerOfView = [[droppedTarget.dropView superview] convertPoint:droppedTarget.dropView.center toView:[self dk_mainAppWindow]];
 				
-				// TODO: Fix this message.
-				if ([droppedTarget.dropDelegate respondsToSelector:@selector(drag:completedOnTargetView:context:)]) {
+				if ([droppedTarget.dragDelegate respondsToSelector:@selector(drag:completedOnTargetView:withDragPasteboard:context:)]) {
 					
 					//grab the associated objects.
 					NSString *dropIdentifier = objc_getAssociatedObject([sender view], &dragKey);
 					void *dropContext = objc_getAssociatedObject([sender view], &contextKey);
+					NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject([sender view], &dataProviderKey);
 					
-					[droppedTarget.dropDelegate drag:dropIdentifier completedOnTargetView:droppedTarget.dropView context:dropContext];
+					// ask for the data and construct a UIPasteboard.
+					UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithUniqueName];
+					
+					// go through each type supported by the drop target
+					// and request the data for that type from the data source.
+					for (NSString *type in droppedTarget.acceptedTypes) {
+						NSData *data = [dataProvider dataForType:type withDrag:dropIdentifier forView:[sender view] context:dropContext];
+						
+						if (data) [dragPasteboard setData:data forPasteboardType:type];
+					}
+					
+					[droppedTarget.dragDelegate drag:dropIdentifier completedOnTargetView:droppedTarget.dropView withDragPasteboard:dragPasteboard context:dropContext];
 				}
 				
 				// collapse the drag view into the drop view.
@@ -501,8 +516,8 @@ CGSize touchOffset;
 			
 			[self dk_setView:target.dropView highlighted:YES animated:YES];
 			
-			if (!target.containsDragView && [target.dropDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
-				[target.dropDelegate dragDidEnterTargetView:target.dropView];
+			if (!target.containsDragView && [target.dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
+				[target.dragDelegate dragDidEnterTargetView:target.dropView];
 			}
 			
 			target.containsDragView = YES;
@@ -512,8 +527,8 @@ CGSize touchOffset;
 			
 			[self dk_setView:target.dropView highlighted:NO animated:YES];
 			
-			if (target.containsDragView && [target.dropDelegate respondsToSelector:@selector(dragDidLeaveTargetView:)]) {
-				[target.dropDelegate dragDidLeaveTargetView:target.dropView];
+			if (target.containsDragView && [target.dragDelegate respondsToSelector:@selector(dragDidLeaveTargetView:)]) {
+				[target.dragDelegate dragDidLeaveTargetView:target.dropView];
 			}
 			
 			target.containsDragView = NO;

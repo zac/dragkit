@@ -130,6 +130,8 @@ static DKDragDropServer *sharedInstance = nil;
 	
 	UIPasteboard *registrationPasteboard = [self pasteboardAddedToManifest];
 	
+	NSLog(@"registration: %@", [registrationPasteboard name]);
+	
 	DKApplicationRegistration *appRegistration = [DKApplicationRegistration registrationWithDragTypes:types];
 	
 	NSData *registrationData = [NSKeyedArchiver archivedDataWithRootObject:appRegistration];
@@ -140,73 +142,144 @@ static DKDragDropServer *sharedInstance = nil;
 - (NSArray *)registeredApplications {
 	//returns all registered applications.
 	
-	// add the suite name.
-	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"DragKit"];
+	if (dk_supportedApplications) return [[dk_supportedApplications retain] autorelease];
 	
-	// we definitely should have this.
-	NSDictionary *manifest = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"dragkit-manifest"];
+	UIPasteboard *manifestPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-manifest" create:YES];
+	NSData *manifestData = [manifestPasteboard dataForPasteboardType:@"dragkit.manifest"];
 	
-	NSAssert(manifest, @"Expected a DragKit manifest to already be created.");
+	NSAssert(manifestData, @"Expected a DragKit manifest to already be created.");
 	
-	NSMutableArray *registeredApplications = [NSMutableArray array];
-	NSMutableArray *keysToDelete = [NSMutableArray array];
-	for (NSString *bundleIdentifier in manifest) {
+	NSMutableArray *manifest = [NSKeyedUnarchiver unarchiveObjectWithData:manifestData];
+	
+	dk_supportedApplications = [[NSMutableArray alloc] init];
+	NSMutableArray *appsToDelete = [NSMutableArray array];
+	for (NSString *pasteboardName in manifest) {
 		
-		if ([bundleIdentifier isEqualToString:[[NSBundle mainBundle] bundleIdentifier]]) {
+		if ([pasteboardName isEqualToString:[[NSUserDefaults standardUserDefaults] objectForKey:@"dragkit-pasteboard"]]) {
 			continue;
 		}
 		
-		NSString *pasteboardName = [manifest objectForKey:bundleIdentifier];
+		UIPasteboard *registrationPasteboard = [UIPasteboard pasteboardWithName:pasteboardName create:YES];
 		
-		UIPasteboard *registrationPasteboard = [UIPasteboard pasteboardWithName:pasteboardName create:NO];
-		if (registrationPasteboard) {
-			
-			NSData *pasteboardData = [registrationPasteboard dataForPasteboardType:@"dragkit.registration"];
-			
+		NSData *pasteboardData = [registrationPasteboard dataForPasteboardType:@"dragkit.registration"];
+		
+		if (pasteboardData) {
 			DKApplicationRegistration *appRegistration = [NSKeyedUnarchiver unarchiveObjectWithData:pasteboardData];
-			[registeredApplications addObject:appRegistration];
+			[dk_supportedApplications addObject:appRegistration];
 		} else {
 			// we don't have a registered pasteboard.
 			// the app must have been deleted.
-			[keysToDelete addObject:bundleIdentifier];
+			[appsToDelete addObject:pasteboardName];
 		}
 	}
 	
-	NSMutableDictionary *fixedDictionary = [NSMutableDictionary dictionaryWithDictionary:manifest];
-	[fixedDictionary removeObjectsForKeys:keysToDelete];
+	[manifest removeObjectsInArray:appsToDelete];
 	
-	[[NSUserDefaults standardUserDefaults] setObject:fixedDictionary forKey:@"dragkit-manifest"];
+	if ([appsToDelete count]) {
+		// set the modified manifest.
+		[manifestPasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:manifest] forPasteboardType:@"dragkit.manifest"];
+	}
 	
-	[[NSUserDefaults standardUserDefaults] removeSuiteNamed:@"DragKit"];
+	return [[dk_supportedApplications retain] autorelease];
+}
+
+#define MAX_NUMBER_OF_REGISTERED_APPS 100
+
+- (void)resetRegistrationDatabase {
+	[UIPasteboard removePasteboardWithName:@"dragkit-manifest"];
 	
-	return registeredApplications;
+	for (int i = 0; i < MAX_NUMBER_OF_REGISTERED_APPS; i++) {
+		[UIPasteboard removePasteboardWithName:[NSString stringWithFormat:@"dragkit-application:%d", i]];
+	}
+	
+	[[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"dragkit-pasteboard"];
 }
 
 - (UIPasteboard *)pasteboardAddedToManifest {
 	
-	// add the suite name.
-	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"DragKit"];
-	
-	//check to see if the manifest has been created yet.
-	
-	//TODO: probably change to an array at some point.
-	NSDictionary *manifest = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"dragkit-manifest"];
-	
 	UIPasteboard *pasteboard = nil;
-	if (!manifest || ![manifest objectForKey:[[NSBundle mainBundle] bundleIdentifier]]) {
-		
-		pasteboard = [UIPasteboard pasteboardWithUniqueName];
+	
+	// add the suite name.
+	NSString *pasteboardName = [[NSUserDefaults standardUserDefaults] objectForKey:@"dragkit-pasteboard"];
+	
+	if (pasteboardName) {
+		pasteboard = [UIPasteboard pasteboardWithName:pasteboardName create:YES];
 		pasteboard.persistent = YES;
 		
-		NSDictionary *singleEntry = [NSDictionary dictionaryWithObject:pasteboard.name forKey:[[NSBundle mainBundle] bundleIdentifier]];
-		
-		[[NSUserDefaults standardUserDefaults] setObject:singleEntry forKey:@"dragkit-manifest"];
-	} else {
-		NSString *pasteboardName = [manifest objectForKey:[[NSBundle mainBundle] bundleIdentifier]];
-		pasteboard = [UIPasteboard pasteboardWithName:pasteboardName create:YES];
+		NSData *registrationData = [pasteboard dataForPasteboardType:@"dragkit.registration"];
+		if (!registrationData) {
+			NSLog(@"ERROR: The pasteboard our app said it created is now gone.");
+			[[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"dragkit-pasteboard"];
+			pasteboardName = nil;
+			pasteboard = nil;
+		}
 	}
 	
-	[[NSUserDefaults standardUserDefaults] removeSuiteNamed:@"DragKit"];
+	// check to see if the manifest has been created yet.
+	UIPasteboard *manifestPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-manifest" create:YES];
+	NSData *manifestData = [manifestPasteboard dataForPasteboardType:@"dragkit.manifest"];
+	
+	NSLog(@"manifest: %@", [NSKeyedUnarchiver unarchiveObjectWithData:manifestData]);
+	
+	// we found the manifest and we are already in it.
+	if (pasteboard && manifestData) return pasteboard;
+	
+	// we need to create the manifest or our pasteboard or both.
+	
+	NSMutableArray *manifest = [NSMutableArray array];
+	
+	// the original application that created the manifest could have been deleted.
+	// this would leave UIPasteboards out there without a central manifest.
+	// we must scan through the possible application registration slots and recreate the manifest.
+	// of course, we could be the first app. In that case, we'll scan through and just create the manifest
+	// pointing to just our app's registration data.
+	
+	NSString *firstAvailableSlot = nil;
+	
+	NSLog(@"Our manifest was deleted. Recreating.");
+	for (int i = 0; i < MAX_NUMBER_OF_REGISTERED_APPS; i++) {
+		UIPasteboard *possibleApp = [UIPasteboard pasteboardWithName:[NSString stringWithFormat:@"dragkit-application:%d", i] create:YES];
+		if ([possibleApp containsPasteboardTypes:[NSArray arrayWithObject:@"dragkit.registration"]]) {
+			
+			// if it is our pasteboard, don't bother.
+			if ([possibleApp.name isEqualToString:pasteboardName]) continue;
+			
+			[manifest addObject:possibleApp.name];
+			
+		} else if (!firstAvailableSlot) {
+			firstAvailableSlot = [possibleApp.name retain];
+		}
+	}
+	
+	if (firstAvailableSlot) {
+		if (pasteboard) {
+			// we already have a pasteboard. add its name to the manifest and return.
+			[manifest addObject:pasteboardName];
+		} else {
+			
+			// create a new pasteboard with the name firstAvailableSlot.
+			pasteboard = [UIPasteboard pasteboardWithName:firstAvailableSlot create:YES];
+			pasteboard.persistent = YES;
+			
+			[[NSUserDefaults standardUserDefaults] setObject:firstAvailableSlot forKey:@"dragkit-pasteboard"];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+			
+			[manifest addObject:firstAvailableSlot];
+		}
+	} else {
+		NSLog(@"ERROR: All available app registration slots are used.");
+		return nil;
+	}
+	
+	if ([manifest count]) {
+		NSLog(@"we have other apps on the system!");
+		NSLog(@"apps: %@", manifest);
+		
+		NSData *newManifestData = [NSKeyedArchiver archivedDataWithRootObject:manifest];
+		
+		NSAssert(manifestPasteboard, @"ERROR: We don't have a valid pasteboard.");
+		[manifestPasteboard setData:newManifestData forPasteboardType:@"dragkit.manifest"];
+	}
 	
 	return pasteboard;
 }

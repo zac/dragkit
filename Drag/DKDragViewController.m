@@ -61,6 +61,17 @@
 	NSLog(@"otherFrame: %@", NSStringFromCGRect(otherView.frame));
 	[otherView release];
 	
+	UIButton *resetButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+	[resetButton setTitle:@"Reset" forState:UIControlStateNormal];
+	[resetButton addTarget:self action:@selector(reset:) forControlEvents:UIControlEventTouchUpInside];
+	resetButton.frame = CGRectMake(100, 700, 100, 70);
+	
+	[self.view addSubview:resetButton];
+	
+}
+
+- (void)reset:(id)sender {
+	[[DKDragDropServer sharedServer] resetRegistrationDatabase];
 }
 
 - (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type {

@@ -56,6 +56,9 @@ typedef enum {
 	// the GameKit session.
 	GKSession *dk_gameKitSession;
 	
+	// our chached verison of supported applications.
+	NSMutableArray *dk_supportedApplications;
+	
 	// the external application registrations keyed with the peerID from GameKit.
 	NSMutableDictionary *dk_externalApplications;
 	
@@ -79,6 +82,8 @@ typedef enum {
 @property (nonatomic, retain) DKDrawerViewController *drawerController;
 
 @property (nonatomic) DKDrawerVisibilityLevel drawerVisibilityLevel;
+
+- (void)resetRegistrationDatabase;
 
 // the API for marking a view as draggable or a drop target.
 - (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource context:(void *)context;

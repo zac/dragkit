@@ -15,9 +15,16 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	
+	[[DKDragDropServer sharedServer] registerApplicationWithTypes:[NSArray arrayWithObject:@"public.text"]];
+	
 	[[DKDragDropServer sharedServer] markViewAsDropTarget:self.dropWell
 												 forTypes:[NSArray arrayWithObject:@"public.text"]
 											 withDelegate:self];
+}
+
+- (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type {
+	NSLog(@"type: %@", type);
+	return YES;
 }
 
 - (void)dragDidEnterTargetView:(UIView *)targetView {

@@ -10,6 +10,10 @@
 
 
 @interface DKApplicationRegistration : NSObject {
+	
+	NSString *applicationName;
+	NSString *applicationBundleIdentifier;
+	
 	// for iPhone 4.
 	UIImage *icon114;
 	// for iPad.
@@ -31,6 +35,9 @@
 }
 
 + (DKApplicationRegistration *)registrationWithDragTypes:(NSArray *)dragTypes;
+
+@property (nonatomic, copy) NSString *applicationName;
+@property (nonatomic, copy) NSString *applicationBundleIdentifier;
 
 @property (nonatomic, retain) UIImage *icon114;
 @property (nonatomic, retain) UIImage *icon72;

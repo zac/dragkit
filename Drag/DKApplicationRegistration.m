@@ -12,6 +12,7 @@
 
 @implementation DKApplicationRegistration
 
+@synthesize applicationName, applicationBundleIdentifier;
 @synthesize icon114, icon72, icon57, iconPrerendered;
 @synthesize frameworkVersion;
 @synthesize urlScheme, supportedDragTypes;
@@ -35,6 +36,9 @@
 		NSLog(@"full: %@", fullPath);
 	}
 	
+	appRegistration.applicationName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+	appRegistration.applicationBundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+	
 	appRegistration.iconPrerendered = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIPrerenderedIcon"] boolValue];
 	appRegistration.frameworkVersion = [DKDragDropServer versionString];
 	appRegistration.supportedDragTypes = dragTypes;
@@ -49,6 +53,9 @@
 - (id)initWithCoder:(NSCoder*)coder {
 	if (!(self = [super init])) return nil;
 	
+	self.applicationName = [coder decodeObjectForKey:@"applicationName"];
+	self.applicationBundleIdentifier = [coder decodeObjectForKey:@"applicationBundleIdentifier"];
+	
 	self.icon114 = [coder decodeObjectForKey:@"icon114"];
 	self.icon72 = [coder decodeObjectForKey:@"icon72"];
 	self.icon57 = [coder decodeObjectForKey:@"icon57"];
@@ -62,6 +69,10 @@
 }
 
 - (void)encodeWithCoder:(NSCoder*)coder {
+	
+	[coder encodeObject:self.applicationName forKey:@"applicationName"];
+	[coder encodeObject:self.applicationBundleIdentifier forKey:@"applicationBundleIdentifier"];
+	
 	[coder encodeObject:UIImagePNGRepresentation(self.icon114) forKey:@"icon114"];
 	[coder encodeObject:UIImagePNGRepresentation(self.icon72) forKey:@"icon72"];
 	[coder encodeObject:UIImagePNGRepresentation(self.icon57) forKey:@"icon57"];
@@ -72,7 +83,14 @@
 	[coder encodeObject:self.urlScheme forKey:@"urlScheme"];
 }
 
+- (NSString *)description {
+	return [NSString stringWithFormat:@"%@: %@ (%@)", [super description], self.applicationName, self.applicationBundleIdentifier];
+}
+
 - (void)dealloc {
+	
+	self.applicationName = nil;
+	self.applicationBundleIdentifier = nil;
 	
 	self.icon114 = nil;
 	self.icon72 = nil;

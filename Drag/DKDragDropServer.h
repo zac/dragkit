@@ -56,7 +56,10 @@ typedef enum {
 	// the GameKit session.
 	GKSession *dk_gameKitSession;
 	
-	// our chached verison of supported applications.
+	// the manifest of all apps on the system that support DragKit.
+	NSMutableArray *dk_manifest;
+	
+	// the resolved supported applications.
 	NSMutableArray *dk_supportedApplications;
 	
 	// the external application registrations keyed with the peerID from GameKit.
@@ -72,7 +75,6 @@ typedef enum {
 // application registration.
 - (void)registerApplicationWithTypes:(NSArray *)types;
 - (NSArray *)registeredApplications;
-- (UIPasteboard *)pasteboardAddedToManifest;
 
 - (void)cancelDrag;
 

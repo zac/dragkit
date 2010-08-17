@@ -75,6 +75,24 @@
 	NSLog(@"completed drop %@ on %@ with %@.", dropID, targetView, dragPasteboard);
 	//take our pasteboard and make it persistent.
 	//launch the appropriate application using our url scheme with the persistent pasteboard's name as a parameter.
+	
+	NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
+	
+	// add the drag image. if none is set, we can use default.
+	[metadata setObject:[NSData data] forKey:@"dragImage"];
+	
+	// add the registration for the application that we're dragging from.
+	[metadata setObject:[NSNull null] forKey:@"draggingApplication"];
+	
+	// set our metadata on our private metadata type.
+	[dragPasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:metadata] forPasteboardType:@"dragkit.metadata"];
+	[metadata release];
+	
+	// make sure our drag pasteboard sticks around.
+	dragPasteboard.persistent = YES;
+	
+	// open the application with the url scheme pointing to our drag pasteboard.
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"TODO://"]];
 }
 
 #pragma mark -

@@ -180,6 +180,8 @@ static DKDragDropServer *sharedInstance = nil;
 		[manifestPasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:manifest] forPasteboardType:@"dragkit.manifest"];
 	}
 	
+	NSLog(@"registered apps: %@", dk_supportedApplications);
+	
 	return [[dk_supportedApplications retain] autorelease];
 }
 
@@ -195,11 +197,12 @@ static DKDragDropServer *sharedInstance = nil;
 	[[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"dragkit-pasteboard"];
 }
 
+// this is where the horrible, horrible magic happens.
 - (UIPasteboard *)pasteboardAddedToManifest {
 	
 	UIPasteboard *pasteboard = nil;
 	
-	// add the suite name.
+	// check to see if we've already created a pasteboard. this returns a valid pasteboard in the common case.
 	NSString *pasteboardName = [[NSUserDefaults standardUserDefaults] objectForKey:@"dragkit-pasteboard"];
 	
 	if (pasteboardName) {
@@ -219,8 +222,6 @@ static DKDragDropServer *sharedInstance = nil;
 	UIPasteboard *manifestPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-manifest" create:YES];
 	NSData *manifestData = [manifestPasteboard dataForPasteboardType:@"dragkit.manifest"];
 	
-	NSLog(@"manifest: %@", [NSKeyedUnarchiver unarchiveObjectWithData:manifestData]);
-	
 	// we found the manifest and we are already in it.
 	if (pasteboard && manifestData) return pasteboard;
 	
@@ -236,12 +237,14 @@ static DKDragDropServer *sharedInstance = nil;
 	
 	NSString *firstAvailableSlot = nil;
 	
-	NSLog(@"Our manifest was deleted. Recreating.");
+	NSLog(@"Our manifest was deleted. Recreating...");
 	for (int i = 0; i < MAX_NUMBER_OF_REGISTERED_APPS; i++) {
 		UIPasteboard *possibleApp = [UIPasteboard pasteboardWithName:[NSString stringWithFormat:@"dragkit-application:%d", i] create:YES];
 		if ([possibleApp containsPasteboardTypes:[NSArray arrayWithObject:@"dragkit.registration"]]) {
 			
 			// if it is our pasteboard, don't bother.
+			// pasteboardName could be nil if we haven't been launched.
+			// in that case, we'll get a manifest that's missing us anyway.
 			if ([possibleApp.name isEqualToString:pasteboardName]) continue;
 			
 			[manifest addObject:possibleApp.name];
@@ -251,9 +254,12 @@ static DKDragDropServer *sharedInstance = nil;
 		}
 	}
 	
+	// we should always have a first available slot.
+	// if we don't, we've run out of slots and probably should have picked a higher number than 100.
 	if (firstAvailableSlot) {
 		if (pasteboard) {
 			// we already have a pasteboard. add its name to the manifest and return.
+			// this is the case where we've launched but the app that last created our manifest was deleted. poor app.
 			[manifest addObject:pasteboardName];
 		} else {
 			
@@ -272,8 +278,7 @@ static DKDragDropServer *sharedInstance = nil;
 	}
 	
 	if ([manifest count]) {
-		NSLog(@"we have other apps on the system!");
-		NSLog(@"apps: %@", manifest);
+		NSLog(@"creating manifest: %@", manifest);
 		
 		NSData *newManifestData = [NSKeyedArchiver archivedDataWithRootObject:manifest];
 		

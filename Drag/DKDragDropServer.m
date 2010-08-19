@@ -25,6 +25,7 @@ static DKDragDropServer *sharedInstance = nil;
 - (UIImage *)dk_generateImageForDragFromView:(UIView *)theView;
 - (void)dk_displayDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point;
 - (void)dk_moveDragViewToPoint:(CGPoint)point;
+- (void)dk_createDragPasteboardForView:(UIView *)view;
 - (void)dk_messageTargetsHitByPoint:(CGPoint)point;
 - (void)dk_setView:(UIView *)view highlighted:(BOOL)highlighted animated:(BOOL)animated;
 - (void)dk_handleURL:(NSNotification *)notification;
@@ -76,8 +77,8 @@ static DKDragDropServer *sharedInstance = nil;
 			dk_dropTargets = [[NSMutableArray alloc] init];
 			
 			[[NSNotificationCenter defaultCenter] addObserver:self
-													 selector:@selector(dk_handleURL:)
-														 name:UIApplicationDidFinishLaunchingNotification
+													 selector:@selector(dk_applicationWillTerminate:)
+														 name:UIApplicationWillTerminateNotification
 													   object:nil];
 		}
 		
@@ -105,9 +106,16 @@ static DKDragDropServer *sharedInstance = nil;
 	return dk_mainAppWindow;
 }
 
+- (void)dk_applicationWillTerminate:(NSNotification *)notification {
+	UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-drag" create:NO];
+	if (dragPasteboard) dragPasteboard.persistent = YES;
+}
+
 #define MAX_NUMBER_OF_REGISTERED_APPS 100
 
 - (void)registerApplicationWithTypes:(NSArray *)types {
+	
+	NSLog(@"reg: %@", types);
 	
 	if (dk_manifest) {
 		NSLog(@"dk_buildManifest should only be called once.");
@@ -118,6 +126,12 @@ static DKDragDropServer *sharedInstance = nil;
 	
 	// check to see if we've already created a pasteboard. this returns a valid pasteboard in the common case.
 	NSString *pasteboardName = [[NSUserDefaults standardUserDefaults] objectForKey:@"dragkit-pasteboard"];
+	
+	// create our app registration.
+	DKApplicationRegistration *appRegistration = [DKApplicationRegistration registrationWithDragTypes:types];
+	
+	[dk_applicationRegistration release];
+	dk_applicationRegistration = [appRegistration retain];
 	
 	// the original application that created the manifest could have been deleted.
 	// this would leave UIPasteboards out there without a central manifest.
@@ -148,8 +162,6 @@ static DKDragDropServer *sharedInstance = nil;
 			// create a new pasteboard with the name [possibleApp name].
 			UIPasteboard *registrationPasteboard = [UIPasteboard pasteboardWithName:[possibleApp name] create:YES];
 			registrationPasteboard.persistent = YES;
-			
-			DKApplicationRegistration *appRegistration = [DKApplicationRegistration registrationWithDragTypes:types];
 			
 			NSData *registrationData = [NSKeyedArchiver archivedDataWithRootObject:appRegistration];
 			
@@ -258,6 +270,45 @@ static char dataProviderKey;
 	if (targetToRemove) [dk_dropTargets removeObject:targetToRemove];
 }
 
+- (void)dk_createDragPasteboardForView:(UIView *)view {
+	//grab the associated objects.
+	NSString *dropIdentifier = objc_getAssociatedObject(view, &dragKey);
+	void *dropContext = objc_getAssociatedObject(view, &contextKey);
+	NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(view, &dataProviderKey);
+	
+	// ask for the data and construct a UIPasteboard.
+	UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-drag" create:YES];
+	
+	// associate metadata with the pasteboard.
+	NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
+	
+	// add the drag image. if none is set, we can use default.
+	// [metadata setObject:[NSData data] forKey:@"dragImage"];
+	
+	// add the registration for the application that we're dragging from.
+	[metadata setObject:dk_applicationRegistration forKey:@"draggingApplication"];
+	
+	// set the date so we know the drag happened a reasonable time ago in the receiving app.
+	[metadata setObject:[NSDate date] forKey:@"dragDate"];
+	
+	// set our metadata on our private metadata type.
+	[dragPasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:metadata] forPasteboardType:@"dragkit.metadata"];
+	[metadata release];
+	
+	// go through each type supported by the drop target
+	// and request the data for that type from the data source.
+	
+	NSArray *advertisedTypes = [dataProvider typesSupportedForDrag:dropIdentifier forView:view context:dropContext];
+	
+	for (NSString *type in advertisedTypes) {
+		NSData *data = [dataProvider dataForType:type withDrag:dropIdentifier forView:view context:dropContext];
+		
+		if (data) {
+			[dragPasteboard addItems:[NSArray arrayWithObject:[NSDictionary dictionaryWithObject:data forKey:type]]];
+		}
+	}
+}
+
 #pragma mark -
 #pragma mark Dragging Callback
 
@@ -285,6 +336,9 @@ CGSize touchOffset;
 			CGPoint position = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
 			
 			[self dk_displayDragViewForView:self.originalView atPoint:position];
+			
+			// create our drag pasteboard with the proper types.
+			[self dk_createDragPasteboardForView:[sender view]];
 			
 			break;
 		case UIGestureRecognizerStateChanged:
@@ -314,18 +368,15 @@ CGSize touchOffset;
 					//grab the associated objects.
 					NSString *dropIdentifier = objc_getAssociatedObject([sender view], &dragKey);
 					void *dropContext = objc_getAssociatedObject([sender view], &contextKey);
-					NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject([sender view], &dataProviderKey);
 					
 					// ask for the data and construct a UIPasteboard.
-					UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithUniqueName];
+					UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-drag" create:NO];
 					
-					// go through each type supported by the drop target
-					// and request the data for that type from the data source.
-					for (NSString *type in droppedTarget.acceptedTypes) {
-						NSData *data = [dataProvider dataForType:type withDrag:dropIdentifier forView:[sender view] context:dropContext];
-						
-						if (data) [dragPasteboard setData:data forPasteboardType:type];
-					}
+					NSDictionary *meta = [NSKeyedUnarchiver unarchiveObjectWithData:[dragPasteboard dataForPasteboardType:@"dragkit.metadata"]];
+					NSLog(@"META: %@", meta);
+					
+					// get rid of our temp metadata because we're not doing interapp.
+					//[dragPasteboard setData:nil forPasteboardType:@"dragkit.metadata"];
 					
 					[droppedTarget.dragDelegate drag:dropIdentifier completedOnTargetView:droppedTarget.dropView withDragPasteboard:dragPasteboard context:dropContext];
 				}
@@ -350,20 +401,6 @@ CGSize touchOffset;
 		default:
 			break;
 	}
-}
-
-#pragma mark -
-#pragma mark URL Open Handlers
-
-// DragKit URLs look like so: x-drag-com.zacwhite.appname://?dkpasteboard=23402349343&type=image.png
-
-- (void)dk_handleURL:(NSNotification *)notification {
-	//handle the URL!
-	NSLog(@"notification: %@", notification);
-	
-//	UIAlertView *options = [[UIAlertView alloc] initWithTitle:@"options" message:[NSString stringWithFormat:@"%@", launchOptions] delegate:nil cancelButtonTitle:@"Dismiss" otherButtonTitles:nil];
-//	[options show];
-//	[options release];
 }
 
 - (DKDropTarget *)dk_dropTargetHitByPoint:(CGPoint)point {
@@ -587,6 +624,7 @@ CGSize touchOffset;
 
 - (void)dealloc {
 	
+	[dk_applicationRegistration release];
 	[dk_dropTargets release];
 	[dk_mainAppWindow release];
 	

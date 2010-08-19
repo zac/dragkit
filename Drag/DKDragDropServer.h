@@ -11,6 +11,7 @@
 @protocol DKDragDataProvider
 
 // request the data from the view.
+- (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 - (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 
 @end
@@ -25,7 +26,7 @@
 
 @end
 
-@class DKHoldingAreaViewController;
+@class DKHoldingAreaViewController, DKApplicationRegistration;
 
 @interface DKDragDropServer : NSObject {
 	UIView *draggedView;
@@ -48,8 +49,8 @@
 	// the resolved supported applications.
 	NSMutableArray *dk_supportedApplications;
 	
-	// the external application registrations keyed with the peerID from GameKit.
-	NSMutableDictionary *dk_externalApplications;
+	// the application registrations.
+	DKApplicationRegistration *dk_applicationRegistration;
 	
 	// arrays that store the targets and delegates.
 	NSMutableArray *dk_dropTargets;

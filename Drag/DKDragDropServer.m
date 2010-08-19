@@ -11,10 +11,7 @@
 
 #import "DKDropTarget.h"
 
-#import "DKDrawerViewController.h"
-
 #import "DKApplicationRegistration.h"
-#import "DKExternalApplicationRegistration.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -35,16 +32,11 @@ static DKDragDropServer *sharedInstance = nil;
 - (DKDropTarget *)dk_dropTargetHitByPoint:(CGPoint)point;
 - (void)dk_collapseDragViewAtPoint:(CGPoint)point;
 
-// GameKit
-
-// GameKit data handling.
-- (void)receiveData:(NSData *)data fromPeer:(NSString *)peer inSession:(GKSession *)session context:(void *)context;
-
 @end
 
 @implementation DKDragDropServer
 
-@synthesize draggedView, originalView, drawerController, drawerVisibilityLevel;
+@synthesize draggedView, originalView;
 
 #pragma mark -
 #pragma mark Singleton
@@ -87,19 +79,6 @@ static DKDragDropServer *sharedInstance = nil;
 													 selector:@selector(dk_handleURL:)
 														 name:UIApplicationDidFinishLaunchingNotification
 													   object:nil];
-			
-			dk_externalApplications = [[NSMutableDictionary alloc] init];
-			
-			NSString *deviceName = [[UIDevice currentDevice] name];
-			NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
-			dk_gameKitSession = [[GKSession alloc] initWithSessionID:@"DragKitSession"
-														 displayName:[NSString stringWithFormat:@"%@ (%@)", deviceName, appName]
-														 sessionMode:GKSessionModePeer];
-			dk_gameKitSession.delegate = self;
-			[dk_gameKitSession setDataReceiveHandler:self withContext:nil];
-			
-			//start advertising immediately.
-			dk_gameKitSession.available = YES;
 		}
 		
 		//Assign sharedInstance here so that we don't end up with multiple instances if a caller calls +alloc/-init without going through +sharedInstance.
@@ -284,9 +263,6 @@ static char dataProviderKey;
 
 #define MARGIN_Y (50)
 
-#define PEEK_DISTANCE (30)
-#define VISIBLE_WIDTH (300)
-
 CGSize touchOffset;
 
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender {
@@ -310,8 +286,6 @@ CGSize touchOffset;
 			
 			[self dk_displayDragViewForView:self.originalView atPoint:position];
 			
-			self.drawerVisibilityLevel = DKDrawerVisibilityLevelPeeking;
-			
 			break;
 		case UIGestureRecognizerStateChanged:
 			
@@ -321,12 +295,6 @@ CGSize touchOffset;
 			windowWidth = [[self dk_mainAppWindow] frame].size.width;
 			
 			[self dk_messageTargetsHitByPoint:touchPoint];
-			
-			if (touchPoint.x > windowWidth - 100) {
-				self.drawerVisibilityLevel = DKDrawerVisibilityLevelVisible;
-			} else if (self.drawerVisibilityLevel == DKDrawerVisibilityLevelVisible && touchPoint.x < windowWidth - VISIBLE_WIDTH) {
-				self.drawerVisibilityLevel = DKDrawerVisibilityLevelPeeking;
-			}
 			
 			viewPosition = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
 			
@@ -382,114 +350,6 @@ CGSize touchOffset;
 		default:
 			break;
 	}
-}
-
-- (void)setDrawerVisibilityLevel:(DKDrawerVisibilityLevel)newLevel {
-	
-	if (newLevel == drawerVisibilityLevel) return;
-	
-	drawerVisibilityLevel = newLevel;
-	
-	CGRect windowFrame = [[self dk_mainAppWindow] frame];
-	
-	if (!self.drawerController) {
-		self.drawerController = [[[DKDrawerViewController alloc] init] autorelease];
-		self.drawerController.view.frame = CGRectMake(windowFrame.size.width,
-													  MARGIN_Y,
-													  VISIBLE_WIDTH,
-													  windowFrame.size.height - 2 * MARGIN_Y);
-		[[self dk_mainAppWindow] addSubview:self.drawerController.view];
-		
-		[[self.draggedView superview] bringSubviewToFront:self.draggedView];
-	}
-	
-	CGFloat drawerX = 0.0;
-	//TODO: Support different anchor points.
-	switch (drawerVisibilityLevel) {
-		case DKDrawerVisibilityLevelHidden:
-			drawerX = windowFrame.size.width;
-			break;
-		case DKDrawerVisibilityLevelPeeking:
-			drawerX = windowFrame.size.width - PEEK_DISTANCE;
-			break;
-		case DKDrawerVisibilityLevelVisible:
-			drawerX = windowFrame.size.width - VISIBLE_WIDTH;
-			break;
-		default:
-			break;
-	}
-	
-	[UIView beginAnimations:@"DrawerMove" context:NULL];
-	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:0.3];
-	
-	self.drawerController.view.frame = CGRectMake(drawerX,
-												  MARGIN_Y,
-												  VISIBLE_WIDTH,
-												  windowFrame.size.height - 2 * MARGIN_Y);
-	[UIView commitAnimations];
-}
-
-#pragma mark -
-#pragma mark GameKit Session Delegate
-
-- (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state {
-	// update the state of the item in the drawer to reflect the new state.
-	NSLog(@"peer: %@ didChangeState: %d", peerID, state);
-	
-	if (state == GKPeerStateAvailable) {
-		
-		DKExternalApplicationRegistration *externalApp = [dk_externalApplications objectForKey:peerID];
-		
-		if (!externalApp) {
-			// create the application and insert it into our dictionary.
-			externalApp = [[DKExternalApplicationRegistration alloc] init];
-			externalApp.peerID = peerID;
-			
-			// the state is idle for now until we get more registration information.
-			externalApp.currentState = DKExternalApplicaionStateUnregistered;
-			
-			NSLog(@"display: %@", [dk_gameKitSession displayNameForPeer:peerID]);
-		}
-	} else if (state == GKPeerStateConnected) {
-		// send something!
-	} else if (state == GKPeerStateUnavailable) {
-		
-		NSLog(@"Device became unavailable: %@", peerID);
-		
-		// the device became unavailable.
-		[[dk_externalApplications objectForKey:peerID] setCurrentState:DKExternalApplicaionStateDisconnected];
-		[dk_externalApplications removeObjectForKey:peerID];
-	}
-}
-
-- (void)session:(GKSession *)session didReceiveConnectionRequestFromPeer:(NSString *)peerID {
-	// a peer wants to connect.
-	
-	NSLog(@"peer: %@ wants to connect");
-	
-	NSError *error = nil;
-	BOOL connectionAccepted = [session acceptConnectionFromPeer:peerID error:&error];
-	
-	if (!connectionAccepted) {
-		//could not accept connection.
-		NSLog(@"Could not accept connection: %@", error);
-	}
-}
-
-- (void)session:(GKSession *)session connectionWithPeerFailed:(NSString *)peerID withError:(NSError *)error {
-	// some error occurred while trying to connect to peer.
-	NSLog(@"Couldn't connect with peer %@: %@", peerID, error);
-}
-
-- (void)session:(GKSession *)session didFailWithError:(NSError *)error {
-	NSLog(@"Session failed: %@", error);
-}
-
-
-- (void)receiveData:(NSData *)data fromPeer:(NSString *)peer inSession:(GKSession *)session context:(void *)context {
-	//got data!
-	NSLog(@"peer %@ gave data: %@", peer, data);
 }
 
 #pragma mark -
@@ -711,17 +571,14 @@ CGSize touchOffset;
 	self.draggedView.alpha = 0.5;
 	
 	[UIView commitAnimations];
-	
-	self.drawerVisibilityLevel = DKDrawerVisibilityLevelHidden;
 }
 
 - (void)cancelAnimationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {
 	
 	if ([animationID isEqualToString:@"SnapBack"] || [animationID isEqualToString:@"DropSuck"]) {
+		
 		[self.draggedView removeFromSuperview];
 		self.draggedView = nil;
-		
-		self.drawerVisibilityLevel = DKDrawerVisibilityLevelHidden;
 		
 	} else if ([animationID isEqualToString:@"ResizeDragView"]) {
 		[(UIView *)context removeFromSuperview];
@@ -732,9 +589,6 @@ CGSize touchOffset;
 	
 	[dk_dropTargets release];
 	[dk_mainAppWindow release];
-	
-	[dk_externalApplications release];
-	[dk_gameKitSession release];
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	

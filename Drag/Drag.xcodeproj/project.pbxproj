@@ -7,23 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1100210F11D04A640046072D /* DKDrawerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1100210E11D04A640046072D /* DKDrawerCell.m */; };
 		110021D311D053E70046072D /* DKApplicationRegistration.m in Sources */ = {isa = PBXBuildFile; fileRef = 110021D211D053E70046072D /* DKApplicationRegistration.m */; };
 		111F001611CDE11D004AED24 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 111F001511CDE11D004AED24 /* QuartzCore.framework */; };
 		111F011D11CE2756004AED24 /* DKDropTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F011C11CE2756004AED24 /* DKDropTarget.m */; };
 		111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F3616117E9E2200B72C00 /* DKDragViewController.m */; };
-		111FFFAF11CDDC72004AED24 /* DKDrawerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFAE11CDDC72004AED24 /* DKDrawerViewController.m */; };
-		111FFFD611CDDDCF004AED24 /* AQGridView.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFC411CDDDCF004AED24 /* AQGridView.m */; };
-		111FFFD711CDDDCF004AED24 /* AQGridViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFC811CDDDCF004AED24 /* AQGridViewCell.m */; };
-		111FFFD811CDDDCF004AED24 /* AQGridViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFCB11CDDDCF004AED24 /* AQGridViewController.m */; };
-		111FFFD911CDDDCF004AED24 /* AQGridViewData.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFCD11CDDDCF004AED24 /* AQGridViewData.m */; };
-		111FFFDA11CDDDCF004AED24 /* AQGridViewUpdateInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFCF11CDDDCF004AED24 /* AQGridViewUpdateInfo.m */; };
-		111FFFDB11CDDDCF004AED24 /* AQGridViewUpdateItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFD111CDDDCF004AED24 /* AQGridViewUpdateItem.m */; };
-		111FFFDC11CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFD311CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.m */; };
-		111FFFDD11CDDDCF004AED24 /* UIColor+AQGridView.m in Sources */ = {isa = PBXBuildFile; fileRef = 111FFFD511CDDDCF004AED24 /* UIColor+AQGridView.m */; };
 		112284CE1214D5C0007165D3 /* DKHoldingAreaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 112284CD1214D5C0007165D3 /* DKHoldingAreaViewController.m */; };
 		1150E4B3120E40C6008902F8 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1150E4B2120E40C6008902F8 /* GameKit.framework */; };
-		1150E4EE120E4E56008902F8 /* DKExternalApplicationRegistration.m in Sources */ = {isa = PBXBuildFile; fileRef = 1150E4ED120E4E56008902F8 /* DKExternalApplicationRegistration.m */; };
 		117462A211CD95C300BAD1D9 /* drag_view_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 117462A011CD95C300BAD1D9 /* drag_view_background.png */; };
 		117462A311CD95C300BAD1D9 /* drag_view_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 117462A111CD95C300BAD1D9 /* drag_view_background@2x.png */; };
 		11DF18E3117EA17B00233A48 /* DKDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18E2117EA17B00233A48 /* DKDragView.m */; };
@@ -39,8 +28,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1100210D11D04A640046072D /* DKDrawerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDrawerCell.h; sourceTree = "<group>"; };
-		1100210E11D04A640046072D /* DKDrawerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDrawerCell.m; sourceTree = "<group>"; };
 		110021D111D053E70046072D /* DKApplicationRegistration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKApplicationRegistration.h; sourceTree = "<group>"; };
 		110021D211D053E70046072D /* DKApplicationRegistration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKApplicationRegistration.m; sourceTree = "<group>"; };
 		111F001511CDE11D004AED24 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -48,32 +35,9 @@
 		111F011C11CE2756004AED24 /* DKDropTarget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDropTarget.m; sourceTree = "<group>"; };
 		111F3615117E9E2200B72C00 /* DKDragViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragViewController.h; sourceTree = "<group>"; };
 		111F3616117E9E2200B72C00 /* DKDragViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragViewController.m; sourceTree = "<group>"; };
-		111FFFAD11CDDC72004AED24 /* DKDrawerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDrawerViewController.h; sourceTree = "<group>"; };
-		111FFFAE11CDDC72004AED24 /* DKDrawerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDrawerViewController.m; sourceTree = "<group>"; };
-		111FFFC311CDDDCF004AED24 /* AQGridView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AQGridView.h; path = ../AQGridView/Classes/AQGridView.h; sourceTree = SOURCE_ROOT; };
-		111FFFC411CDDDCF004AED24 /* AQGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AQGridView.m; path = ../AQGridView/Classes/AQGridView.m; sourceTree = SOURCE_ROOT; };
-		111FFFC511CDDDCF004AED24 /* AQGridView+CellLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AQGridView+CellLayout.h"; path = "../AQGridView/Classes/AQGridView+CellLayout.h"; sourceTree = SOURCE_ROOT; };
-		111FFFC611CDDDCF004AED24 /* AQGridView+CellLocationDelegation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AQGridView+CellLocationDelegation.h"; path = "../AQGridView/Classes/AQGridView+CellLocationDelegation.h"; sourceTree = SOURCE_ROOT; };
-		111FFFC711CDDDCF004AED24 /* AQGridViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AQGridViewCell.h; path = ../AQGridView/Classes/AQGridViewCell.h; sourceTree = SOURCE_ROOT; };
-		111FFFC811CDDDCF004AED24 /* AQGridViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AQGridViewCell.m; path = ../AQGridView/Classes/AQGridViewCell.m; sourceTree = SOURCE_ROOT; };
-		111FFFC911CDDDCF004AED24 /* AQGridViewCell+AQGridViewCellPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AQGridViewCell+AQGridViewCellPrivate.h"; path = "../AQGridView/Classes/AQGridViewCell+AQGridViewCellPrivate.h"; sourceTree = SOURCE_ROOT; };
-		111FFFCA11CDDDCF004AED24 /* AQGridViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AQGridViewController.h; path = ../AQGridView/Classes/AQGridViewController.h; sourceTree = SOURCE_ROOT; };
-		111FFFCB11CDDDCF004AED24 /* AQGridViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AQGridViewController.m; path = ../AQGridView/Classes/AQGridViewController.m; sourceTree = SOURCE_ROOT; };
-		111FFFCC11CDDDCF004AED24 /* AQGridViewData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AQGridViewData.h; path = ../AQGridView/Classes/AQGridViewData.h; sourceTree = SOURCE_ROOT; };
-		111FFFCD11CDDDCF004AED24 /* AQGridViewData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AQGridViewData.m; path = ../AQGridView/Classes/AQGridViewData.m; sourceTree = SOURCE_ROOT; };
-		111FFFCE11CDDDCF004AED24 /* AQGridViewUpdateInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AQGridViewUpdateInfo.h; path = ../AQGridView/Classes/AQGridViewUpdateInfo.h; sourceTree = SOURCE_ROOT; };
-		111FFFCF11CDDDCF004AED24 /* AQGridViewUpdateInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AQGridViewUpdateInfo.m; path = ../AQGridView/Classes/AQGridViewUpdateInfo.m; sourceTree = SOURCE_ROOT; };
-		111FFFD011CDDDCF004AED24 /* AQGridViewUpdateItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AQGridViewUpdateItem.h; path = ../AQGridView/Classes/AQGridViewUpdateItem.h; sourceTree = SOURCE_ROOT; };
-		111FFFD111CDDDCF004AED24 /* AQGridViewUpdateItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AQGridViewUpdateItem.m; path = ../AQGridView/Classes/AQGridViewUpdateItem.m; sourceTree = SOURCE_ROOT; };
-		111FFFD211CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSIndexSet+AQIsSetContiguous.h"; path = "../AQGridView/Classes/NSIndexSet+AQIsSetContiguous.h"; sourceTree = SOURCE_ROOT; };
-		111FFFD311CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSIndexSet+AQIsSetContiguous.m"; path = "../AQGridView/Classes/NSIndexSet+AQIsSetContiguous.m"; sourceTree = SOURCE_ROOT; };
-		111FFFD411CDDDCF004AED24 /* UIColor+AQGridView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor+AQGridView.h"; path = "../AQGridView/Classes/UIColor+AQGridView.h"; sourceTree = SOURCE_ROOT; };
-		111FFFD511CDDDCF004AED24 /* UIColor+AQGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor+AQGridView.m"; path = "../AQGridView/Classes/UIColor+AQGridView.m"; sourceTree = SOURCE_ROOT; };
 		112284CC1214D5C0007165D3 /* DKHoldingAreaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKHoldingAreaViewController.h; sourceTree = "<group>"; };
 		112284CD1214D5C0007165D3 /* DKHoldingAreaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKHoldingAreaViewController.m; sourceTree = "<group>"; };
 		1150E4B2120E40C6008902F8 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
-		1150E4EC120E4E56008902F8 /* DKExternalApplicationRegistration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKExternalApplicationRegistration.h; sourceTree = "<group>"; };
-		1150E4ED120E4E56008902F8 /* DKExternalApplicationRegistration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKExternalApplicationRegistration.m; sourceTree = "<group>"; };
 		117462A011CD95C300BAD1D9 /* drag_view_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = drag_view_background.png; sourceTree = "<group>"; };
 		117462A111CD95C300BAD1D9 /* drag_view_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "drag_view_background@2x.png"; sourceTree = "<group>"; };
 		11AB612811D1C8BA00D13C90 /* DragKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DragKit.h; sourceTree = "<group>"; };
@@ -112,32 +76,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		111FFFC011CDDDB9004AED24 /* AQGridView */ = {
-			isa = PBXGroup;
-			children = (
-				111FFFC311CDDDCF004AED24 /* AQGridView.h */,
-				111FFFC411CDDDCF004AED24 /* AQGridView.m */,
-				111FFFC511CDDDCF004AED24 /* AQGridView+CellLayout.h */,
-				111FFFC611CDDDCF004AED24 /* AQGridView+CellLocationDelegation.h */,
-				111FFFC711CDDDCF004AED24 /* AQGridViewCell.h */,
-				111FFFC811CDDDCF004AED24 /* AQGridViewCell.m */,
-				111FFFC911CDDDCF004AED24 /* AQGridViewCell+AQGridViewCellPrivate.h */,
-				111FFFCA11CDDDCF004AED24 /* AQGridViewController.h */,
-				111FFFCB11CDDDCF004AED24 /* AQGridViewController.m */,
-				111FFFCC11CDDDCF004AED24 /* AQGridViewData.h */,
-				111FFFCD11CDDDCF004AED24 /* AQGridViewData.m */,
-				111FFFCE11CDDDCF004AED24 /* AQGridViewUpdateInfo.h */,
-				111FFFCF11CDDDCF004AED24 /* AQGridViewUpdateInfo.m */,
-				111FFFD011CDDDCF004AED24 /* AQGridViewUpdateItem.h */,
-				111FFFD111CDDDCF004AED24 /* AQGridViewUpdateItem.m */,
-				111FFFD211CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.h */,
-				111FFFD311CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.m */,
-				111FFFD411CDDDCF004AED24 /* UIColor+AQGridView.h */,
-				111FFFD511CDDDCF004AED24 /* UIColor+AQGridView.m */,
-			);
-			name = AQGridView;
-			sourceTree = "<group>";
-		};
 		1174629E11CD95B700BAD1D9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -157,24 +95,10 @@
 				112284CD1214D5C0007165D3 /* DKHoldingAreaViewController.m */,
 				110021D111D053E70046072D /* DKApplicationRegistration.h */,
 				110021D211D053E70046072D /* DKApplicationRegistration.m */,
-				1150E4EC120E4E56008902F8 /* DKExternalApplicationRegistration.h */,
-				1150E4ED120E4E56008902F8 /* DKExternalApplicationRegistration.m */,
 				111F011B11CE2756004AED24 /* DKDropTarget.h */,
 				111F011C11CE2756004AED24 /* DKDropTarget.m */,
-				11E6EFD911F6A08D00F1F29C /* Drawer */,
 			);
 			name = DragKit;
-			sourceTree = "<group>";
-		};
-		11E6EFD911F6A08D00F1F29C /* Drawer */ = {
-			isa = PBXGroup;
-			children = (
-				111FFFAD11CDDC72004AED24 /* DKDrawerViewController.h */,
-				111FFFAE11CDDC72004AED24 /* DKDrawerViewController.m */,
-				1100210D11D04A640046072D /* DKDrawerCell.h */,
-				1100210E11D04A640046072D /* DKDrawerCell.m */,
-			);
-			name = Drawer;
 			sourceTree = "<group>";
 		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
@@ -208,7 +132,6 @@
 		28EEBF621118D79A00187D67 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				111FFFC011CDDDB9004AED24 /* AQGridView */,
 				1174629E11CD95B700BAD1D9 /* Resources */,
 				8D1107310486CEB800E47090 /* Drag-Info.plist */,
 			);
@@ -319,19 +242,8 @@
 				111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */,
 				11DF18E3117EA17B00233A48 /* DKDragView.m in Sources */,
 				11DF18ED117EA66E00233A48 /* DKDragDropServer.m in Sources */,
-				111FFFAF11CDDC72004AED24 /* DKDrawerViewController.m in Sources */,
-				111FFFD611CDDDCF004AED24 /* AQGridView.m in Sources */,
-				111FFFD711CDDDCF004AED24 /* AQGridViewCell.m in Sources */,
-				111FFFD811CDDDCF004AED24 /* AQGridViewController.m in Sources */,
-				111FFFD911CDDDCF004AED24 /* AQGridViewData.m in Sources */,
-				111FFFDA11CDDDCF004AED24 /* AQGridViewUpdateInfo.m in Sources */,
-				111FFFDB11CDDDCF004AED24 /* AQGridViewUpdateItem.m in Sources */,
-				111FFFDC11CDDDCF004AED24 /* NSIndexSet+AQIsSetContiguous.m in Sources */,
-				111FFFDD11CDDDCF004AED24 /* UIColor+AQGridView.m in Sources */,
 				111F011D11CE2756004AED24 /* DKDropTarget.m in Sources */,
-				1100210F11D04A640046072D /* DKDrawerCell.m in Sources */,
 				110021D311D053E70046072D /* DKApplicationRegistration.m in Sources */,
-				1150E4EE120E4E56008902F8 /* DKExternalApplicationRegistration.m in Sources */,
 				112284CE1214D5C0007165D3 /* DKHoldingAreaViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

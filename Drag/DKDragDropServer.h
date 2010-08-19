@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <GameKit/GameKit.h>
 
 @protocol DKDragDataProvider
 
@@ -26,21 +25,11 @@
 
 @end
 
-typedef enum {
-	DKDrawerVisibilityLevelHidden,
-	DKDrawerVisibilityLevelPeeking,
-	DKDrawerVisibilityLevelVisible,
-} DKDrawerVisibilityLevel;
+@class DKHoldingAreaViewController;
 
-@class DKDrawerViewController, DKHoldingAreaViewController;
-
-@interface DKDragDropServer : NSObject <GKSessionDelegate> {
+@interface DKDragDropServer : NSObject {
 	UIView *draggedView;
 	UIView *originalView;
-	
-	DKDrawerViewController *drawerController;
-	
-	DKDrawerVisibilityLevel drawerVisibilityLevel;
 	
 @private
 	
@@ -52,9 +41,6 @@ typedef enum {
 	
 	// the pointer to the main app window.
 	UIWindow *dk_mainAppWindow;
-	
-	// the GameKit session.
-	GKSession *dk_gameKitSession;
 	
 	// the manifest of all apps on the system that support DragKit.
 	NSMutableArray *dk_manifest;
@@ -80,10 +66,6 @@ typedef enum {
 
 @property (nonatomic, retain) UIView *draggedView;
 @property (nonatomic, retain) UIView *originalView;
-
-@property (nonatomic, retain) DKDrawerViewController *drawerController;
-
-@property (nonatomic) DKDrawerVisibilityLevel drawerVisibilityLevel;
 
 - (void)resetRegistrationDatabase;
 

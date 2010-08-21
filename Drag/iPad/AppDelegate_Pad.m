@@ -17,14 +17,15 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
 	
-	[[DKDragDropServer sharedServer] registerApplicationWithTypes:[NSArray arrayWithObject:@"public.text"]];
-	
     // Override point for customization after application launch
 	
 	DKDragViewController *dragViewController = [[DKDragViewController alloc] initWithNibName:nil bundle:nil];
 	[window addSubview:dragViewController.view];
 	
     [window makeKeyAndVisible];
+	
+	// must be done after the window is key.
+	[[DKDragDropServer sharedServer] registerApplicationWithTypes:[NSArray arrayWithObject:@"public.text"]];
 	
 	return YES;
 }

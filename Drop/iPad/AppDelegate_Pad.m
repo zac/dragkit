@@ -24,6 +24,8 @@
 	
     [window makeKeyAndVisible];
 	
+	[[DKDragDropServer sharedServer] registerApplicationWithTypes:[NSArray arrayWithObject:@"public.text"]];
+	
 	return YES;
 }
 

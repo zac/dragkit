@@ -42,6 +42,8 @@
 	UIView *dk_holdingArea;
 	UILabel *dk_holdingAreaLabel;
 	
+	NSArray *dk_currentDragTypes;
+	
 	// the drop targets dictionary with associated data.
 	NSMutableDictionary *dk_dropTargetsDictionary;
 	

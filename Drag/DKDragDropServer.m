@@ -22,10 +22,12 @@ static DKDragDropServer *sharedInstance = nil;
 
 @interface DKDragDropServer (DKPrivate)
 
+- (void)dk_clearDragPasteboard;
 - (void)dk_showHoldingAreaForPasteboard:(UIPasteboard *)pasteboard;
+- (void)dk_hideHoldingArea;
 - (BOOL)dk_dragPasteboard:(UIPasteboard *)pasteboard conformsToTypes:(NSArray *)types;
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender;
-- (UIImage *)dk_generateImageForDragFromView:(UIView *)theView;
+- (UIImage *)dk_generateImageFromView:(UIView *)theView;
 - (void)dk_displayDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point;
 - (void)dk_moveDragViewToPoint:(CGPoint)point;
 - (void)dk_createDragPasteboardForView:(UIView *)view;
@@ -313,12 +315,25 @@ static char dataProviderKey;
 	void *dropContext = objc_getAssociatedObject(view, &contextKey);
 	NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(view, &dataProviderKey);
 	
+	
+	// if we are the data provider, that means we already have a pasteboard.
+	if (dataProvider == self) {
+		// set up our current drag types.
+		
+		UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-drag" create:YES];
+		[dk_currentDragTypes release];
+		
+		dk_currentDragTypes = [[NSArray alloc] initWithArray:[[dragPasteboard pasteboardTypesForItemSet:nil] lastObject]];
+		
+		return;
+	}
+	
+	// clear the drag pasteboard.
+	[self dk_clearDragPasteboard];
+	
 	// ask for the data and construct a UIPasteboard.
 	UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-drag" create:YES];
 	dragPasteboard.persistent = YES;
-	
-	// clear the pasteboard.
-	[dragPasteboard setItems:nil];
 	
 	// associate metadata with the pasteboard.
 	NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
@@ -348,6 +363,9 @@ static char dataProviderKey;
 		}
 	}
 	
+	[dk_currentDragTypes release];
+	dk_currentDragTypes = [[NSArray alloc] initWithArray:pasteboardTypes];
+	
 	[dragPasteboard addItems:pasteboardTypes];
 }
 
@@ -357,6 +375,7 @@ static char dataProviderKey;
 #define MARGIN_Y (50)
 
 CGSize touchOffset;
+CGPoint lastTouch;
 
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender {
 	// let the drag server know our frame and that we want to start dragging.
@@ -370,6 +389,7 @@ CGSize touchOffset;
 		case UIGestureRecognizerStateBegan:
 			
 			// create the necessary view and animate it.
+			[self dk_hideHoldingArea];
 			
 			self.originalView = [sender view];
 			
@@ -401,7 +421,7 @@ CGSize touchOffset;
 		case UIGestureRecognizerStateRecognized:
 			
 			// the user has let go.
-			droppedTarget = [self dk_dropTargetHitByPoint:touchPoint];
+			droppedTarget = [self dk_dropTargetHitByPoint:lastTouch];
 			
 			if (droppedTarget) {
 				CGPoint centerOfView = [[droppedTarget.dropView superview] convertPoint:droppedTarget.dropView.center toView:[self dk_mainAppWindow]];
@@ -418,10 +438,9 @@ CGSize touchOffset;
 					NSDictionary *meta = [NSKeyedUnarchiver unarchiveObjectWithData:[dragPasteboard dataForPasteboardType:@"dragkit.metadata"]];
 					NSLog(@"META: %@", meta);
 					
-					// get rid of our temp metadata because we're not doing interapp.
-					//[dragPasteboard setData:nil forPasteboardType:@"dragkit.metadata"];
-					
 					[droppedTarget.dragDelegate drag:dropIdentifier completedOnTargetView:droppedTarget.dropView withDragPasteboard:dragPasteboard context:dropContext];
+					
+					[dragPasteboard setItems:nil];
 				}
 				
 				// collapse the drag view into the drop view.
@@ -444,12 +463,17 @@ CGSize touchOffset;
 		default:
 			break;
 	}
+	
+	lastTouch = [sender locationInView:[self dk_mainAppWindow]];
 }
 
 - (DKDropTarget *)dk_dropTargetHitByPoint:(CGPoint)point {
 	for (DKDropTarget *target in dk_dropTargets) {
+		
 		if (CGRectContainsPoint(target.frameInWindow, point)) {
-			return target;
+			if ([[NSSet setWithArray:target.acceptedTypes] intersectsSet:[NSSet setWithArray:dk_currentDragTypes]]) {
+				return target;
+			}
 		}
 	}
 	return nil;
@@ -463,13 +487,16 @@ CGSize touchOffset;
 		if (CGRectContainsPoint(target.frameInWindow, point)) {
 			//message the target.
 			
-			[self dk_setView:target.dropView highlighted:YES animated:YES];
-			
-			if (!target.containsDragView && [target.dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
-				[target.dragDelegate dragDidEnterTargetView:target.dropView];
+			if ([[NSSet setWithArray:target.acceptedTypes] intersectsSet:[NSSet setWithArray:dk_currentDragTypes]]) {
+				
+				[self dk_setView:target.dropView highlighted:YES animated:YES];
+				
+				if (!target.containsDragView && [target.dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
+					[target.dragDelegate dragDidEnterTargetView:target.dropView];
+				}
+				
+				target.containsDragView = YES;
 			}
-			
-			target.containsDragView = YES;
 			
 		} else if (target.containsDragView) {
 			//it just left.
@@ -521,7 +548,9 @@ CGSize touchOffset;
 
 // we are going to zoom from this image to the normal view for the content type.
 
-- (UIImage *)dk_generateImageForDragFromView:(UIView *)theView {
+- (UIImage *)dk_generateImageFromView:(UIView *)theView {
+	
+	if (!theView) return nil;
 	
 	UIGraphicsBeginImageContext(theView.bounds.size);
 	
@@ -540,7 +569,7 @@ CGSize touchOffset;
 	if (!self.draggedView) {
 		
 		// grab the image.
-		UIImage *dragImage = [self dk_generateImageForDragFromView:draggableView];
+		UIImage *dragImage = [self dk_generateImageFromView:draggableView];
 		
 		// transition from the dragImage to our view.
 		NSString *dropIdentifier = objc_getAssociatedObject(draggableView, &dragKey);
@@ -560,29 +589,6 @@ CGSize touchOffset;
 																	 background.size.width,
 																	 background.size.height)] autorelease];
 		
-		// then apply a translate and a scale to make it the size/location of the original view.
-		
-		// remove the offset.
-		CGPoint translationPoint = [[self dk_mainAppWindow] convertPoint:CGPointMake(point.x - background.size.width / 2.0 + touchOffset.width,
-																					 point.y - background.size.height / 2.0 + touchOffset.height)
-																  toView:self.originalView];
-		
-		// add back in the offset.
-		translationPoint.x = translationPoint.x - touchOffset.width;
-		translationPoint.y = translationPoint.y - touchOffset.height;
-		
-		float widthRatio = self.originalView.frame.size.width / self.draggedView.frame.size.width;
-		float heightRatio = self.originalView.frame.size.height / self.draggedView.frame.size.height;
-		
-		float widthDiff = self.originalView.frame.size.width - self.draggedView.frame.size.width;
-		float heightDiff = self.originalView.frame.size.height - self.draggedView.frame.size.height;
-		
-		self.draggedView.transform = CGAffineTransformMakeTranslation(-translationPoint.x + widthDiff / 2.0, -translationPoint.y + heightDiff / 2.0);
-		self.draggedView.transform = CGAffineTransformScale(self.draggedView.transform,
-															widthRatio,
-															heightRatio);
-		
-		
 		UIImageView *dragImageView = [[UIImageView alloc] initWithFrame:self.draggedView.bounds];
 		dragImageView.image = background;
 		
@@ -592,24 +598,49 @@ CGSize touchOffset;
 		[self.draggedView addSubview:dragImageView];
 		[self.draggedView addSubview:originalImageView];
 		
-		originalImageView.alpha = 1.0;
-		dragImageView.alpha = 0.0;
-		
 		[[self dk_mainAppWindow] addSubview:self.draggedView];
 		
-		[UIView beginAnimations:@"ResizeDragView" context:originalImageView];
-		[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-		[UIView setAnimationDuration:0.3];
-		[UIView setAnimationDelegate:self];
-		[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
+		if (draggableView) {
 		
-		// snap it to normal.
-		self.draggedView.transform = CGAffineTransformIdentity;
-		
-		dragImageView.alpha = 1.0;
-		originalImageView.alpha = 0.0;
-		
-		[UIView commitAnimations];
+			// then apply a translate and a scale to make it the size/location of the original view.
+			
+			// remove the offset.
+			CGPoint translationPoint = [[self dk_mainAppWindow] convertPoint:CGPointMake(point.x - background.size.width / 2.0 + touchOffset.width,
+																						 point.y - background.size.height / 2.0 + touchOffset.height)
+																	  toView:self.originalView];
+			
+			// add back in the offset.
+			translationPoint.x = translationPoint.x - touchOffset.width;
+			translationPoint.y = translationPoint.y - touchOffset.height;
+			
+			float widthRatio = self.originalView.frame.size.width / self.draggedView.frame.size.width;
+			float heightRatio = self.originalView.frame.size.height / self.draggedView.frame.size.height;
+			
+			float widthDiff = self.originalView.frame.size.width - self.draggedView.frame.size.width;
+			float heightDiff = self.originalView.frame.size.height - self.draggedView.frame.size.height;
+			
+			self.draggedView.transform = CGAffineTransformMakeTranslation(-translationPoint.x + widthDiff / 2.0, -translationPoint.y + heightDiff / 2.0);
+			self.draggedView.transform = CGAffineTransformScale(self.draggedView.transform,
+																widthRatio,
+																heightRatio);
+			
+			originalImageView.alpha = 1.0;
+			dragImageView.alpha = 0.0;
+			
+			[UIView beginAnimations:@"ResizeDragView" context:originalImageView];
+			[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+			[UIView setAnimationDuration:0.3];
+			[UIView setAnimationDelegate:self];
+			[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
+			
+			// snap it to normal.
+			self.draggedView.transform = CGAffineTransformIdentity;
+			
+			dragImageView.alpha = 1.0;
+			originalImageView.alpha = 0.0;
+			
+			[UIView commitAnimations];
+		}
 		
 		[dragImageView release];
 		[originalImageView release];
@@ -644,8 +675,21 @@ CGSize touchOffset;
 	[UIView commitAnimations];
 }
 
+- (void)dk_clearDragPasteboard {
+	
+	[dk_currentDragTypes release];
+	dk_currentDragTypes = nil;
+	
+	UIPasteboard *pasteboard = [UIPasteboard pasteboardWithName:@"dragkit-drag" create:YES];
+	pasteboard.persistent = NO;
+	[pasteboard setItems:nil];
+}
+
 - (void)cancelDrag {
 	// cancel the window by animating it back to its location.
+	
+	// don't clear for now.
+	[self dk_clearDragPasteboard];
 	
 	CGPoint originalLocation = [[self.originalView superview] convertPoint:self.originalView.center toView:[self dk_mainAppWindow]];
 	
@@ -682,7 +726,51 @@ CGSize touchOffset;
 #pragma mark Holding Area Drawing
 
 - (void)dk_showHoldingAreaForPasteboard:(UIPasteboard *)pasteboard {
-	NSLog(@"window: %@", [self dk_mainAppWindow]);
+	
+	UIWindow *mainWindow = [self dk_mainAppWindow];
+	
+	dk_holdingArea = [[UIView alloc] initWithFrame:mainWindow.bounds];
+	dk_holdingArea.backgroundColor = [UIColor blackColor];
+	dk_holdingArea.alpha = 0.0;
+	
+	[mainWindow addSubview:dk_holdingArea];
+	
+	[self dk_displayDragViewForView:nil atPoint:CGPointMake(mainWindow.frame.size.width / 2.0, mainWindow.frame.size.height / 2.0)];
+	self.draggedView.alpha = 0.0;
+	
+	// use associated objects to attach our drag identifier.
+	objc_setAssociatedObject(self.draggedView, &dragKey, @"DragKit-Internal", OBJC_ASSOCIATION_COPY_NONATOMIC);
+	// attach the drag delegate.
+	objc_setAssociatedObject(self.draggedView, &dataProviderKey, self, OBJC_ASSOCIATION_ASSIGN);
+	
+	UIPanGestureRecognizer *dragGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
+	[self.draggedView addGestureRecognizer:dragGesture];
+	[dragGesture release];
+	
+	[UIView beginAnimations:@"HoldingAreaShow" context:nil];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:0.3];
+	
+	dk_holdingArea.alpha = 0.4;
+	self.draggedView.alpha = 1.0;
+	
+	[UIView commitAnimations];
+}
+
+- (void)dk_hideHoldingArea {
+	[UIView beginAnimations:@"HoldingAreaHide" context:nil];
+	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+	[UIView setAnimationDuration:0.3];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDidStopSelector:@selector(hideAnimationDidStop:finished:context:)];
+	
+	dk_holdingArea.alpha = 0.0;
+	
+	[UIView commitAnimations];
+}
+
+- (void)hideAnimationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {
+	[dk_holdingArea removeFromSuperview];
 }
 
 #pragma mark -
@@ -690,6 +778,8 @@ CGSize touchOffset;
 
 - (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context {
 	// return all types advertised in the pasteboard.
+	
+	NSLog(@"asking for types!");
 	return nil;
 }
 

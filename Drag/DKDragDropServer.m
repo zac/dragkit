@@ -8,6 +8,9 @@
 //  Singleton code stolen from: http://boredzo.org/blog/archives/2009-06-17/doing-it-wrong
 
 #import "DKDragDropServer.h"
+#import <MobileCoreServices/UTType.h>
+
+#import "DKHoldingAreaViewController.h"
 
 #import "DKDropTarget.h"
 
@@ -21,6 +24,7 @@ static DKDragDropServer *sharedInstance = nil;
 
 @interface DKDragDropServer (DKPrivate)
 
+- (BOOL)dk_dragPasteboard:(UIPasteboard *)pasteboard conformsToTypes:(NSArray *)types;
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender;
 - (UIImage *)dk_generateImageForDragFromView:(UIView *)theView;
 - (void)dk_displayDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point;
@@ -113,9 +117,43 @@ static DKDragDropServer *sharedInstance = nil;
 
 #define MAX_NUMBER_OF_REGISTERED_APPS 100
 
+- (BOOL)dk_dragPasteboard:(UIPasteboard *)pasteboard conformsToTypes:(NSArray *)types {
+	for (NSString *type in types) {
+		// check to see if any of the types being dragged are ones we support.
+		
+		for (NSArray *dragTypes in [pasteboard pasteboardTypesForItemSet:nil]) {
+			
+			// ignore if we are dealing with the metadata.
+			if ([dragTypes containsObject:@"dragkit.metadata"]) continue;
+			
+			for (NSArray *individualType in dragTypes) {
+				if (UTTypeConformsTo((CFStringRef)type, (CFStringRef)individualType)) {
+					return YES;
+				}
+			}
+		}
+	}
+	
+	return NO;
+}
+
 - (void)registerApplicationWithTypes:(NSArray *)types {
 	
 	NSLog(@"reg: %@", types);
+	
+	UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-drag" create:YES];
+	NSDictionary *meta = [NSKeyedUnarchiver unarchiveObjectWithData:[[dragPasteboard valuesForPasteboardType:@"dragkit.metadata" inItemSet:nil] lastObject]];
+	
+	if (meta) {
+		// we have a drag in progress.
+		
+		if ([self dk_dragPasteboard:dragPasteboard conformsToTypes:types]) {
+//			dk_holdingAreaViewController = [[DKHoldingAreaViewController alloc] init];
+//			[[self dk_mainAppWindow] addSubview:dk_holdingAreaViewController.view];
+		}
+	}
+	
+	NSLog(@"meta: %@", meta);
 	
 	if (dk_manifest) {
 		NSLog(@"dk_buildManifest should only be called once.");
@@ -278,35 +316,40 @@ static char dataProviderKey;
 	
 	// ask for the data and construct a UIPasteboard.
 	UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:@"dragkit-drag" create:YES];
+	dragPasteboard.persistent = YES;
+	
+	// clear the pasteboard.
+	[dragPasteboard setItems:nil];
 	
 	// associate metadata with the pasteboard.
 	NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
 	
 	// add the drag image. if none is set, we can use default.
-	// [metadata setObject:[NSData data] forKey:@"dragImage"];
+	//[metadata setObject:[NSData data] forKey:@"dragImage"];
 	
 	// add the registration for the application that we're dragging from.
 	[metadata setObject:dk_applicationRegistration forKey:@"draggingApplication"];
 	
-	// set the date so we know the drag happened a reasonable time ago in the receiving app.
-	[metadata setObject:[NSDate date] forKey:@"dragDate"];
-	
 	// set our metadata on our private metadata type.
-	[dragPasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:metadata] forPasteboardType:@"dragkit.metadata"];
+	[dragPasteboard addItems:[NSArray arrayWithObject:[NSDictionary dictionaryWithObject:[NSKeyedArchiver archivedDataWithRootObject:metadata]
+																				  forKey:@"dragkit.metadata"]]];
 	[metadata release];
 	
 	// go through each type supported by the drop target
 	// and request the data for that type from the data source.
 	
 	NSArray *advertisedTypes = [dataProvider typesSupportedForDrag:dropIdentifier forView:view context:dropContext];
+	NSMutableArray *pasteboardTypes = [NSMutableArray array];
 	
 	for (NSString *type in advertisedTypes) {
 		NSData *data = [dataProvider dataForType:type withDrag:dropIdentifier forView:view context:dropContext];
 		
 		if (data) {
-			[dragPasteboard addItems:[NSArray arrayWithObject:[NSDictionary dictionaryWithObject:data forKey:type]]];
+			[pasteboardTypes addObject:[NSDictionary dictionaryWithObject:data forKey:type]];
 		}
 	}
+	
+	[dragPasteboard addItems:pasteboardTypes];
 }
 
 #pragma mark -

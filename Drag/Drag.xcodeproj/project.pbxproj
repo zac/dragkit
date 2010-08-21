@@ -12,6 +12,7 @@
 		111F011D11CE2756004AED24 /* DKDropTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F011C11CE2756004AED24 /* DKDropTarget.m */; };
 		111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F3616117E9E2200B72C00 /* DKDragViewController.m */; };
 		112284CE1214D5C0007165D3 /* DKHoldingAreaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 112284CD1214D5C0007165D3 /* DKHoldingAreaViewController.m */; };
+		113F29CE121F87290073645E /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 113F29CD121F87290073645E /* MobileCoreServices.framework */; };
 		1150E4B3120E40C6008902F8 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1150E4B2120E40C6008902F8 /* GameKit.framework */; };
 		117462A211CD95C300BAD1D9 /* drag_view_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 117462A011CD95C300BAD1D9 /* drag_view_background.png */; };
 		117462A311CD95C300BAD1D9 /* drag_view_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 117462A111CD95C300BAD1D9 /* drag_view_background@2x.png */; };
@@ -37,6 +38,7 @@
 		111F3616117E9E2200B72C00 /* DKDragViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragViewController.m; sourceTree = "<group>"; };
 		112284CC1214D5C0007165D3 /* DKHoldingAreaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKHoldingAreaViewController.h; sourceTree = "<group>"; };
 		112284CD1214D5C0007165D3 /* DKHoldingAreaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKHoldingAreaViewController.m; sourceTree = "<group>"; };
+		113F29CD121F87290073645E /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		1150E4B2120E40C6008902F8 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		117462A011CD95C300BAD1D9 /* drag_view_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = drag_view_background.png; sourceTree = "<group>"; };
 		117462A111CD95C300BAD1D9 /* drag_view_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "drag_view_background@2x.png"; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 				288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */,
 				111F001611CDE11D004AED24 /* QuartzCore.framework in Frameworks */,
 				1150E4B3120E40C6008902F8 /* GameKit.framework in Frameworks */,
+				113F29CE121F87290073645E /* MobileCoreServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +176,7 @@
 				288765FC0DF74451002DB57D /* CoreGraphics.framework */,
 				111F001511CDE11D004AED24 /* QuartzCore.framework */,
 				1150E4B2120E40C6008902F8 /* GameKit.framework */,
+				113F29CD121F87290073645E /* MobileCoreServices.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

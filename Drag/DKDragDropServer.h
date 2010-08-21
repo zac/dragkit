@@ -11,8 +11,12 @@
 @protocol DKDragDataProvider
 
 // request the data from the view.
+
 - (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 - (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
+
+@optional
+- (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 
 @end
 
@@ -26,16 +30,17 @@
 
 @end
 
-@class DKHoldingAreaViewController, DKApplicationRegistration;
+@class DKApplicationRegistration;
 
-@interface DKDragDropServer : NSObject {
+@interface DKDragDropServer : NSObject <DKDragDataProvider> {
 	UIView *draggedView;
 	UIView *originalView;
 	
 @private
 	
-	// the modal view that comes up when we have a drag.
-	DKHoldingAreaViewController *dk_holdingAreaViewController;
+	// UI for the holding area.
+	UIView *dk_holdingArea;
+	UILabel *dk_holdingAreaLabel;
 	
 	// the drop targets dictionary with associated data.
 	NSMutableDictionary *dk_dropTargetsDictionary;

@@ -10,8 +10,6 @@
 #import "DKDragDropServer.h"
 #import <MobileCoreServices/UTType.h>
 
-#import "DKHoldingAreaViewController.h"
-
 #import "DKDropTarget.h"
 
 #import "DKApplicationRegistration.h"
@@ -24,6 +22,7 @@ static DKDragDropServer *sharedInstance = nil;
 
 @interface DKDragDropServer (DKPrivate)
 
+- (void)dk_showHoldingAreaForPasteboard:(UIPasteboard *)pasteboard;
 - (BOOL)dk_dragPasteboard:(UIPasteboard *)pasteboard conformsToTypes:(NSArray *)types;
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender;
 - (UIImage *)dk_generateImageForDragFromView:(UIView *)theView;
@@ -148,8 +147,8 @@ static DKDragDropServer *sharedInstance = nil;
 		// we have a drag in progress.
 		
 		if ([self dk_dragPasteboard:dragPasteboard conformsToTypes:types]) {
-//			dk_holdingAreaViewController = [[DKHoldingAreaViewController alloc] init];
-//			[[self dk_mainAppWindow] addSubview:dk_holdingAreaViewController.view];
+			// create and show the holding area.
+			[self dk_showHoldingAreaForPasteboard:dragPasteboard];
 		}
 	}
 	
@@ -374,7 +373,8 @@ CGSize touchOffset;
 			
 			self.originalView = [sender view];
 			
-			touchOffset = CGSizeMake(104, 39);
+			// our touch offset is just 0,0, which makes it the center.
+			touchOffset = CGSizeMake(0,0);
 			
 			CGPoint position = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
 			
@@ -522,6 +522,7 @@ CGSize touchOffset;
 // we are going to zoom from this image to the normal view for the content type.
 
 - (UIImage *)dk_generateImageForDragFromView:(UIView *)theView {
+	
 	UIGraphicsBeginImageContext(theView.bounds.size);
 	
 	[theView.layer renderInContext:UIGraphicsGetCurrentContext()];
@@ -542,19 +543,28 @@ CGSize touchOffset;
 		UIImage *dragImage = [self dk_generateImageForDragFromView:draggableView];
 		
 		// transition from the dragImage to our view.
+		NSString *dropIdentifier = objc_getAssociatedObject(draggableView, &dragKey);
+		void *dropContext = objc_getAssociatedObject(draggableView, &contextKey);
+		NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
 		
-		UIImage *background = [UIImage imageNamed:@"drag_view_background.png"];
+		UIImage *background = nil;
+		if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:context:)]) {
+			background = [dataProvider imageForDrag:dropIdentifier forView:draggableView context:dropContext];
+		} else {
+			background = [UIImage imageNamed:@"drag_view_background.png"];
+		}
 		
 		// create our drag view where we want it.
-		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake(point.x,
-																	 point.y,
+		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake(point.x - background.size.width / 2.0,
+																	 point.y - background.size.height / 2.0,
 																	 background.size.width,
 																	 background.size.height)] autorelease];
 		
 		// then apply a translate and a scale to make it the size/location of the original view.
 		
 		// remove the offset.
-		CGPoint translationPoint = [[self dk_mainAppWindow] convertPoint:CGPointMake(point.x + touchOffset.width, point.y + touchOffset.height)
+		CGPoint translationPoint = [[self dk_mainAppWindow] convertPoint:CGPointMake(point.x - background.size.width / 2.0 + touchOffset.width,
+																					 point.y - background.size.height / 2.0 + touchOffset.height)
 																  toView:self.originalView];
 		
 		// add back in the offset.
@@ -613,7 +623,10 @@ CGSize touchOffset;
 		return;
 	}
 	
-	self.draggedView.frame = CGRectMake(point.x, point.y, self.draggedView.frame.size.width, self.draggedView.frame.size.height);
+	self.draggedView.frame = CGRectMake(point.x - self.draggedView.frame.size.width / 2.0,
+										point.y - self.draggedView.frame.size.height / 2.0,
+										self.draggedView.frame.size.width,
+										self.draggedView.frame.size.height);
 }
 
 - (void)dk_collapseDragViewAtPoint:(CGPoint)point {
@@ -664,6 +677,32 @@ CGSize touchOffset;
 		[(UIView *)context removeFromSuperview];
 	}
 }
+
+#pragma mark -
+#pragma mark Holding Area Drawing
+
+- (void)dk_showHoldingAreaForPasteboard:(UIPasteboard *)pasteboard {
+	NSLog(@"window: %@", [self dk_mainAppWindow]);
+}
+
+#pragma mark -
+#pragma mark DKDragDataProvider For Holding Area
+
+- (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context {
+	// return all types advertised in the pasteboard.
+	return nil;
+}
+
+- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context {
+	// fetch data from the pasteboard.
+	return nil;
+}
+
+- (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context {
+	// read in the pasteboard for the drag image.
+	return nil;
+}
+
 
 - (void)dealloc {
 	

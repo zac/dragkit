@@ -7,11 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <GameKit/GameKit.h>
 
 @protocol DKDragDataProvider
 
 // request the data from the view.
+- (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 - (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 
 @end
@@ -26,21 +26,11 @@
 
 @end
 
-typedef enum {
-	DKDrawerVisibilityLevelHidden,
-	DKDrawerVisibilityLevelPeeking,
-	DKDrawerVisibilityLevelVisible,
-} DKDrawerVisibilityLevel;
+@class DKHoldingAreaViewController, DKApplicationRegistration;
 
-@class DKDrawerViewController, DKHoldingAreaViewController;
-
-@interface DKDragDropServer : NSObject <GKSessionDelegate> {
+@interface DKDragDropServer : NSObject {
 	UIView *draggedView;
 	UIView *originalView;
-	
-	DKDrawerViewController *drawerController;
-	
-	DKDrawerVisibilityLevel drawerVisibilityLevel;
 	
 @private
 	
@@ -53,17 +43,14 @@ typedef enum {
 	// the pointer to the main app window.
 	UIWindow *dk_mainAppWindow;
 	
-	// the GameKit session.
-	GKSession *dk_gameKitSession;
-	
 	// the manifest of all apps on the system that support DragKit.
 	NSMutableArray *dk_manifest;
 	
 	// the resolved supported applications.
 	NSMutableArray *dk_supportedApplications;
 	
-	// the external application registrations keyed with the peerID from GameKit.
-	NSMutableDictionary *dk_externalApplications;
+	// the application registrations.
+	DKApplicationRegistration *dk_applicationRegistration;
 	
 	// arrays that store the targets and delegates.
 	NSMutableArray *dk_dropTargets;
@@ -80,10 +67,6 @@ typedef enum {
 
 @property (nonatomic, retain) UIView *draggedView;
 @property (nonatomic, retain) UIView *originalView;
-
-@property (nonatomic, retain) DKDrawerViewController *drawerController;
-
-@property (nonatomic) DKDrawerVisibilityLevel drawerVisibilityLevel;
 
 - (void)resetRegistrationDatabase;
 

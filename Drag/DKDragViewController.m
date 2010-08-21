@@ -25,6 +25,10 @@
 #pragma mark -
 #pragma mark DKDragDataProvider Methods
 
+- (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context {
+	return [NSArray arrayWithObject:@"public.text"];
+}
+
 //request the data from the view.
 - (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context {
 	
@@ -88,7 +92,9 @@
 
 - (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard context:(void *)context {
 	NSLog(@"drag: %@ completedOnTargetView:%@ dragPasteboard:%@ context:%p", dropID, targetView, dragPasteboard, context);
-	NSString *text = [[NSString alloc] initWithData:[dragPasteboard dataForPasteboardType:@"public.text"] encoding:NSUTF8StringEncoding];
+	
+	NSString *text = [[NSString alloc] initWithData:[[dragPasteboard valuesForPasteboardType:@"public.text" inItemSet:nil] lastObject]
+										   encoding:NSUTF8StringEncoding];
 	NSLog(@"data: %@", text);
 }
 

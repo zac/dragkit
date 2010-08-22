@@ -337,8 +337,8 @@ static char dataProviderKey;
 	NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
 	
 	// add the drag image. if none is set, we can use default.
-	//[metadata setObject:[NSData data] forKey:@"dragImage"];
-	
+	[metadata setObject:UIImagePNGRepresentation(background) forKey:@"dragImage"];
+
 	// add the registration for the application that we're dragging from.
 	[metadata setObject:dk_applicationRegistration forKey:@"draggingApplication"];
 	
@@ -666,7 +666,7 @@ CGPoint lastTouch;
 		NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
 		
 		UIImage *overlay = [UIImage imageNamed:@"drag_overlay.png"];
-		UIImage *background = nil;
+		background = nil;
 		if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:context:)]) {
 			background = [dataProvider imageForDrag:dropIdentifier forView:draggableView context:dropContext];
 		} else {

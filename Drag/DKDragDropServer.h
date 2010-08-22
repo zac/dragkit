@@ -32,6 +32,8 @@
 
 @class DKApplicationRegistration;
 
+extern NSString *const DKPasteboardNameDrag;
+
 @interface DKDragDropServer : NSObject {
 	UIView *draggedView;
 	UIView *originalView;

@@ -670,7 +670,20 @@ CGPoint lastTouch;
 		if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:context:)]) {
 			background = [dataProvider imageForDrag:dropIdentifier forView:draggableView context:dropContext];
 		} else {
-			background = [UIImage imageNamed:@"drag_default.png"];
+			
+			UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
+			
+			NSDictionary *metadata = [NSKeyedUnarchiver unarchiveObjectWithData:[[dragPasteboard valuesForPasteboardType:@"dragkit.metadata" inItemSet:nil] lastObject]];
+			
+			NSData *imageData = [metadata objectForKey:@"dragImage"];
+			
+			if (imageData) {
+				background = [UIImage imageWithData:imageData];
+			}
+			
+			if (!imageData || !background) {
+				background = [UIImage imageNamed:@"drag_default.png"];
+			}
 		}
 		
 		// create our drag view where we want it.

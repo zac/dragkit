@@ -693,20 +693,20 @@ CGPoint lastTouch;
 		[self.draggedView addSubview:originalImageView];
 		
 		// taken from AQGridView.
-		CALayer *theLayer = self.draggedView.layer;
-		if ([theLayer respondsToSelector: @selector(setShadowPath:)] && [theLayer respondsToSelector: @selector(shadowPath)]) {
+		CALayer *dragLayer = self.draggedView.layer;
+		if ([dragLayer respondsToSelector: @selector(setShadowPath:)] && [dragLayer respondsToSelector: @selector(shadowPath)]) {
 			
 			CGMutablePathRef path = CGPathCreateMutable();
-			CGPathAddRect( path, NULL, theLayer.bounds );
-			theLayer.shadowPath = path;
+			CGPathAddRect( path, NULL, dragLayer.bounds );
+			dragLayer.shadowPath = path;
 			CGPathRelease( path );
 			
-			theLayer.shadowOffset = CGSizeMake(0, 10);
+			dragLayer.shadowOffset = CGSizeMake(0, 10);
 			
-			theLayer.shadowColor = [[UIColor darkGrayColor] CGColor];
-			theLayer.shadowRadius = 8.0;
+			dragLayer.shadowColor = [[UIColor darkGrayColor] CGColor];
+			dragLayer.shadowRadius = 8.0;
 			
-			theLayer.shadowOpacity = 1.0;
+			dragLayer.shadowOpacity = 1.0;
 		}
 		
 		[[self dk_mainAppWindow] addSubview:self.draggedView];

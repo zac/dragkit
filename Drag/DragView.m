@@ -1,5 +1,5 @@
 //
-//  DKDragView.m
+//  DragView.m
 //  Drag
 //
 //  Created by Zac White on 4/20/10.

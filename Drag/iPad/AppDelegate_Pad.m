@@ -8,7 +8,7 @@
 
 #import "AppDelegate_Pad.h"
 
-#import "DKDragViewController.h"
+#import "DragViewController.h"
 
 @implementation AppDelegate_Pad
 
@@ -19,7 +19,7 @@
 	
     // Override point for customization after application launch
 	
-	DKDragViewController *dragViewController = [[DKDragViewController alloc] initWithNibName:nil bundle:nil];
+	DragViewController *dragViewController = [[DragViewController alloc] initWithNibName:nil bundle:nil];
 	[window addSubview:dragViewController.view];
 	
     [window makeKeyAndVisible];

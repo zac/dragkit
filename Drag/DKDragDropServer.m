@@ -39,7 +39,7 @@ NSString *const DKPasteboardNameDrag = @"dragkit-drag";
 - (void)dk_handleURL:(NSNotification *)notification;
 - (UIWindow *)dk_mainAppWindow;
 - (DKDropTarget *)dk_dropTargetHitByPoint:(CGPoint)point;
-- (void)dk_collapseDragViewAtPoint:(CGPoint)point;
+- (void)dk_collapseDragView;
 
 @end
 
@@ -392,7 +392,7 @@ CGPoint lastTouch;
 			self.originalView = [sender view];
 			
 			// our touch offset is just 0,0, which makes it the center.
-			touchOffset = CGSizeMake(0,50);
+			touchOffset = CGSizeMake(0,70);
 			
 			CGPoint position = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
 			
@@ -422,7 +422,6 @@ CGPoint lastTouch;
 			droppedTarget = [self dk_dropTargetHitByPoint:lastTouch];
 			
 			if (droppedTarget) {
-				CGPoint centerOfView = [[droppedTarget.dropView superview] convertPoint:droppedTarget.dropView.center toView:[self dk_mainAppWindow]];
 				
 				if ([droppedTarget.dragDelegate respondsToSelector:@selector(drag:completedOnTargetView:withDragPasteboard:context:)]) {
 					
@@ -439,7 +438,7 @@ CGPoint lastTouch;
 				}
 				
 				// collapse the drag view into the drop view.
-				[self dk_collapseDragViewAtPoint:centerOfView];
+				[self dk_collapseDragView];
 				
 				// de-highlight the view.
 				[self dk_setView:droppedTarget.dropView highlighted:NO animated:YES];
@@ -568,29 +567,41 @@ CGPoint lastTouch;
 		void *dropContext = objc_getAssociatedObject(draggableView, &contextKey);
 		NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
 		
+		UIImage *overlay = [UIImage imageNamed:@"drag_overlay.png"];
 		UIImage *background = nil;
 		if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:context:)]) {
 			background = [dataProvider imageForDrag:dropIdentifier forView:draggableView context:dropContext];
 		} else {
-			background = [UIImage imageNamed:@"default_drag_image.png"];
+			background = [UIImage imageNamed:@"drag_default.png"];
 		}
 		
 		// create our drag view where we want it.
-		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake(point.x - background.size.width / 2.0,
-																	 point.y - background.size.height / 2.0,
-																	 background.size.width,
-																	 background.size.height)] autorelease];
+		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake((int)(point.x - overlay.size.width / 2.0),
+																	 (int)(point.y - overlay.size.height / 2.0),
+																	 overlay.size.width,
+																	 overlay.size.height)] autorelease];
+		
+		UIImageView *backgroundImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8, 4, 108, 108)];
+		backgroundImageView.image = background;
+		backgroundImageView.contentMode = UIViewContentModeScaleAspectFit;
+		backgroundImageView.layer.cornerRadius = 10;
+		backgroundImageView.clipsToBounds = YES;
 		
 		UIImageView *dragImageView = [[UIImageView alloc] initWithFrame:self.draggedView.bounds];
-		dragImageView.image = background;
+		dragImageView.image = overlay;
 		
+		[self.draggedView addSubview:backgroundImageView];
 		[self.draggedView addSubview:dragImageView];
+		
+		[backgroundImageView release];
+		[dragImageView release];
 		
 		[[self dk_mainAppWindow] addSubview:self.draggedView];
 		
 		if (draggableView) {
 			
-			self.draggedView.transform = CGAffineTransformMakeScale(0.001, 0.001);
+			self.draggedView.transform = CGAffineTransformMakeTranslation(touchOffset.width, touchOffset.height);
+			self.draggedView.transform = CGAffineTransformScale(self.draggedView.transform, 0.001, 0.001);
 			self.draggedView.alpha = 0.0;
 			
 			[UIView beginAnimations:@"DragExpand" context:NULL];
@@ -604,8 +615,6 @@ CGPoint lastTouch;
 			
 			[UIView commitAnimations];
 		}
-		
-		[dragImageView release];
 	}
 }
 
@@ -616,13 +625,13 @@ CGPoint lastTouch;
 		return;
 	}
 	
-	self.draggedView.frame = CGRectMake(point.x - self.draggedView.frame.size.width / 2.0,
-										point.y - self.draggedView.frame.size.height / 2.0,
+	self.draggedView.frame = CGRectMake((int)(point.x - self.draggedView.frame.size.width / 2.0),
+										(int)(point.y - self.draggedView.frame.size.height / 2.0),
 										self.draggedView.frame.size.width,
 										self.draggedView.frame.size.height);
 }
 
-- (void)dk_collapseDragViewAtPoint:(CGPoint)point {
+- (void)dk_collapseDragView {
 	
 	[UIView beginAnimations:@"DropSuck" context:NULL];
 	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
@@ -632,7 +641,7 @@ CGPoint lastTouch;
 	
 	self.draggedView.transform = CGAffineTransformMakeScale(0.001, 0.001);
 	self.draggedView.alpha = 0.0;
-	self.draggedView.center = point;
+	self.draggedView.center = CGPointMake(self.draggedView.center.x + touchOffset.width, self.draggedView.center.y + touchOffset.height);
 	
 	[UIView commitAnimations];
 }

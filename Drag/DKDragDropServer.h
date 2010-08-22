@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <QuartzCore/CAAnimation.h>
+
 
 @protocol DKDragDataProvider
 
@@ -63,6 +65,19 @@ extern NSString *const DKPasteboardNameDrag;
 	
 	// arrays that store the targets and delegates.
 	NSMutableArray *dk_dropTargets;
+	
+	// point to determine how much it has moved
+	CGPoint lastPoint;
+	CGPoint pausedPoint;
+	
+	// time at point
+	NSTimer *pausedTimer;
+	
+	BOOL inOnePlace;
+	
+	UIView *springboard;
+	
+	CALayer *theLayer;
 }
 
 + (id)sharedServer;
@@ -76,6 +91,7 @@ extern NSString *const DKPasteboardNameDrag;
 
 @property (nonatomic, retain) UIView *draggedView;
 @property (nonatomic, retain) UIView *originalView;
+@property (nonatomic, retain) NSTimer *pausedTimer;
 
 - (void)resetRegistrationDatabase;
 
@@ -86,5 +102,8 @@ extern NSString *const DKPasteboardNameDrag;
 // unmarking views
 - (void)unmarkViewAsDraggable:(UIView *)draggableView;
 - (void)unmarkDropTarget:(UIView *)dropView;
+
+
+- (void)animationDidStop:(CAAnimation *)theAnimation finished:(BOOL)flag;
 
 @end

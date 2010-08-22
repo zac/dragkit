@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DKDragView : UIView {
+@interface DragView : UIView {
 	UIImageView *thumbnailView;
 	UILabel *topLabel;
 	UILabel *bottomLabel;

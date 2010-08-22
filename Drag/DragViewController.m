@@ -1,16 +1,16 @@
-    //
-//  DKDragViewController.m
+//
+//  DragViewController.m
 //  Drag
 //
 //  Created by Zac White on 4/20/10.
 //  Copyright 2010 Zac White. All rights reserved.
 //
 
-#import "DKDragViewController.h"
+#import "DragViewController.h"
 
-#import "DKDragView.h"
+#import "DragView.h"
 
-@implementation DKDragViewController
+@implementation DragViewController
 
 /*
  // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
@@ -45,7 +45,7 @@
 	
 	NSLog(@"frame: %@", NSStringFromCGRect(self.view.frame));
 	
-	DKDragView *dragView = [[DKDragView alloc] initWithFrame:CGRectMake(100, 100, 400, 100)];
+	DragView *dragView = [[DragView alloc] initWithFrame:CGRectMake(100, 100, 400, 100)];
 	dragView.topLabel.text = @"Testing!!";
 	dragView.bottomLabel.text = @"1.2.3.";
 	

@@ -1,5 +1,5 @@
 //
-//  DKDragViewController.h
+//  DragViewController.h
 //  Drag
 //
 //  Created by Zac White on 4/20/10.
@@ -10,7 +10,7 @@
 
 #import "DKDragDropServer.h"
 
-@interface DKDragViewController : UIViewController <DKDragDataProvider, DKDragDelegate> {
+@interface DragViewController : UIViewController <DKDragDataProvider, DKDragDelegate> {
 
 }
 

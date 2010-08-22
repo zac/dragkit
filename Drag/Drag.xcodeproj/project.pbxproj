@@ -10,12 +10,12 @@
 		110021D311D053E70046072D /* DKApplicationRegistration.m in Sources */ = {isa = PBXBuildFile; fileRef = 110021D211D053E70046072D /* DKApplicationRegistration.m */; };
 		111F001611CDE11D004AED24 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 111F001511CDE11D004AED24 /* QuartzCore.framework */; };
 		111F011D11CE2756004AED24 /* DKDropTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F011C11CE2756004AED24 /* DKDropTarget.m */; };
-		111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F3616117E9E2200B72C00 /* DKDragViewController.m */; };
+		111F3618117E9E2200B72C00 /* DragViewController_Phone.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F3616117E9E2200B72C00 /* DragViewController_Phone.m */; };
 		113F29CE121F87290073645E /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 113F29CD121F87290073645E /* MobileCoreServices.framework */; };
 		1144A1181220D9A500FDEAE6 /* drag_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 1144A1161220D9A500FDEAE6 /* drag_default.png */; };
 		1144A1191220D9A500FDEAE6 /* drag_overlay.png in Resources */ = {isa = PBXBuildFile; fileRef = 1144A1171220D9A500FDEAE6 /* drag_overlay.png */; };
 		1150E4B3120E40C6008902F8 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1150E4B2120E40C6008902F8 /* GameKit.framework */; };
-		11DF18E3117EA17B00233A48 /* DKDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18E2117EA17B00233A48 /* DKDragView.m */; };
+		11DF18E3117EA17B00233A48 /* DragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18E2117EA17B00233A48 /* DragView.m */; };
 		11DF18ED117EA66E00233A48 /* DKDragDropServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18EC117EA66E00233A48 /* DKDragDropServer.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -33,15 +33,15 @@
 		111F001511CDE11D004AED24 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		111F011B11CE2756004AED24 /* DKDropTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDropTarget.h; sourceTree = "<group>"; };
 		111F011C11CE2756004AED24 /* DKDropTarget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDropTarget.m; sourceTree = "<group>"; };
-		111F3615117E9E2200B72C00 /* DKDragViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragViewController.h; sourceTree = "<group>"; };
-		111F3616117E9E2200B72C00 /* DKDragViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragViewController.m; sourceTree = "<group>"; };
+		111F3615117E9E2200B72C00 /* DragViewController_Phone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DragViewController_Phone.h; path = ../DragViewController_Phone.h; sourceTree = "<group>"; };
+		111F3616117E9E2200B72C00 /* DragViewController_Phone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DragViewController_Phone.m; path = ../DragViewController_Phone.m; sourceTree = "<group>"; };
 		113F29CD121F87290073645E /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		1144A1161220D9A500FDEAE6 /* drag_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = drag_default.png; sourceTree = "<group>"; };
 		1144A1171220D9A500FDEAE6 /* drag_overlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = drag_overlay.png; sourceTree = "<group>"; };
 		1150E4B2120E40C6008902F8 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		11AB612811D1C8BA00D13C90 /* DragKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DragKit.h; sourceTree = "<group>"; };
-		11DF18E1117EA17B00233A48 /* DKDragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragView.h; sourceTree = "<group>"; };
-		11DF18E2117EA17B00233A48 /* DKDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragView.m; sourceTree = "<group>"; };
+		11DF18E1117EA17B00233A48 /* DragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DragView.h; sourceTree = "<group>"; };
+		11DF18E2117EA17B00233A48 /* DragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DragView.m; sourceTree = "<group>"; };
 		11DF18EB117EA66E00233A48 /* DKDragDropServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragDropServer.h; sourceTree = "<group>"; };
 		11DF18EC117EA66E00233A48 /* DKDragDropServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragDropServer.m; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -110,6 +110,8 @@
 		2860E324111B887F00E27156 /* iPhone */ = {
 			isa = PBXGroup;
 			children = (
+				111F3615117E9E2200B72C00 /* DragViewController_Phone.h */,
+				111F3616117E9E2200B72C00 /* DragViewController_Phone.m */,
 				2860E325111B887F00E27156 /* AppDelegate_Phone.h */,
 				2860E326111B887F00E27156 /* AppDelegate_Phone.m */,
 				2860E327111B887F00E27156 /* MainWindow_Phone.xib */,
@@ -139,10 +141,8 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				111F3615117E9E2200B72C00 /* DKDragViewController.h */,
-				111F3616117E9E2200B72C00 /* DKDragViewController.m */,
-				11DF18E1117EA17B00233A48 /* DKDragView.h */,
-				11DF18E2117EA17B00233A48 /* DKDragView.m */,
+				11DF18E1117EA17B00233A48 /* DragView.h */,
+				11DF18E2117EA17B00233A48 /* DragView.m */,
 				11E6EFD611F6A06A00F1F29C /* DragKit */,
 				2860E32A111B888700E27156 /* iPad */,
 				2860E324111B887F00E27156 /* iPhone */,
@@ -238,8 +238,8 @@
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				2860E328111B887F00E27156 /* AppDelegate_Phone.m in Sources */,
 				2860E32E111B888700E27156 /* AppDelegate_Pad.m in Sources */,
-				111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */,
-				11DF18E3117EA17B00233A48 /* DKDragView.m in Sources */,
+				111F3618117E9E2200B72C00 /* DragViewController_Phone.m in Sources */,
+				11DF18E3117EA17B00233A48 /* DragView.m in Sources */,
 				11DF18ED117EA66E00233A48 /* DKDragDropServer.m in Sources */,
 				111F011D11CE2756004AED24 /* DKDropTarget.m in Sources */,
 				110021D311D053E70046072D /* DKApplicationRegistration.m in Sources */,

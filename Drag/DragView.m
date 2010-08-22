@@ -6,10 +6,10 @@
 //  Copyright 2010 Zac White. All rights reserved.
 //
 
-#import "DKDragView.h"
+#import "DragView.h"
 
 
-@implementation DKDragView
+@implementation DragView
 
 @synthesize thumbnailView, topLabel, bottomLabel;
 

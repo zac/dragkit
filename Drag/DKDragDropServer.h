@@ -32,7 +32,7 @@
 
 @class DKApplicationRegistration;
 
-@interface DKDragDropServer : NSObject <DKDragDataProvider> {
+@interface DKDragDropServer : NSObject {
 	UIView *draggedView;
 	UIView *originalView;
 	

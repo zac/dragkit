@@ -10,11 +10,11 @@
 		112285501214E9D7007165D3 /* DKApplicationRegistration.m in Sources */ = {isa = PBXBuildFile; fileRef = 112285411214E9D7007165D3 /* DKApplicationRegistration.m */; };
 		112285511214E9D7007165D3 /* DKDragDropServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 112285431214E9D7007165D3 /* DKDragDropServer.m */; };
 		112285541214E9D7007165D3 /* DKDropTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 112285491214E9D7007165D3 /* DKDropTarget.m */; };
-		112285571214E9D7007165D3 /* drag_view_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 1122854E1214E9D7007165D3 /* drag_view_background.png */; };
 		1122857F1214E9F9007165D3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1122857E1214E9F9007165D3 /* QuartzCore.framework */; };
 		112285881214EA1E007165D3 /* DropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 112285861214EA1E007165D3 /* DropViewController.m */; };
 		112285891214EA1E007165D3 /* DropViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 112285871214EA1E007165D3 /* DropViewController.xib */; };
 		113F299E121F84220073645E /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 113F299D121F84220073645E /* MobileCoreServices.framework */; };
+		11449F7712209EA500FDEAE6 /* default_drag_image.png in Resources */ = {isa = PBXBuildFile; fileRef = 11449F7612209EA500FDEAE6 /* default_drag_image.png */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
@@ -32,13 +32,13 @@
 		112285431214E9D7007165D3 /* DKDragDropServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DKDragDropServer.m; path = ../Drag/DKDragDropServer.m; sourceTree = SOURCE_ROOT; };
 		112285481214E9D7007165D3 /* DKDropTarget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DKDropTarget.h; path = ../Drag/DKDropTarget.h; sourceTree = SOURCE_ROOT; };
 		112285491214E9D7007165D3 /* DKDropTarget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DKDropTarget.m; path = ../Drag/DKDropTarget.m; sourceTree = SOURCE_ROOT; };
-		1122854E1214E9D7007165D3 /* drag_view_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = drag_view_background.png; path = ../Drag/drag_view_background.png; sourceTree = SOURCE_ROOT; };
 		1122854F1214E9D7007165D3 /* DragKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DragKit.h; path = ../Drag/DragKit.h; sourceTree = SOURCE_ROOT; };
 		1122857E1214E9F9007165D3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		112285851214EA1E007165D3 /* DropViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropViewController.h; sourceTree = "<group>"; };
 		112285861214EA1E007165D3 /* DropViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropViewController.m; sourceTree = "<group>"; };
 		112285871214EA1E007165D3 /* DropViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DropViewController.xib; sourceTree = "<group>"; };
 		113F299D121F84220073645E /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		11449F7612209EA500FDEAE6 /* default_drag_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = default_drag_image.png; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* Drop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Drop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -79,7 +79,7 @@
 				112285411214E9D7007165D3 /* DKApplicationRegistration.m */,
 				112285481214E9D7007165D3 /* DKDropTarget.h */,
 				112285491214E9D7007165D3 /* DKDropTarget.m */,
-				1122854E1214E9D7007165D3 /* drag_view_background.png */,
+				11449F7612209EA500FDEAE6 /* default_drag_image.png */,
 				1122854F1214E9D7007165D3 /* DragKit.h */,
 			);
 			name = DragKit;
@@ -203,8 +203,8 @@
 			files = (
 				2860E329111B887F00E27156 /* MainWindow_Phone.xib in Resources */,
 				2860E32F111B888700E27156 /* MainWindow_Pad.xib in Resources */,
-				112285571214E9D7007165D3 /* drag_view_background.png in Resources */,
 				112285891214EA1E007165D3 /* DropViewController.xib in Resources */,
+				11449F7712209EA500FDEAE6 /* default_drag_image.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

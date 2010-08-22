@@ -12,9 +12,8 @@
 		111F011D11CE2756004AED24 /* DKDropTarget.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F011C11CE2756004AED24 /* DKDropTarget.m */; };
 		111F3618117E9E2200B72C00 /* DKDragViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F3616117E9E2200B72C00 /* DKDragViewController.m */; };
 		113F29CE121F87290073645E /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 113F29CD121F87290073645E /* MobileCoreServices.framework */; };
+		11449F8F12209F6500FDEAE6 /* default_drag_image.png in Resources */ = {isa = PBXBuildFile; fileRef = 11449F8D12209F6500FDEAE6 /* default_drag_image.png */; };
 		1150E4B3120E40C6008902F8 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1150E4B2120E40C6008902F8 /* GameKit.framework */; };
-		117462A211CD95C300BAD1D9 /* drag_view_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 117462A011CD95C300BAD1D9 /* drag_view_background.png */; };
-		117462A311CD95C300BAD1D9 /* drag_view_background@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 117462A111CD95C300BAD1D9 /* drag_view_background@2x.png */; };
 		11DF18E3117EA17B00233A48 /* DKDragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18E2117EA17B00233A48 /* DKDragView.m */; };
 		11DF18ED117EA66E00233A48 /* DKDragDropServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18EC117EA66E00233A48 /* DKDragDropServer.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -36,9 +35,8 @@
 		111F3615117E9E2200B72C00 /* DKDragViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragViewController.h; sourceTree = "<group>"; };
 		111F3616117E9E2200B72C00 /* DKDragViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragViewController.m; sourceTree = "<group>"; };
 		113F29CD121F87290073645E /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		11449F8D12209F6500FDEAE6 /* default_drag_image.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = default_drag_image.png; path = ../Drop/default_drag_image.png; sourceTree = SOURCE_ROOT; };
 		1150E4B2120E40C6008902F8 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
-		117462A011CD95C300BAD1D9 /* drag_view_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = drag_view_background.png; sourceTree = "<group>"; };
-		117462A111CD95C300BAD1D9 /* drag_view_background@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "drag_view_background@2x.png"; sourceTree = "<group>"; };
 		11AB612811D1C8BA00D13C90 /* DragKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DragKit.h; sourceTree = "<group>"; };
 		11DF18E1117EA17B00233A48 /* DKDragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DKDragView.h; sourceTree = "<group>"; };
 		11DF18E2117EA17B00233A48 /* DKDragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DKDragView.m; sourceTree = "<group>"; };
@@ -79,8 +77,6 @@
 		1174629E11CD95B700BAD1D9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				117462A011CD95C300BAD1D9 /* drag_view_background.png */,
-				117462A111CD95C300BAD1D9 /* drag_view_background@2x.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -95,6 +91,7 @@
 				110021D211D053E70046072D /* DKApplicationRegistration.m */,
 				111F011B11CE2756004AED24 /* DKDropTarget.h */,
 				111F011C11CE2756004AED24 /* DKDropTarget.m */,
+				11449F8D12209F6500FDEAE6 /* default_drag_image.png */,
 			);
 			name = DragKit;
 			sourceTree = "<group>";
@@ -223,8 +220,7 @@
 			files = (
 				2860E329111B887F00E27156 /* MainWindow_Phone.xib in Resources */,
 				2860E32F111B888700E27156 /* MainWindow_Pad.xib in Resources */,
-				117462A211CD95C300BAD1D9 /* drag_view_background.png in Resources */,
-				117462A311CD95C300BAD1D9 /* drag_view_background@2x.png in Resources */,
+				11449F8F12209F6500FDEAE6 /* default_drag_image.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

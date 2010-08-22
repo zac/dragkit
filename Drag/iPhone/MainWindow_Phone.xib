@@ -10,10 +10,7 @@
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 			<string key="NS.object.0">117</string>
 		</object>
-		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="13"/>
-			<integer value="2"/>
-		</array>
+		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs"/>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 		</array>
@@ -31,11 +28,10 @@
 				<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 			</object>
 			<object class="IBUIWindow" id="380026005">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">1316</int>
 				<object class="NSPSMatrix" key="NSFrameMatrix"/>
 				<string key="NSFrameSize">{320, 480}</string>
-				<reference key="NSSuperview"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">1</int>
 					<bytes key="NSRGB">MSAxIDEAA</bytes>
@@ -48,7 +44,7 @@
 			</object>
 			<object class="IBUIViewController" id="92716899">
 				<object class="IBUIView" key="IBUIView" id="106157284">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">274</int>
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="IBUINavigationBar" id="995491216">
@@ -57,7 +53,7 @@
 							<string key="NSFrameSize">{320, 44}</string>
 							<reference key="NSSuperview" ref="106157284"/>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-							<array class="NSMutableArray" key="IBUIItems">
+							<array key="IBUIItems">
 								<object class="IBUINavigationItem" id="738057963">
 									<reference key="IBUINavigationBar" ref="995491216"/>
 									<string key="IBUITitle">Title</string>
@@ -197,7 +193,6 @@
 						</object>
 					</array>
 					<string key="NSFrameSize">{320, 460}</string>
-					<reference key="NSSuperview"/>
 					<object class="NSColor" key="IBUIBackgroundColor">
 						<int key="NSColorSpace">3</int>
 						<bytes key="NSWhite">MQA</bytes>
@@ -433,7 +428,7 @@
 				<string key="30.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="4.CustomClassName">AppDelegate_Phone</string>
 				<string key="4.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-				<string key="9.CustomClassName">DKDragViewController</string>
+				<string key="9.CustomClassName">DragViewController_Phone</string>
 				<string key="9.IBEditorWindowLastContentRect">{{216, 125}, {320, 480}}</string>
 				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 			</dictionary>
@@ -473,7 +468,7 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">DKDragViewController</string>
+					<string key="className">DragViewController_Phone</string>
 					<string key="superclassName">UIViewController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="navBar:">id</string>
@@ -514,8 +509,8 @@
 						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">DKDragViewController.h</string>
+						<string key="majorKey">IBUserSource</string>
+						<string key="minorKey"/>
 					</object>
 				</object>
 			</array>

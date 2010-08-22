@@ -8,7 +8,7 @@
 
 #import "AppDelegate_Phone.h"
 
-#import "DKDragViewController.h"
+#import "DragViewController_Phone.h"
 
 @implementation AppDelegate_Phone
 

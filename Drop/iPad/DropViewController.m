@@ -15,8 +15,6 @@
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	
-	[[DKDragDropServer sharedServer] registerApplicationWithTypes:[NSArray arrayWithObject:@"public.text"]];
-	
 	[[DKDragDropServer sharedServer] markViewAsDropTarget:self.dropWell
 												 forTypes:[NSArray arrayWithObject:@"public.text"]
 											 withDelegate:self];
@@ -37,7 +35,10 @@
 
 - (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard context:(void *)context {
 	// context is always nil on inter-app drags.
-	self.dropWell.text = [[[NSString alloc] initWithData:[dragPasteboard dataForPasteboardType:@"public.text"] encoding:NSUTF8StringEncoding] autorelease];
+	
+	NSData *dragData = [[dragPasteboard dataForPasteboardType:@"public.text" inItemSet:nil] lastObject];
+	
+	self.dropWell.text = [[[NSString alloc] initWithData:dragData encoding:NSUTF8StringEncoding] autorelease];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {

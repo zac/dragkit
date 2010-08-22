@@ -8,6 +8,8 @@
 
 #import "AppDelegate_Phone.h"
 
+#import "DKDragViewController.h"
+
 @implementation AppDelegate_Phone
 
 @synthesize window;
@@ -15,7 +17,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
 	
-    // Override point for customization after application launch
+	[[DKDragDropServer sharedServer] registerApplicationWithTypes:[NSArray arrayWithObject:@"public.text"]];
 	
     [window makeKeyAndVisible];
 	

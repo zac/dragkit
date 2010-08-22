@@ -10,8 +10,17 @@
 
 #import "DKDragDropServer.h"
 
-@interface DKDragViewController : UIViewController <DKDragDataProvider, DKDragDelegate> {
-
+@interface DKDragViewController : UIViewController <DKDragDataProvider, DKDragDelegate, UITabBarDelegate> {
+	IBOutlet UILabel *top;
+	IBOutlet UIView *drop;
 }
 
+@property (nonatomic, retain) UILabel *top;
+@property (nonatomic, retain) UIView *drop;
+
+- (IBAction)reset:(id)sender;
+- (IBAction)segmentChanged:(id)sender;
+- (IBAction)navBar:(id)sender;
+- (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item;
+	
 @end

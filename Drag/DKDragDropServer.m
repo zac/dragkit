@@ -37,7 +37,7 @@ static DKDragDropServer *sharedInstance = nil;
 
 @implementation DKDragDropServer
 
-@synthesize draggedView, originalView;
+@synthesize draggedView, originalView, pausedTimer;
 
 #pragma mark -
 #pragma mark Singleton
@@ -80,6 +80,7 @@ static DKDragDropServer *sharedInstance = nil;
 													 selector:@selector(dk_applicationWillTerminate:)
 														 name:UIApplicationWillTerminateNotification
 													   object:nil];
+			pausedTimer = nil;
 		}
 		
 		//Assign sharedInstance here so that we don't end up with multiple instances if a caller calls +alloc/-init without going through +sharedInstance.
@@ -315,6 +316,56 @@ static char dataProviderKey;
 #define MARGIN_Y (50)
 
 CGSize touchOffset;
+- (void)dk_springboardOpenItemFromTimer:(NSTimer*)theTimer {
+	NSLog(@"Timer Fired");
+	[self.draggedView setHidden:YES];
+	springboard = [dk_mainAppWindow hitTest:lastPoint withEvent:nil];
+	[self.draggedView setHidden:NO];
+	if ( springboard != nil && [springboard respondsToSelector:@selector(sendActionsForControlEvents:)] ){
+		if ( theLayer ) {
+			[theLayer removeAllAnimations];
+		}
+		theLayer = springboard.layer;
+
+		// taken from AQGridView.
+		if ([theLayer respondsToSelector: @selector(setShadowPath:)] && [theLayer respondsToSelector: @selector(shadowPath)]) {
+			NSLog(@"the flash");
+			CGMutablePathRef path = CGPathCreateMutable();
+			CGPathAddRect( path, NULL, theLayer.bounds );
+			theLayer.shadowPath = path;
+			CGPathRelease( path );
+			// TODO should really save all of these settings before changing them so that they can be restored later
+			theLayer.shadowOffset = CGSizeZero;
+			theLayer.shadowColor = [[UIColor blueColor] CGColor];
+			theLayer.shadowRadius = 0.0;
+			theLayer.shadowOpacity = 10.0;
+			
+			CABasicAnimation *animator = [CABasicAnimation animationWithKeyPath:@"shadowRadius"];
+			animator.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+			animator.duration = 0.1;
+			animator.fromValue = [NSNumber numberWithFloat:0.0];
+			animator.toValue = [NSNumber numberWithFloat:12.0];
+			animator.delegate = self;
+			animator.repeatCount = 2;
+			animator.autoreverses = YES;
+			
+			[theLayer addAnimation:animator	forKey:@"theFlash"];
+		}
+					
+		
+	}
+}
+
+- (void)animationDidStop:(CAAnimation *)theAnimation finished:(BOOL)flag {
+	theLayer.shadowPath = nil;
+	theLayer.shadowColor = nil;
+	if ( flag ) {
+		NSLog(@"send event to class: %@", NSStringFromClass([springboard class]));
+		[(UIControl*)springboard sendActionsForControlEvents:(UIControlEventTouchDown | UIControlEventTouchUpInside)];
+	} else {
+		NSLog(@"Animation canceled");
+	}
+}
 
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender {
 	// let the drag server know our frame and that we want to start dragging.
@@ -351,11 +402,47 @@ CGSize touchOffset;
 			[self dk_messageTargetsHitByPoint:touchPoint];
 			
 			viewPosition = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
+
+			lastPoint = CGPointMake(touchPoint.x, touchPoint.y);
+			
+			if ( !self.pausedTimer || ![self.pausedTimer isValid] ) {
+				// no timer, update point
+				if ( (((lastPoint.x - pausedPoint.x) *
+					   (lastPoint.x - pausedPoint.x)) + 
+					  ((lastPoint.y - pausedPoint.y) *
+					   (lastPoint.y - pausedPoint.y))) > 200 ) {
+					// only make a new one if we moved enough
+					pausedPoint = lastPoint;
+					self.pausedTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(dk_springboardOpenItemFromTimer:) userInfo:nil repeats:NO];
+				} else if ((((lastPoint.x - pausedPoint.x) *
+								   (lastPoint.x - pausedPoint.x)) + 
+								  ((lastPoint.y - pausedPoint.y) *
+								   (lastPoint.y - pausedPoint.y))) > 40) {
+					// moved too much, cancel the animation
+					if ( theLayer ) {
+						  [theLayer removeAllAnimations];
+					}  
+				}
+			} else if ( (((lastPoint.x - pausedPoint.x) *
+						  (lastPoint.x - pausedPoint.x)) + 
+						 ((lastPoint.y - pausedPoint.y) *
+						  (lastPoint.y - pausedPoint.y))) > 20 ) {
+				// we moved too much, cancel timer
+				[self.pausedTimer invalidate];
+				// now make a new one
+				pausedPoint = lastPoint;
+				self.pausedTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(dk_springboardOpenItemFromTimer:) userInfo:nil repeats:NO];
+			} 
 			
 			[self dk_moveDragViewToPoint:viewPosition];
 			
 			break;
 		case UIGestureRecognizerStateRecognized:
+			[self.pausedTimer invalidate];
+			self.pausedTimer = nil;
+			if ( theLayer ) {
+				[theLayer removeAllAnimations];
+			} 
 			
 			// the user has let go.
 			droppedTarget = [self dk_dropTargetHitByPoint:touchPoint];
@@ -393,6 +480,11 @@ CGSize touchOffset;
 			
 			break;
 		case UIGestureRecognizerStateCancelled:
+			[self.pausedTimer invalidate];
+			self.pausedTimer = nil;
+			if ( theLayer ) {
+				[theLayer removeAllAnimations];
+			} 
 			
 			// something happened and we need to cancel.
 			[self cancelDrag];
@@ -440,11 +532,15 @@ CGSize touchOffset;
 			target.containsDragView = NO;
 		}
 	}
+	
+	// Try to 
+	
+	
 }
 
 - (void)dk_setView:(UIView *)view highlighted:(BOOL)highlighted animated:(BOOL)animated {
-	
-	CALayer *theLayer = view.layer;
+
+	CALayer *dropLayer = view.layer;
 	
 	if (animated) {
 		[UIView beginAnimations: @"HighlightView" context: NULL];
@@ -453,23 +549,23 @@ CGSize touchOffset;
 	}
 	
 	// taken from AQGridView.
-	if ([theLayer respondsToSelector: @selector(setShadowPath:)] && [theLayer respondsToSelector: @selector(shadowPath)]) {
+	if ([dropLayer respondsToSelector: @selector(setShadowPath:)] && [dropLayer respondsToSelector: @selector(shadowPath)]) {
 		
 		if (highlighted) {
 			CGMutablePathRef path = CGPathCreateMutable();
-			CGPathAddRect( path, NULL, theLayer.bounds );
-			theLayer.shadowPath = path;
+			CGPathAddRect( path, NULL, dropLayer.bounds );
+			dropLayer.shadowPath = path;
 			CGPathRelease( path );
 			
-			theLayer.shadowOffset = CGSizeZero;
+			dropLayer.shadowOffset = CGSizeZero;
 			
-			theLayer.shadowColor = [[UIColor darkGrayColor] CGColor];
-			theLayer.shadowRadius = 12.0;
+			dropLayer.shadowColor = [[UIColor darkGrayColor] CGColor];
+			dropLayer.shadowRadius = 12.0;
 			
-			theLayer.shadowOpacity = 1.0;
+			dropLayer.shadowOpacity = 1.0;
 			
 		} else {
-			theLayer.shadowOpacity = 0.0;
+			dropLayer.shadowOpacity = 0.0;
 		}
 	}
 	

@@ -1,19 +1,16 @@
-    //
-//  DKDragViewController.m
+//
+//  DragViewController.m
 //  Drag
 //
 //  Created by Zac White on 4/20/10.
 //  Copyright 2010 Zac White. All rights reserved.
 //
 
-#import "DKDragViewController.h"
+#import "DragViewController.h"
 
-#import "DKDragView.h"
+#import "DragView.h"
 
-@implementation DKDragViewController
-
-@synthesize top, drop;
-
+@implementation DragViewController
 
 /*
  // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
@@ -47,29 +44,38 @@
     [super viewDidLoad];
 	
 	NSLog(@"frame: %@", NSStringFromCGRect(self.view.frame));
-          
-	[[DKDragDropServer sharedServer] markViewAsDraggable:self.top forDrag:@"MainDrag" withDataSource:self context:nil];
 	
-	[[DKDragDropServer sharedServer] markViewAsDropTarget:self.drop forTypes:[NSArray arrayWithObject:@"public.text"] withDelegate:self];
+	DragView *dragView = [[DragView alloc] initWithFrame:CGRectMake(100, 100, 400, 100)];
+	dragView.topLabel.text = @"Testing!!";
+	dragView.bottomLabel.text = @"1.2.3.";
+	
+	[[DKDragDropServer sharedServer] markViewAsDraggable:dragView forDrag:@"MainDrag" withDataSource:self context:nil];
+	
+	[self.view addSubview:dragView];
+	NSLog(@"dragFrame: %@", NSStringFromCGRect(dragView.frame));
+	[dragView release];
+	
+	
+	UIView *otherView = [[UIView alloc] initWithFrame:CGRectMake(100, 500, 400, 100)];
+	otherView.backgroundColor = [UIColor yellowColor];
+	
+	[[DKDragDropServer sharedServer] markViewAsDropTarget:otherView forTypes:[NSArray arrayWithObject:@"public.text"] withDelegate:self];
+	
+	[self.view addSubview:otherView];
+	NSLog(@"otherFrame: %@", NSStringFromCGRect(otherView.frame));
+	[otherView release];
+	
+	UIButton *resetButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+	[resetButton setTitle:@"Reset" forState:UIControlStateNormal];
+	[resetButton addTarget:self action:@selector(reset:) forControlEvents:UIControlEventTouchUpInside];
+	resetButton.frame = CGRectMake(100, 700, 100, 70);
+	
+	[self.view addSubview:resetButton];
+	
 }
 
 - (void)reset:(id)sender {
-	NSLog(@"RESET.");
 	[[DKDragDropServer sharedServer] resetRegistrationDatabase];
-	[sender setBackgroundColor:[UIColor redColor]];
-	
-}
-
-- (IBAction)segmentChanged:(id)sender {
-	NSLog(@"Segment Changed: %d", [sender selectedSegmentIndex]);
-}
-
-- (IBAction)navBar:(id)sender {
-	NSLog(@"navBar button clicked");
-}
-
-- (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item {
-	NSLog(@"tabBar item %@ selected", item.title);
 }
 
 - (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type {
@@ -115,9 +121,6 @@
 
 - (void)dealloc {
     [super dealloc];
-	
-	self.top = nil;
-	self.drop = nil;
 }
 
 

@@ -71,7 +71,6 @@
 	resetButton.frame = CGRectMake(100, 700, 100, 70);
 	
 	[self.view addSubview:resetButton];
-	
 }
 
 - (void)reset:(id)sender {

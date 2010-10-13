@@ -7,8 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
-#import "DragKit.h"
+#import "DKDragDropServer.h"
 
 @interface DropViewController : UIViewController <DKDragDelegate> {
 	IBOutlet UILabel *dropWell;

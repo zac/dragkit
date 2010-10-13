@@ -15,6 +15,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import <UIKit/UIGestureRecognizerSubclass.h>
 
+#import "DKDragImages.h"
+
 #import <objc/runtime.h>
 
 static DKDragDropServer *sharedInstance = nil;
@@ -715,12 +717,12 @@ UIView *lastView = nil;
 		void *dropContext = objc_getAssociatedObject(draggableView, &contextKey);
 		NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
 		
-		UIImage *overlay = [UIImage imageNamed:@"drag_overlay.png"];
+		UIImage *overlay = [UIImage imageWithData:[NSData dataWithBytes:drag_overlay_png length:drag_overlay_png_len]];
 		UIImage *background = nil;
 		if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:context:)]) {
 			background = [dataProvider imageForDrag:dropIdentifier forView:draggableView context:dropContext];
 		} else {
-			background = [UIImage imageNamed:@"drag_default.png"];
+			background = [UIImage imageWithData:[NSData dataWithBytes:drag_default_png length:drag_default_png_len]];
 		}
 		
 		// create our drag view where we want it.

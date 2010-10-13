@@ -2,6 +2,7 @@
 output/*
 *.pbxuser
 *.mode1v3
+build
 
 # hm, what are these... :)
 project.xcworkspace/

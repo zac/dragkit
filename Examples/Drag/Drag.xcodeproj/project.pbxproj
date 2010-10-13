@@ -7,14 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		112285501214E9D7007165D3 /* DKApplicationRegistration.m in Sources */ = {isa = PBXBuildFile; fileRef = 112285411214E9D7007165D3 /* DKApplicationRegistration.m */; };
-		112285511214E9D7007165D3 /* DKDragDropServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 112285431214E9D7007165D3 /* DKDragDropServer.m */; };
-		1122857F1214E9F9007165D3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1122857E1214E9F9007165D3 /* QuartzCore.framework */; };
-		112285881214EA1E007165D3 /* DropViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 112285861214EA1E007165D3 /* DropViewController.m */; };
-		112285891214EA1E007165D3 /* DropViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 112285871214EA1E007165D3 /* DropViewController.xib */; };
-		113F299E121F84220073645E /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 113F299D121F84220073645E /* MobileCoreServices.framework */; };
-		1144A15D1220DDB600FDEAE6 /* drag_default.png in Resources */ = {isa = PBXBuildFile; fileRef = 1144A15B1220DDB600FDEAE6 /* drag_default.png */; };
-		1144A15E1220DDB600FDEAE6 /* drag_overlay.png in Resources */ = {isa = PBXBuildFile; fileRef = 1144A15C1220DDB600FDEAE6 /* drag_overlay.png */; };
+		111F001611CDE11D004AED24 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 111F001511CDE11D004AED24 /* QuartzCore.framework */; };
+		111F3618117E9E2200B72C00 /* DragViewController_Phone.m in Sources */ = {isa = PBXBuildFile; fileRef = 111F3616117E9E2200B72C00 /* DragViewController_Phone.m */; };
+		113F29CE121F87290073645E /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 113F29CD121F87290073645E /* MobileCoreServices.framework */; };
+		1150E4B3120E40C6008902F8 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1150E4B2120E40C6008902F8 /* GameKit.framework */; };
+		11DF18E3117EA17B00233A48 /* DragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 11DF18E2117EA17B00233A48 /* DragView.m */; };
+		11E24BD212655BFC0099AE8C /* libDragKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 11E24BD112655BFC0099AE8C /* libDragKit.a */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
@@ -23,22 +21,22 @@
 		2860E32E111B888700E27156 /* AppDelegate_Pad.m in Sources */ = {isa = PBXBuildFile; fileRef = 2860E32C111B888700E27156 /* AppDelegate_Pad.m */; };
 		2860E32F111B888700E27156 /* MainWindow_Pad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2860E32D111B888700E27156 /* MainWindow_Pad.xib */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
+		972102251220DA1D00470344 /* DragViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 972102241220DA1D00470344 /* DragViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		112285401214E9D7007165D3 /* DKApplicationRegistration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DKApplicationRegistration.h; path = ../Drag/DKApplicationRegistration.h; sourceTree = SOURCE_ROOT; };
-		112285411214E9D7007165D3 /* DKApplicationRegistration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DKApplicationRegistration.m; path = ../Drag/DKApplicationRegistration.m; sourceTree = SOURCE_ROOT; };
-		112285421214E9D7007165D3 /* DKDragDropServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DKDragDropServer.h; path = ../Drag/DKDragDropServer.h; sourceTree = SOURCE_ROOT; };
-		112285431214E9D7007165D3 /* DKDragDropServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DKDragDropServer.m; path = ../Drag/DKDragDropServer.m; sourceTree = SOURCE_ROOT; };
-		1122857E1214E9F9007165D3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		112285851214EA1E007165D3 /* DropViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DropViewController.h; sourceTree = "<group>"; };
-		112285861214EA1E007165D3 /* DropViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DropViewController.m; sourceTree = "<group>"; };
-		112285871214EA1E007165D3 /* DropViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DropViewController.xib; sourceTree = "<group>"; };
-		113F299D121F84220073645E /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		1144A15B1220DDB600FDEAE6 /* drag_default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = drag_default.png; path = ../Drag/drag_default.png; sourceTree = SOURCE_ROOT; };
-		1144A15C1220DDB600FDEAE6 /* drag_overlay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = drag_overlay.png; path = ../Drag/drag_overlay.png; sourceTree = SOURCE_ROOT; };
+		111F001511CDE11D004AED24 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		111F3615117E9E2200B72C00 /* DragViewController_Phone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DragViewController_Phone.h; path = ../DragViewController_Phone.h; sourceTree = "<group>"; };
+		111F3616117E9E2200B72C00 /* DragViewController_Phone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DragViewController_Phone.m; path = ../DragViewController_Phone.m; sourceTree = "<group>"; };
+		113F29CD121F87290073645E /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		1150E4B2120E40C6008902F8 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		11DF18E1117EA17B00233A48 /* DragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DragView.h; sourceTree = "<group>"; };
+		11DF18E2117EA17B00233A48 /* DragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DragView.m; sourceTree = "<group>"; };
+		11E24BD112655BFC0099AE8C /* libDragKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDragKit.a; path = "../../src/DragKit/build/Release-universal/libDragKit.a"; sourceTree = SOURCE_ROOT; };
+		11E24C9912656C1A0099AE8C /* DKApplicationRegistration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DKApplicationRegistration.h; path = ../../src/DragKit/DKApplicationRegistration.h; sourceTree = SOURCE_ROOT; };
+		11E24C9A12656C1A0099AE8C /* DKDragDropServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DKDragDropServer.h; path = ../../src/DragKit/DKDragDropServer.h; sourceTree = SOURCE_ROOT; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		1D6058910D05DD3D006BFB54 /* Drop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Drop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6058910D05DD3D006BFB54 /* Drag.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Drag.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		2860E325111B887F00E27156 /* AppDelegate_Phone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate_Phone.h; sourceTree = "<group>"; };
 		2860E326111B887F00E27156 /* AppDelegate_Phone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate_Phone.m; sourceTree = "<group>"; };
@@ -48,8 +46,10 @@
 		2860E32D111B888700E27156 /* MainWindow_Pad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow_Pad.xib; sourceTree = "<group>"; };
 		288765FC0DF74451002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Shared/main.m; sourceTree = "<group>"; };
-		32CA4F630368D1EE00C91783 /* Drop_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Drop_Prefix.pch; sourceTree = "<group>"; };
-		8D1107310486CEB800E47090 /* Drop-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Drop-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		32CA4F630368D1EE00C91783 /* Drag_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Drag_Prefix.pch; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* Drag-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Drag-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		972102241220DA1D00470344 /* DragViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DragViewController.m; sourceTree = "<group>"; };
+		972102261220DB2B00470344 /* DragViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DragViewController.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,23 +60,29 @@
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */,
-				1122857F1214E9F9007165D3 /* QuartzCore.framework in Frameworks */,
-				113F299E121F84220073645E /* MobileCoreServices.framework in Frameworks */,
+				111F001611CDE11D004AED24 /* QuartzCore.framework in Frameworks */,
+				1150E4B3120E40C6008902F8 /* GameKit.framework in Frameworks */,
+				113F29CE121F87290073645E /* MobileCoreServices.framework in Frameworks */,
+				11E24BD212655BFC0099AE8C /* libDragKit.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1122853F1214E9D1007165D3 /* DragKit */ = {
+		1174629E11CD95B700BAD1D9 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				112285421214E9D7007165D3 /* DKDragDropServer.h */,
-				112285431214E9D7007165D3 /* DKDragDropServer.m */,
-				112285401214E9D7007165D3 /* DKApplicationRegistration.h */,
-				112285411214E9D7007165D3 /* DKApplicationRegistration.m */,
-				1144A15B1220DDB600FDEAE6 /* drag_default.png */,
-				1144A15C1220DDB600FDEAE6 /* drag_overlay.png */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		11E24C6212655F7B0099AE8C /* DragKit */ = {
+			isa = PBXGroup;
+			children = (
+				11E24BD112655BFC0099AE8C /* libDragKit.a */,
+				11E24C9912656C1A0099AE8C /* DKApplicationRegistration.h */,
+				11E24C9A12656C1A0099AE8C /* DKDragDropServer.h */,
 			);
 			name = DragKit;
 			sourceTree = "<group>";
@@ -84,7 +90,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D6058910D05DD3D006BFB54 /* Drop.app */,
+				1D6058910D05DD3D006BFB54 /* Drag.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -92,6 +98,8 @@
 		2860E324111B887F00E27156 /* iPhone */ = {
 			isa = PBXGroup;
 			children = (
+				111F3615117E9E2200B72C00 /* DragViewController_Phone.h */,
+				111F3616117E9E2200B72C00 /* DragViewController_Phone.m */,
 				2860E325111B887F00E27156 /* AppDelegate_Phone.h */,
 				2860E326111B887F00E27156 /* AppDelegate_Phone.m */,
 				2860E327111B887F00E27156 /* MainWindow_Phone.xib */,
@@ -105,9 +113,6 @@
 				2860E32B111B888700E27156 /* AppDelegate_Pad.h */,
 				2860E32C111B888700E27156 /* AppDelegate_Pad.m */,
 				2860E32D111B888700E27156 /* MainWindow_Pad.xib */,
-				112285851214EA1E007165D3 /* DropViewController.h */,
-				112285861214EA1E007165D3 /* DropViewController.m */,
-				112285871214EA1E007165D3 /* DropViewController.xib */,
 			);
 			path = iPad;
 			sourceTree = "<group>";
@@ -115,8 +120,9 @@
 		28EEBF621118D79A00187D67 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				1122853F1214E9D1007165D3 /* DragKit */,
-				8D1107310486CEB800E47090 /* Drop-Info.plist */,
+				11E24C6212655F7B0099AE8C /* DragKit */,
+				1174629E11CD95B700BAD1D9 /* Resources */,
+				8D1107310486CEB800E47090 /* Drag-Info.plist */,
 			);
 			name = Shared;
 			sourceTree = "<group>";
@@ -124,6 +130,10 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				972102261220DB2B00470344 /* DragViewController.h */,
+				972102241220DA1D00470344 /* DragViewController.m */,
+				11DF18E1117EA17B00233A48 /* DragView.h */,
+				11DF18E2117EA17B00233A48 /* DragView.m */,
 				2860E32A111B888700E27156 /* iPad */,
 				2860E324111B887F00E27156 /* iPhone */,
 				28EEBF621118D79A00187D67 /* Shared */,
@@ -137,7 +147,7 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				32CA4F630368D1EE00C91783 /* Drop_Prefix.pch */,
+				32CA4F630368D1EE00C91783 /* Drag_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 			);
 			name = "Other Sources";
@@ -149,8 +159,9 @@
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
 				288765FC0DF74451002DB57D /* CoreGraphics.framework */,
-				1122857E1214E9F9007165D3 /* QuartzCore.framework */,
-				113F299D121F84220073645E /* MobileCoreServices.framework */,
+				111F001511CDE11D004AED24 /* QuartzCore.framework */,
+				1150E4B2120E40C6008902F8 /* GameKit.framework */,
+				113F29CD121F87290073645E /* MobileCoreServices.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -158,9 +169,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1D6058900D05DD3D006BFB54 /* Drop */ = {
+		1D6058900D05DD3D006BFB54 /* Drag */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Drop" */;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Drag" */;
 			buildPhases = (
 				1D60588D0D05DD3D006BFB54 /* Resources */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
@@ -170,9 +181,9 @@
 			);
 			dependencies = (
 			);
-			name = Drop;
-			productName = Drop;
-			productReference = 1D6058910D05DD3D006BFB54 /* Drop.app */;
+			name = Drag;
+			productName = Drag;
+			productReference = 1D6058910D05DD3D006BFB54 /* Drag.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -180,14 +191,24 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Drop" */;
+			attributes = {
+				ORGANIZATIONNAME = "Zac White";
+			};
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Drag" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1D6058900D05DD3D006BFB54 /* Drop */,
+				1D6058900D05DD3D006BFB54 /* Drag */,
 			);
 		};
 /* End PBXProject section */
@@ -199,9 +220,6 @@
 			files = (
 				2860E329111B887F00E27156 /* MainWindow_Phone.xib in Resources */,
 				2860E32F111B888700E27156 /* MainWindow_Pad.xib in Resources */,
-				112285891214EA1E007165D3 /* DropViewController.xib in Resources */,
-				1144A15D1220DDB600FDEAE6 /* drag_default.png in Resources */,
-				1144A15E1220DDB600FDEAE6 /* drag_overlay.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,9 +233,9 @@
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				2860E328111B887F00E27156 /* AppDelegate_Phone.m in Sources */,
 				2860E32E111B888700E27156 /* AppDelegate_Pad.m in Sources */,
-				112285501214E9D7007165D3 /* DKApplicationRegistration.m in Sources */,
-				112285511214E9D7007165D3 /* DKDragDropServer.m in Sources */,
-				112285881214EA1E007165D3 /* DropViewController.m in Sources */,
+				111F3618117E9E2200B72C00 /* DragViewController_Phone.m in Sources */,
+				11DF18E3117EA17B00233A48 /* DragView.m in Sources */,
+				972102251220DA1D00470344 /* DragViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,9 +250,13 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = Drop_Prefix.pch;
-				INFOPLIST_FILE = "Drop-Info.plist";
-				PRODUCT_NAME = Drop;
+				GCC_PREFIX_HEADER = Drag_Prefix.pch;
+				INFOPLIST_FILE = "Drag-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../src/DragKit/build/Release-universal\"",
+				);
+				PRODUCT_NAME = Drag;
 			};
 			name = Debug;
 		};
@@ -244,9 +266,13 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = Drop_Prefix.pch;
-				INFOPLIST_FILE = "Drop-Info.plist";
-				PRODUCT_NAME = Drop;
+				GCC_PREFIX_HEADER = Drag_Prefix.pch;
+				INFOPLIST_FILE = "Drag-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../src/DragKit/build/Release-universal\"",
+				);
+				PRODUCT_NAME = Drag;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -257,6 +283,7 @@
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
@@ -272,6 +299,7 @@
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1;
@@ -285,7 +313,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Drop" */ = {
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Drag" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1D6058940D05DD3E006BFB54 /* Debug */,
@@ -294,7 +322,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Drop" */ = {
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Drag" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,

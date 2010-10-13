@@ -349,8 +349,8 @@ static char containsDragViewKey;
 	NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
 	
 	// add the drag image. if none is set, we can use default.
-	//[metadata setObject:[NSData data] forKey:@"dragImage"];
-	
+	[metadata setObject:UIImagePNGRepresentation(background) forKey:@"dragImage"];
+
 	// add the registration for the application that we're dragging from.
 	[metadata setObject:dk_applicationRegistration forKey:@"draggingApplication"];
 	
@@ -716,11 +716,24 @@ UIView *lastView = nil;
 		NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
 		
 		UIImage *overlay = [UIImage imageNamed:@"drag_overlay.png"];
-		UIImage *background = nil;
+		background = nil;
 		if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:context:)]) {
 			background = [dataProvider imageForDrag:dropIdentifier forView:draggableView context:dropContext];
 		} else {
-			background = [UIImage imageNamed:@"drag_default.png"];
+			
+			UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
+			
+			NSDictionary *metadata = [NSKeyedUnarchiver unarchiveObjectWithData:[[dragPasteboard valuesForPasteboardType:@"dragkit.metadata" inItemSet:nil] lastObject]];
+			
+			NSData *imageData = [metadata objectForKey:@"dragImage"];
+			
+			if (imageData) {
+				background = [UIImage imageWithData:imageData];
+			}
+			
+			if (!imageData || !background) {
+				background = [UIImage imageNamed:@"drag_default.png"];
+			}
 		}
 		
 		// create our drag view where we want it.

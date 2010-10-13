@@ -78,6 +78,8 @@ extern NSString *const DKPasteboardNameDrag;
 	UIView *springboard;
 	
 	CALayer *theLayer;
+	
+	UIImage *background;
 }
 
 + (id)sharedServer;

@@ -35,6 +35,7 @@
 		NSString *fullPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:iconPath];
 		NSLog(@"full: %@", fullPath);
 	}
+    [iconNames release];
 	
 	appRegistration.applicationName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 	appRegistration.applicationBundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];

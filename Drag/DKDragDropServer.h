@@ -19,6 +19,12 @@
 
 @optional
 - (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
+- (void)drag:(NSString *)dragID didStartForView:(UIView *)view;
+- (void)drag:(NSString *)dragID didFinishForView:(UIView *)view; // review name later (modification by pdcgomes 06.09.2012)
+- (BOOL)shouldStartDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
+
+// TODO -- add support for custom animations (pdcgomes 10.09.2012)
+//- (void)performDragAnimationForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 
 @end
 
@@ -28,6 +34,7 @@
 - (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type;
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
+- (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point;
 - (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard context:(void *)context;
 
 @end
@@ -36,7 +43,7 @@
 
 extern NSString *const DKPasteboardNameDrag;
 
-@interface DKDragDropServer : NSObject {
+@interface DKDragDropServer : NSObject <UIGestureRecognizerDelegate> {
 	UIView *draggedView;
 	UIView *originalView;
 	
@@ -80,6 +87,8 @@ extern NSString *const DKPasteboardNameDrag;
 	CALayer *theLayer;
 	
 	UIImage *background;
+    
+    UILongPressGestureRecognizer *dragRecognizer;
 }
 
 + (id)sharedServer;

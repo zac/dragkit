@@ -9,15 +9,20 @@
 #import <Foundation/Foundation.h>
 #import <QuartzCore/CAAnimation.h>
 
+@interface UIPasteboard (Objects)
+- (void)setObject:(id)object forPasteboardType:(NSString*)type;
+- (id)objectForPasteboardType:(NSString*)type;
+@end
 
 @protocol DKDragDataProvider
 
-// request the data from the view.
-
 - (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
-- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 
 @optional
+
+- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
+- (id)objectForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
+
 - (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
 - (void)drag:(NSString *)dragID didStartForView:(UIView *)view;
 - (void)drag:(NSString *)dragID didFinishForView:(UIView *)view; // review name later (modification by pdcgomes 06.09.2012)

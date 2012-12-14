@@ -17,6 +17,20 @@
 
 #import <objc/runtime.h>
 
+@implementation UIPasteboard (Objects)
+
+- (void)setObject:(id)object forPasteboardType:(NSString *)type
+{
+    objc_setAssociatedObject(self, type, object, OBJC_ASSOCIATION_RETAIN);
+}
+
+- (id)objectForPasteboardType:(NSString *)type
+{
+    return objc_getAssociatedObject(self, type);
+}
+
+@end
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 static inline CGFloat DKDegreesToRadians(const CGFloat degrees)
@@ -378,7 +392,7 @@ static char containsDragViewKey;
 	
 	// add the drag image. if none is set, we can use default.
 	[metadata setObject:UIImagePNGRepresentation(background) forKey:@"dragImage"];
-
+    
 	// add the registration for the application that we're dragging from.
 	[metadata setObject:dk_applicationRegistration forKey:@"draggingApplication"];
 	
@@ -394,18 +408,27 @@ static char containsDragViewKey;
 	NSMutableArray *pasteboardTypes = [NSMutableArray array];
 	NSMutableArray *justTypes = [NSMutableArray array];
 	for (NSString *type in advertisedTypes) {
-		NSData *data = [dataProvider dataForType:type withDrag:dropIdentifier forView:view context:dropContext];
+        
+        NSData *data = nil;
+        id object = nil;
+        
+        if([dataProvider respondsToSelector:@selector(dataForType:withDrag:forView:context:)])
+            data = [dataProvider dataForType:type withDrag:dropIdentifier forView:view context:dropContext];
+        
+        if([dataProvider respondsToSelector:@selector(objectForType:withDrag:forView:context:)])
+            object = [dataProvider objectForType:type withDrag:dropIdentifier forView:view context:dropContext];
 		
-		if (data) {
+		if (data || object)
 			[justTypes addObject:type];
-			[pasteboardTypes addObject:[NSDictionary dictionaryWithObject:data forKey:type]];
-		}
-	}
-	
-	[dk_currentDragTypes release];
-	dk_currentDragTypes = [[NSArray alloc] initWithArray:justTypes];
-	
-	[dragPasteboard addItems:pasteboardTypes];
+
+        if(data) [pasteboardTypes addObject:[NSDictionary dictionaryWithObject:data forKey:type]];
+        if(object) [dragPasteboard setObject:object forPasteboardType:type];
+    }
+    
+    [dk_currentDragTypes release];
+    dk_currentDragTypes = [[NSArray alloc] initWithArray:justTypes];
+    
+    [dragPasteboard addItems:pasteboardTypes];
 }
 
 #pragma mark -
@@ -424,7 +447,7 @@ CGSize touchOffset;
 			[theLayer removeAllAnimations];
 		}
 		theLayer = springboard.layer;
-
+        
 		// taken from AQGridView.
 		if ([theLayer respondsToSelector: @selector(setShadowPath:)] && [theLayer respondsToSelector: @selector(shadowPath)]) {
 			CGMutablePathRef path = CGPathCreateMutable();
@@ -448,7 +471,7 @@ CGSize touchOffset;
 			
 			[theLayer addAnimation:animator	forKey:@"theFlash"];
 		}
-					
+        
 		
 	}
 }
@@ -487,8 +510,8 @@ CGPoint lastTouch;
 				[sender setState:UIGestureRecognizerStateFailed];
 				return;
 			}
-
-             // added (pdcgomes 10.09.2012)
+            
+            // added (pdcgomes 10.09.2012)
 			if(![self dk_shouldStartDragForView:dragView]) {
                 [sender setState:UIGestureRecognizerStateFailed];
                 return;
@@ -497,7 +520,7 @@ CGPoint lastTouch;
 			self.originalView = dragView;
             
 			// our touch offset is just 0,0, which makes it the center.
-//			touchOffset = CGSizeMake(0,70);
+            //			touchOffset = CGSizeMake(0,70);
 			
 			CGPoint position = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
 			
@@ -518,37 +541,37 @@ CGPoint lastTouch;
 			[self dk_messageTargetsHitByPoint:touchPoint];
 			
 			viewPosition = CGPointMake(touchPoint.x - touchOffset.width, touchPoint.y - touchOffset.height);
-
+            
 			lastPoint = CGPointMake(touchPoint.x, touchPoint.y);
 			
 			if ( !self.pausedTimer || ![self.pausedTimer isValid] ) {
 				// no timer, update point
 				if ( (((lastPoint.x - pausedPoint.x) *
-					   (lastPoint.x - pausedPoint.x)) + 
+					   (lastPoint.x - pausedPoint.x)) +
 					  ((lastPoint.y - pausedPoint.y) *
 					   (lastPoint.y - pausedPoint.y))) > 200 ) {
-					// only make a new one if we moved enough
-					pausedPoint = lastPoint;
-					self.pausedTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(dk_springboardOpenItemFromTimer:) userInfo:nil repeats:NO];
-				} else if ((((lastPoint.x - pausedPoint.x) *
-								   (lastPoint.x - pausedPoint.x)) + 
+                          // only make a new one if we moved enough
+                          pausedPoint = lastPoint;
+                          self.pausedTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(dk_springboardOpenItemFromTimer:) userInfo:nil repeats:NO];
+                      } else if ((((lastPoint.x - pausedPoint.x) *
+								   (lastPoint.x - pausedPoint.x)) +
 								  ((lastPoint.y - pausedPoint.y) *
 								   (lastPoint.y - pausedPoint.y))) > 40) {
-					// moved too much, cancel the animation
-					if ( theLayer ) {
-						  [theLayer removeAllAnimations];
-					}  
-				}
+                                      // moved too much, cancel the animation
+                                      if ( theLayer ) {
+                                          [theLayer removeAllAnimations];
+                                      }
+                                  }
 			} else if ( (((lastPoint.x - pausedPoint.x) *
-						  (lastPoint.x - pausedPoint.x)) + 
+						  (lastPoint.x - pausedPoint.x)) +
 						 ((lastPoint.y - pausedPoint.y) *
 						  (lastPoint.y - pausedPoint.y))) > 20 ) {
-				// we moved too much, cancel timer
-				[self.pausedTimer invalidate];
-				// now make a new one
-				pausedPoint = lastPoint;
-				self.pausedTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(dk_springboardOpenItemFromTimer:) userInfo:nil repeats:NO];
-			} 
+                             // we moved too much, cancel timer
+                             [self.pausedTimer invalidate];
+                             // now make a new one
+                             pausedPoint = lastPoint;
+                             self.pausedTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(dk_springboardOpenItemFromTimer:) userInfo:nil repeats:NO];
+                         }
 			
 			[self dk_moveDragViewToPoint:viewPosition];
 			
@@ -692,7 +715,7 @@ UIView *lastView = nil;
 }
 
 - (void)dk_setView:(UIView *)view highlighted:(BOOL)highlighted animated:(BOOL)animated {
-
+    
 	CALayer *dropLayer = view.layer;
 	
 	if (animated) {
@@ -800,7 +823,7 @@ UIView *lastView = nil;
 			self.draggedView.transform = CGAffineTransformMakeTranslation(touchOffset.width, touchOffset.height);
 			self.draggedView.transform = CGAffineTransformScale(self.draggedView.transform, 0.001, 0.001);
 			self.draggedView.alpha = 0.0;
-
+            
             // adjust the dragImage rotation if needed (pdcgomes 10.09.2012)
             CGAffineTransform rotationTransform = CGAffineTransformIdentity;
             UIDeviceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
@@ -816,7 +839,7 @@ UIView *lastView = nil;
 			[UIView setAnimationDelegate:self];
 			[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
 			
-//			self.draggedView.transform = CGAffineTransformIdentity;
+            //			self.draggedView.transform = CGAffineTransformIdentity;
             self.draggedView.transform = rotationTransform;
 			self.draggedView.alpha = 1.0;
 			
@@ -847,7 +870,7 @@ UIView *lastView = nil;
 	[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
 	
     self.draggedView.transform = CGAffineTransformScale(self.draggedView.transform, 0.001, 0.001); // changed -- we need to preserve the current rotation (pdcgomes 10.09.2012)
-//	self.draggedView.transform = CGAffineTransformMakeScale(0.001, 0.001);
+    //	self.draggedView.transform = CGAffineTransformMakeScale(0.001, 0.001);
 	self.draggedView.alpha = 0.0;
 	self.draggedView.center = CGPointMake(self.draggedView.center.x + touchOffset.width, self.draggedView.center.y + touchOffset.height);
 	

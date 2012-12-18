@@ -303,6 +303,11 @@ NSString *const DKPasteboardNameDrag = @"dragkit-drag";
 	[[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"dragkit-pasteboard"];
 }
 
+- (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer*)gestureRecognizer
+{
+    [dragRecognizer requireGestureRecognizerToFail:gestureRecognizer];
+}
+
 #pragma mark -
 #pragma mark Marking Views
 

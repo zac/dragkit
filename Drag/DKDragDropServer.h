@@ -122,4 +122,6 @@ extern NSString *const DKPasteboardNameDrag;
 
 - (void)animationDidStop:(CAAnimation *)theAnimation finished:(BOOL)flag;
 
+- (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer*)gestureRecognizer;
+
 @end

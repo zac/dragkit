@@ -1032,6 +1032,8 @@ UIView *lastView = nil;
     if([dataProvider respondsToSelector:@selector(drag:didFinishForView:)]) {
         [dataProvider drag:dragID didFinishForView:view];
     }
+    
+    self.originalView = nil;
 }
 
 @end

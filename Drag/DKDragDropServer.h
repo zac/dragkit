@@ -20,13 +20,13 @@
 
 @optional
 
-- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
-- (id)objectForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
+- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
+- (id)objectForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
 
-- (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
-- (void)drag:(NSString *)dragID didStartForView:(UIView *)view;
-- (void)drag:(NSString *)dragID didFinishForView:(UIView *)view; // review name later (modification by pdcgomes 06.09.2012)
-- (BOOL)shouldStartDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
+- (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
+- (void)drag:(NSString *)dragID didStartForView:(UIView *)view position:(CGPoint)point; // (modification by dmakarenko 14.01.2013)
+- (void)drag:(NSString *)dragID didFinishForView:(UIView *)view position:(CGPoint)point; // review name later (modification by pdcgomes 06.09.2012, modification by dmakarenko 14.01.2013)
+- (BOOL)shouldStartDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
 
 // TODO -- add support for custom animations (pdcgomes 10.09.2012)
 //- (void)performDragAnimationForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
@@ -51,7 +51,7 @@ extern NSString *const DKPasteboardNameDrag;
 @interface DKDragDropServer : NSObject <UIGestureRecognizerDelegate> {
 	UIView *draggedView;
 	UIView *originalView;
-	
+
 @private
 	
 	// UI for the holding area.
@@ -78,6 +78,9 @@ extern NSString *const DKPasteboardNameDrag;
 	// arrays that store the targets and delegates.
 	NSMutableArray *dk_dropTargets;
 	
+    // Point of initial touch.
+	CGPoint initialTouchPoint;
+
 	// point to determine how much it has moved
 	CGPoint lastPoint;
 	CGPoint pausedPoint;

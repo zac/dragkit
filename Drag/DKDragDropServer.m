@@ -454,6 +454,7 @@ CGSize touchOffset;
 		theLayer = springboard.layer;
         
 		// taken from AQGridView.
+        /*
 		if ([theLayer respondsToSelector: @selector(setShadowPath:)] && [theLayer respondsToSelector: @selector(shadowPath)]) {
 			CGMutablePathRef path = CGPathCreateMutable();
 			CGPathAddRect( path, NULL, theLayer.bounds );
@@ -476,7 +477,7 @@ CGSize touchOffset;
 			
 			[theLayer addAnimation:animator	forKey:@"theFlash"];
 		}
-        
+        */
 		
 	}
 }
@@ -729,7 +730,7 @@ UIView *lastView = nil;
 }
 
 - (void)dk_setView:(UIView *)view highlighted:(BOOL)highlighted animated:(BOOL)animated {
-    
+    /*
 	CALayer *dropLayer = view.layer;
 	
 	if (animated) {
@@ -759,7 +760,7 @@ UIView *lastView = nil;
 		}
 	}
 	
-	if (animated) [UIView commitAnimations];
+	if (animated) [UIView commitAnimations];*/
 }
 
 // we are going to zoom from this image to the normal view for the content type.
@@ -817,8 +818,7 @@ UIView *lastView = nil;
 																	 overlay.size.width,
 																	 overlay.size.height)] autorelease];
 		
-		UIImageView *backgroundImageView = [[UIImageView alloc] initWithFrame:CGRectMake(8, 4, 108, 108)];
-		backgroundImageView.image = background;
+		UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:background];
 		backgroundImageView.contentMode = UIViewContentModeScaleAspectFit;
 		backgroundImageView.layer.cornerRadius = 10;
 		backgroundImageView.clipsToBounds = YES;

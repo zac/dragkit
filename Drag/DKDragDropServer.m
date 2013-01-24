@@ -720,7 +720,8 @@ UIView *lastView = nil;
 			[dragDelegate dragDidEnterTargetView:dropTarget];
 		}
         else if(containsDragView && [dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:)]) {
-            [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:point];
+            CGPoint positionInTargetView = [[self dk_mainAppWindow] convertPoint:point toView:dropTarget];
+            [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:positionInTargetView];
         }
 		
 		lastView = [dropTarget retain];

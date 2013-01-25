@@ -9,11 +9,6 @@
 #import <Foundation/Foundation.h>
 #import <QuartzCore/CAAnimation.h>
 
-@interface UIPasteboard (Objects)
-- (void)setObject:(id)object forPasteboardType:(NSString*)type;
-- (id)objectForPasteboardType:(NSString*)type;
-@end
-
 @protocol DKDragDataProvider
 
 - (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
@@ -40,6 +35,8 @@
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
 - (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point;
+- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withObjectsDictionary:(NSDictionary *)objectsDictionary context:(void *)context;  // (modification by dmakarenko 25.01.2013)
+@optional
 - (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard context:(void *)context;
 
 @end

@@ -17,20 +17,6 @@
 
 #import <objc/runtime.h>
 
-@implementation UIPasteboard (Objects)
-
-- (void)setObject:(id)object forPasteboardType:(NSString *)type
-{
-    objc_setAssociatedObject(self, type, object, OBJC_ASSOCIATION_RETAIN);
-}
-
-- (id)objectForPasteboardType:(NSString *)type
-{
-    return objc_getAssociatedObject(self, type);
-}
-
-@end
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 static inline CGFloat DKDegreesToRadians(const CGFloat degrees)
@@ -315,6 +301,7 @@ NSString *const DKPasteboardNameDrag = @"dragkit-drag";
 static char dragKey;
 static char contextKey;
 static char dataProviderKey;
+static char objectsDictionaryKey;
 
 - (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource context:(void *)context {
 	
@@ -412,6 +399,7 @@ static char containsDragViewKey;
 	NSArray *advertisedTypes = [dataProvider typesSupportedForDrag:dropIdentifier forView:view context:dropContext];
 	NSMutableArray *pasteboardTypes = [NSMutableArray array];
 	NSMutableArray *justTypes = [NSMutableArray array];
+    NSMutableDictionary *objectsDictionary = [NSMutableDictionary dictionary];
 	for (NSString *type in advertisedTypes) {
         
         NSData *data = nil;
@@ -427,7 +415,10 @@ static char containsDragViewKey;
 			[justTypes addObject:type];
 
         if(data) [pasteboardTypes addObject:[NSDictionary dictionaryWithObject:data forKey:type]];
-        if(object) [dragPasteboard setObject:object forPasteboardType:type];
+        if(object) [objectsDictionary setObject:object forKey:type];
+    }
+    if([objectsDictionary count] > 0) {
+        objc_setAssociatedObject(dragPasteboard, &objectsDictionaryKey, [NSDictionary dictionaryWithDictionary:objectsDictionary], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     
     [dk_currentDragTypes release];
@@ -614,6 +605,22 @@ CGPoint lastTouch;
 					[dragPasteboard setItems:nil];
 				}
 				
+				if ([dragDelegate respondsToSelector:@selector(drag:completedOnTargetView:withObjectsDictionary:context:)]) {
+					
+					//grab the associated objects.
+					NSString *dropIdentifier = objc_getAssociatedObject(droppedTarget, &dragKey);
+					void *dropContext = objc_getAssociatedObject(droppedTarget, &contextKey);
+
+                    // ask for the data and construct a UIPasteboard.
+					UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:NO];
+
+                    NSDictionary *objectsDictionary = objc_getAssociatedObject(dragPasteboard, &objectsDictionaryKey);
+					
+					[dragDelegate drag:dropIdentifier completedOnTargetView:droppedTarget withObjectsDictionary:objectsDictionary context:dropContext];
+                    
+                    objc_setAssociatedObject(dragPasteboard, &objectsDictionaryKey, nil, OBJC_ASSOCIATION_RETAIN);
+				}
+
 				// collapse the drag view into the drop view.
 				[self dk_collapseDragView];
 				

@@ -34,7 +34,7 @@
 - (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type;
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
-- (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point;
+- (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point withObjectsDictionary:(NSDictionary*)objectsDictionary; // (modification by sceriu 01.02.2013
 - (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withObjectsDictionary:(NSDictionary *)objectsDictionary context:(void *)context;  // (modification by dmakarenko 25.01.2013)
 @optional
 - (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard context:(void *)context;

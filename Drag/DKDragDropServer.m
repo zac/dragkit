@@ -726,9 +726,14 @@ UIView *lastView = nil;
 		if (!containsDragView && [dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
 			[dragDelegate dragDidEnterTargetView:dropTarget];
 		}
-        else if(containsDragView && [dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:)]) {
+        else if(containsDragView && [dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:withObjectsDictionary:)]) {
+            
             CGPoint positionInTargetView = [[self dk_mainAppWindow] convertPoint:point toView:dropTarget];
-            [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:positionInTargetView];
+            
+            UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
+            NSDictionary *objectsDictionary = objc_getAssociatedObject(dragPasteboard, &objectsDictionaryKey);
+            
+            [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:positionInTargetView withObjectsDictionary:objectsDictionary];
         }
 		
 		lastView = [dropTarget retain];

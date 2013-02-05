@@ -129,7 +129,7 @@ NSString *const DKPasteboardNameDrag = @"dragkit-drag";
 
 - (void)dk_applicationDidBecomeActive:(NSNotification *)notification {
 	dragRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
-	dragRecognizer.minimumPressDuration = 0.5;
+	dragRecognizer.minimumPressDuration = 0.25;
 	dragRecognizer.numberOfTapsRequired = 0;
     dragRecognizer.enabled = NO;
     dragRecognizer.delegate = self;

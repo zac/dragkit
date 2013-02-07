@@ -181,7 +181,7 @@ NSString *const DKPasteboardNameDrag = @"dragkit-drag";
 - (void)registerApplicationWithTypes:(NSArray *)types {
 	
 	UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
-	NSDictionary *meta;
+	NSDictionary *meta = nil;
     
     NSData *metadata = [[dragPasteboard valuesForPasteboardType:@"dragkit.metadata" inItemSet:nil] lastObject];
     

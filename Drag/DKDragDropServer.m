@@ -129,7 +129,7 @@ NSString *const DKPasteboardNameDrag = @"dragkit-drag";
 
 - (void)dk_applicationDidBecomeActive:(NSNotification *)notification {
 	dragRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
-	dragRecognizer.minimumPressDuration = 0.25;
+	dragRecognizer.minimumPressDuration = 0.5;
 	dragRecognizer.numberOfTapsRequired = 0;
     dragRecognizer.enabled = NO;
     dragRecognizer.delegate = self;
@@ -181,7 +181,7 @@ NSString *const DKPasteboardNameDrag = @"dragkit-drag";
 - (void)registerApplicationWithTypes:(NSArray *)types {
 	
 	UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
-	NSDictionary *meta = nil;
+	NSDictionary *meta;
     
     NSData *metadata = [[dragPasteboard valuesForPasteboardType:@"dragkit.metadata" inItemSet:nil] lastObject];
     
@@ -630,6 +630,9 @@ CGPoint lastTouch;
 			} else {
 				[self cancelDrag];
 			}
+            targetIsOriginalView = NO;
+            targetIsChanged = NO;
+            
             CGPoint positionInView = [[self dk_mainAppWindow] convertPoint:initialTouchPoint toView:self.originalView];
             [self dk_signalDragCompletionForView:self.originalView position:positionInView];
 			
@@ -692,6 +695,8 @@ CGPoint lastTouch;
 }
 
 UIView *lastView = nil;
+BOOL targetIsChanged = NO;
+BOOL targetIsOriginalView = NO;
 - (void)dk_messageTargetsHitByPoint:(CGPoint)point {
 	//go through the drop targets and find out of the point is in any of those rects.
 	
@@ -712,9 +717,34 @@ UIView *lastView = nil;
 		[lastView release];
 		lastView = nil;
 		
+        targetIsChanged = NO;
+        targetIsOriginalView = NO;
 		return;
-	}
-	
+	} else {
+        if (dropTarget) {
+            if (dropTarget == originalView) {
+                if (NO == targetIsOriginalView) {
+                    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(lastView, &dragDelegateKey);
+                    if ([dragDelegate respondsToSelector:@selector(dragDidChangeTargetView:)]) {
+                        [dragDelegate dragDidChangeTargetView:dropTarget];
+                    }
+                    targetIsOriginalView = YES;
+                }
+                
+            } else {
+                if (targetIsOriginalView) {
+                    targetIsOriginalView = NO;
+                    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(lastView, &dragDelegateKey);
+                    if ([dragDelegate respondsToSelector:@selector(dragDidChangeTargetView:)]) {
+                        [dragDelegate dragDidChangeTargetView:dropTarget];
+                    }
+                }
+            }
+        } else {
+            targetIsChanged = NO;
+            targetIsOriginalView = NO;
+        }
+    }
 	NSArray *acceptedTypes = objc_getAssociatedObject(dropTarget, &acceptedTypesKey);
 	NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(dropTarget, &dragDelegateKey);
 	BOOL containsDragView = [(NSNumber *)objc_getAssociatedObject(dropTarget, &containsDragViewKey) boolValue];
@@ -735,7 +765,7 @@ UIView *lastView = nil;
             
             [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:positionInTargetView withObjectsDictionary:objectsDictionary];
         }
-		
+
 		lastView = [dropTarget retain];
 		
 		objc_setAssociatedObject(dropTarget, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);

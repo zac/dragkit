@@ -181,7 +181,7 @@ NSString *const DKPasteboardNameDrag = @"dragkit-drag";
 - (void)registerApplicationWithTypes:(NSArray *)types {
 	
 	UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
-	NSDictionary *meta;
+	NSDictionary *meta = nil;
     
     NSData *metadata = [[dragPasteboard valuesForPasteboardType:@"dragkit.metadata" inItemSet:nil] lastObject];
     
@@ -884,7 +884,7 @@ BOOL targetIsOriginalView = NO;
             
             // adjust the dragImage rotation if needed (pdcgomes 10.09.2012)
             CGAffineTransform rotationTransform = CGAffineTransformIdentity;
-            UIDeviceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
+            UIDeviceOrientation currentOrientation = (UIDeviceOrientation)[UIApplication sharedApplication].statusBarOrientation;
             if(UIDeviceOrientationIsLandscape(currentOrientation)) {
                 CGFloat rotationAngle = currentOrientation == UIDeviceOrientationLandscapeLeft ? DKDegreesToRadians(90.0) : DKDegreesToRadians(-90.0);
                 self.draggedView.transform = CGAffineTransformRotate(self.draggedView.transform, rotationAngle);

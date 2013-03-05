@@ -833,7 +833,6 @@ BOOL targetIsOriginalView = NO;
 		void *dropContext = objc_getAssociatedObject(draggableView, &contextKey);
 		NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
 		
-		UIImage *overlay = [UIImage imageNamed:@"drag_overlay.png"];
 		background = nil;
 		if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:position:context:)]) {
             CGPoint positionInView = [[self dk_mainAppWindow] convertPoint:point toView:draggableView];
@@ -854,26 +853,20 @@ BOOL targetIsOriginalView = NO;
 				background = [UIImage imageNamed:@"drag_default.png"];
 			}
 		}
-		
-		// create our drag view where we want it.
-		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake((int)(point.x - overlay.size.width / 2.0),
-																	 (int)(point.y - overlay.size.height / 2.0),
-																	 overlay.size.width,
-																	 overlay.size.height)] autorelease];
-		
-		UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:background];
+        
+        UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:background];
 		backgroundImageView.contentMode = UIViewContentModeScaleAspectFit;
 		backgroundImageView.layer.cornerRadius = 10;
 		backgroundImageView.clipsToBounds = YES;
 		
-		UIImageView *dragImageView = [[UIImageView alloc] initWithFrame:self.draggedView.bounds];
-		dragImageView.image = overlay;
+		// create our drag view where we want it.
+		self.draggedView = [[[UIView alloc] initWithFrame:CGRectMake((int)(point.x - backgroundImageView.bounds.size.width / 2.0),
+																	 (int)(point.y - backgroundImageView.bounds.size.height / 2.0),
+																	 backgroundImageView.bounds.size.width,
+																	 backgroundImageView.bounds.size.height)] autorelease];
 		
 		[self.draggedView addSubview:backgroundImageView];
-		[self.draggedView addSubview:dragImageView];
-		
 		[backgroundImageView release];
-		[dragImageView release];
 		
 		[[self dk_mainAppWindow] addSubview:self.draggedView];
 		
@@ -890,6 +883,8 @@ BOOL targetIsOriginalView = NO;
                 self.draggedView.transform = CGAffineTransformRotate(self.draggedView.transform, rotationAngle);
                 rotationTransform = CGAffineTransformMakeRotation(rotationAngle);
             }
+            
+            CGAffineTransform scaleTransform = CGAffineTransformMakeScale(1.25f, 1.25f);
 			
 			[UIView beginAnimations:@"DragExpand" context:NULL];
 			[UIView setAnimationCurve:UIViewAnimationCurveEaseIn];
@@ -897,8 +892,7 @@ BOOL targetIsOriginalView = NO;
 			[UIView setAnimationDelegate:self];
 			[UIView setAnimationDidStopSelector:@selector(cancelAnimationDidStop:finished:context:)];
 			
-            //			self.draggedView.transform = CGAffineTransformIdentity;
-            self.draggedView.transform = rotationTransform;
+            self.draggedView.transform = CGAffineTransformConcat(rotationTransform, scaleTransform);
 			self.draggedView.alpha = 1.0;
 			
 			[UIView commitAnimations];

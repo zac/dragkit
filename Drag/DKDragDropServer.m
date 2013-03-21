@@ -834,29 +834,41 @@ BOOL targetIsOriginalView = NO;
 		NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
 		
 		background = nil;
-		if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:position:context:)]) {
-            CGPoint positionInView = [[self dk_mainAppWindow] convertPoint:point toView:draggableView];
-			background = [dataProvider imageForDrag:dropIdentifier forView:draggableView position:positionInView context:dropContext];
-		} else {
-			
-			UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
-			
-			NSDictionary *metadata = [NSKeyedUnarchiver unarchiveObjectWithData:[[dragPasteboard valuesForPasteboardType:@"dragkit.metadata" inItemSet:nil] lastObject]];
-			
-			NSData *imageData = [metadata objectForKey:@"dragImage"];
-			
-			if (imageData) {
-				background = [UIImage imageWithData:imageData];
-			}
-			
-			if (!imageData || !background) {
-				background = [UIImage imageNamed:@"drag_default.png"];
-			}
-		}
+		
+        BOOL shouldUseViewAsDragImage = NO;
+        if([dataProvider respondsToSelector:@selector(drag:shouldUseViewAsDragImageForView:)])
+            shouldUseViewAsDragImage = [dataProvider drag:dropIdentifier shouldUseViewAsDragImageForView:draggableView];
+
+        if(shouldUseViewAsDragImage) {
+            UIGraphicsBeginImageContext(draggableView.bounds.size);
+            [draggableView.layer renderInContext:UIGraphicsGetCurrentContext()];
+            background = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
+        }
+        else {
+            if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:position:context:)]) {
+                CGPoint positionInView = [[self dk_mainAppWindow] convertPoint:point toView:draggableView];
+                background = [dataProvider imageForDrag:dropIdentifier forView:draggableView position:positionInView context:dropContext];
+            } else {
+                
+                UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
+                
+                NSDictionary *metadata = [NSKeyedUnarchiver unarchiveObjectWithData:[[dragPasteboard valuesForPasteboardType:@"dragkit.metadata" inItemSet:nil] lastObject]];
+                
+                NSData *imageData = [metadata objectForKey:@"dragImage"];
+                
+                if (imageData) {
+                    background = [UIImage imageWithData:imageData];
+                }
+                
+                if (!imageData || !background) {
+                    background = [UIImage imageNamed:@"drag_default.png"];
+                }
+            }
+        }
         
         UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:background];
 		backgroundImageView.contentMode = UIViewContentModeScaleAspectFit;
-		backgroundImageView.layer.cornerRadius = 10;
 		backgroundImageView.clipsToBounds = YES;
 		
 		// create our drag view where we want it.
@@ -884,7 +896,13 @@ BOOL targetIsOriginalView = NO;
                 rotationTransform = CGAffineTransformMakeRotation(rotationAngle);
             }
             
-            CGAffineTransform scaleTransform = CGAffineTransformMakeScale(1.25f, 1.25f);
+            CGAffineTransform scaleTransform;
+            
+            if(shouldUseViewAsDragImage) {
+                scaleTransform = CGAffineTransformIdentity;
+            } else {
+                scaleTransform = CGAffineTransformMakeScale(1.25f, 1.25f);
+            }
 			
 			[UIView beginAnimations:@"DragExpand" context:NULL];
 			[UIView setAnimationCurve:UIViewAnimationCurveEaseIn];

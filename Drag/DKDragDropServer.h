@@ -22,6 +22,7 @@
 - (void)drag:(NSString *)dragID didStartForView:(UIView *)view position:(CGPoint)point; // (modification by dmakarenko 14.01.2013)
 - (void)drag:(NSString *)dragID didFinishForView:(UIView *)view position:(CGPoint)point; // review name later (modification by pdcgomes 06.09.2012, modification by dmakarenko 14.01.2013)
 - (BOOL)shouldStartDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
+- (BOOL)drag:(NSString*)dropID shouldUseViewAsDragImageForView:(UIView*)dragView;
 
 // TODO -- add support for custom animations (pdcgomes 10.09.2012)
 //- (void)performDragAnimationForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;

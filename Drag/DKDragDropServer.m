@@ -629,10 +629,12 @@ CGPoint lastTouch;
                 
                 
                 //Stop calling dragDidLeaveTargetView when changing drags (sceriu 22.03.2013)
-                objc_setAssociatedObject(lastView, &containsDragViewKey, [NSNumber numberWithBool:NO], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-                [self dk_setView:lastView highlighted:NO animated:YES];
-                [lastView release];
-                lastView = nil;
+                if(lastView) {
+                    objc_setAssociatedObject(lastView, &containsDragViewKey, [NSNumber numberWithBool:NO], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                    [self dk_setView:lastView highlighted:NO animated:YES];
+                    [lastView release];
+                    lastView = nil;
+                }
                 
 			} else {
 				[self cancelDrag];

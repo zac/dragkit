@@ -736,7 +736,7 @@ BOOL targetIsOriginalView = NO;
 		return;
 	} else {
         if (dropTarget) {
-            if (dropTarget == originalView) {
+            if ([dropTarget isEqual:lastView]) {
                 if (NO == targetIsOriginalView) {
                     NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(lastView, &dragDelegateKey);
                     if ([dragDelegate respondsToSelector:@selector(dragDidChangeTargetView:)]) {

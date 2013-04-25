@@ -30,9 +30,6 @@
 
 - (BOOL)drag:(NSString*)dropID shouldUseViewAsDragImageForView:(UIView*)dragView;
 
-// TODO -- add support for custom animations (pdcgomes 10.09.2012)
-//- (void)performDragAnimationForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
-
 @end
 
 @protocol DKDragDelegate
@@ -53,47 +50,20 @@
 
 extern NSString *const DKPasteboardNameDrag;
 
-@interface DKDragDropServer : NSObject <UIGestureRecognizerDelegate> {
+@interface DKDragDropServer : NSObject <UIGestureRecognizerDelegate>
 
-@private
-	
-	// UI for the holding area.
-	UIView *dk_holdingArea;
-	
-	NSArray *dk_currentDragTypes;
-	
-	// arrays that store the targets and delegates.
-	NSMutableArray *dk_dropTargets;
-	
-    // Point of initial touch.
-	CGPoint initialTouchPoint;
-
-	// point to determine how much it has moved
-	CGPoint lastPoint;
-	
-	UIImage *background;
-    
-    UILongPressGestureRecognizer *dragRecognizer;
-}
+@property (nonatomic, strong, readonly) UIView *originalView;
 
 + (id)sharedServer;
 
-// application registration.
 - (void)registerApplicationWithTypes:(NSArray *)types;
-
 - (void)cancelDrag;
 
-@property (nonatomic, retain) UIView *draggedView;
-@property (nonatomic, retain) UIView *originalView;
-
-// the API for marking a view as draggable or a drop target.
 - (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource context:(void *)context;
-- (void)markViewAsDropTarget:(UIView *)dropView forTypes:(NSArray *)types withDelegate:(NSObject <DKDragDelegate> *)dropDelegate;
-
-// unmarking views
 - (void)unmarkViewAsDraggable:(UIView *)draggableView;
-- (void)unmarkDropTarget:(UIView *)dropView;
 
+- (void)markViewAsDropTarget:(UIView *)dropView forTypes:(NSArray *)types withDelegate:(NSObject <DKDragDelegate> *)dropDelegate;
+- (void)unmarkDropTarget:(UIView *)dropView;
 
 - (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer*)gestureRecognizer;
 

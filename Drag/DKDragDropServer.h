@@ -19,9 +19,15 @@
 - (id)objectForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
 
 - (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
+
+- (void)drag:(NSString *)dragID willStartForView:(UIView *)view position:(CGPoint)point;
 - (void)drag:(NSString *)dragID didStartForView:(UIView *)view position:(CGPoint)point; // (modification by dmakarenko 14.01.2013)
+
+- (void)drag:(NSString *)dragID willFinishForView:(UIView *)view position:(CGPoint)point;
 - (void)drag:(NSString *)dragID didFinishForView:(UIView *)view position:(CGPoint)point; // review name later (modification by pdcgomes 06.09.2012, modification by dmakarenko 14.01.2013)
+
 - (BOOL)shouldStartDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
+
 - (BOOL)drag:(NSString*)dropID shouldUseViewAsDragImageForView:(UIView*)dragView;
 
 // TODO -- add support for custom animations (pdcgomes 10.09.2012)
@@ -48,31 +54,13 @@
 extern NSString *const DKPasteboardNameDrag;
 
 @interface DKDragDropServer : NSObject <UIGestureRecognizerDelegate> {
-	UIView *draggedView;
-	UIView *originalView;
 
 @private
 	
 	// UI for the holding area.
 	UIView *dk_holdingArea;
-	UILabel *dk_holdingAreaLabel;
 	
 	NSArray *dk_currentDragTypes;
-	
-	// the drop targets dictionary with associated data.
-	NSMutableDictionary *dk_dropTargetsDictionary;
-	
-	// the pointer to the main app window.
-	UIWindow *dk_mainAppWindow;
-	
-	// the manifest of all apps on the system that support DragKit.
-	NSMutableArray *dk_manifest;
-	
-	// the resolved supported applications.
-	NSMutableArray *dk_supportedApplications;
-	
-	// the application registrations.
-	DKApplicationRegistration *dk_applicationRegistration;
 	
 	// arrays that store the targets and delegates.
 	NSMutableArray *dk_dropTargets;
@@ -82,16 +70,6 @@ extern NSString *const DKPasteboardNameDrag;
 
 	// point to determine how much it has moved
 	CGPoint lastPoint;
-	CGPoint pausedPoint;
-	
-	// time at point
-	NSTimer *pausedTimer;
-	
-	BOOL inOnePlace;
-	
-	UIView *springboard;
-	
-	CALayer *theLayer;
 	
 	UIImage *background;
     
@@ -99,19 +77,14 @@ extern NSString *const DKPasteboardNameDrag;
 }
 
 + (id)sharedServer;
-+ (NSString *)versionString;
 
 // application registration.
 - (void)registerApplicationWithTypes:(NSArray *)types;
-- (NSArray *)registeredApplications;
 
 - (void)cancelDrag;
 
 @property (nonatomic, retain) UIView *draggedView;
 @property (nonatomic, retain) UIView *originalView;
-@property (nonatomic, retain) NSTimer *pausedTimer;
-
-- (void)resetRegistrationDatabase;
 
 // the API for marking a view as draggable or a drop target.
 - (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource context:(void *)context;
@@ -121,8 +94,6 @@ extern NSString *const DKPasteboardNameDrag;
 - (void)unmarkViewAsDraggable:(UIView *)draggableView;
 - (void)unmarkDropTarget:(UIView *)dropView;
 
-
-- (void)animationDidStop:(CAAnimation *)theAnimation finished:(BOOL)flag;
 
 - (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer*)gestureRecognizer;
 

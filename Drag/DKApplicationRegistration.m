@@ -41,7 +41,6 @@
 	appRegistration.applicationBundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 	
 	appRegistration.iconPrerendered = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIPrerenderedIcon"] boolValue];
-	appRegistration.frameworkVersion = [DKDragDropServer versionString];
 	appRegistration.supportedDragTypes = dragTypes;
 	
 	appRegistration.urlScheme = [NSString stringWithFormat:@"x-drag-%@", [[NSBundle mainBundle] bundleIdentifier]];

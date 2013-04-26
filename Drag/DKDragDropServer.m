@@ -12,9 +12,10 @@
 #import <QuartzCore/CALayer.h>
 #import <UIKit/UIGestureRecognizerSubclass.h>
 
-static char dragKey;
 static char dataProviderKey;
 static char dragDelegateKey;
+static char dragMetadataKey;
+
 static char containsDragViewKey;
 
 static DKDragDropServer *sharedInstance = nil;
@@ -26,7 +27,6 @@ static DKDragDropServer *sharedInstance = nil;
 @property (nonatomic, strong) UILongPressGestureRecognizer *dragRecognizer;
 
 @property (nonatomic, strong) UIView *lastView;
-@property (nonatomic, assign) BOOL targetIsOriginalView;
 @property (nonatomic, strong) NSMutableSet *dk_dropTargets;
 
 @end
@@ -83,7 +83,6 @@ static DKDragDropServer *sharedInstance = nil;
 
 - (void)unmarkViewAsDraggable:(UIView *)draggableView
 {
-	objc_setAssociatedObject(draggableView, &dragKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
 	objc_setAssociatedObject(draggableView, &dataProviderKey, nil, OBJC_ASSOCIATION_ASSIGN);
 }
 
@@ -176,7 +175,6 @@ static DKDragDropServer *sharedInstance = nil;
 			} else {
 				[self endDrag:NO];
 			}
-            self.targetIsOriginalView = NO;
             
 			break;
         }
@@ -242,32 +240,8 @@ static DKDragDropServer *sharedInstance = nil;
 		
 		
 		self.lastView = nil;
-        self.targetIsOriginalView = NO;
 		return;
-	} else {
-        if (dropTarget) {
-            if ([dropTarget isEqual:self.lastView]) {
-                if (NO == self.targetIsOriginalView) {
-                    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
-                    if ([dragDelegate respondsToSelector:@selector(dragDidChangeTargetView:)]) {
-                        [dragDelegate dragDidChangeTargetView:dropTarget];
-                    }
-                    self.targetIsOriginalView = YES;
-                }
-                
-            } else {
-                if (self.targetIsOriginalView) {
-                    self.targetIsOriginalView = NO;
-                    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
-                    if ([dragDelegate respondsToSelector:@selector(dragDidChangeTargetView:)]) {
-                        [dragDelegate dragDidChangeTargetView:dropTarget];
-                    }
-                }
-            }
-        } else {
-            self.targetIsOriginalView = NO;
-        }
-    }
+	}
     
 	NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(dropTarget, &dragDelegateKey);
 	BOOL containsDragView = [(NSNumber *)objc_getAssociatedObject(dropTarget, &containsDragViewKey) boolValue];
@@ -279,7 +253,8 @@ static DKDragDropServer *sharedInstance = nil;
     else if(containsDragView && [dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:withObjectsDictionary:)]) {
         
         CGPoint positionInTargetView = [[self dk_rootView] convertPoint:point toView:dropTarget];
-        [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:positionInTargetView withObjectsDictionary:nil];//TODO:FIX THIS
+        id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
+        [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:positionInTargetView withObjectsDictionary:metadata];
     }
     
     self.lastView = dropTarget;
@@ -301,6 +276,11 @@ static DKDragDropServer *sharedInstance = nil;
     BOOL shouldUseViewAsDragImage = NO;
     if([dataProvider respondsToSelector:@selector(dragShouldUseViewAsDragImageForView:)]) {
         shouldUseViewAsDragImage = [dataProvider dragShouldUseViewAsDragImageForView:draggableView];
+    }
+    
+    if([dataProvider respondsToSelector:@selector(dragMetadataForView:position:)]) {
+        id metadata = [dataProvider dragMetadataForView:draggableView position:point];
+        objc_setAssociatedObject(draggableView, &dragMetadataKey, metadata, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     
     if(shouldUseViewAsDragImage) {
@@ -362,7 +342,8 @@ static DKDragDropServer *sharedInstance = nil;
         
         if(completed) {
             if ([dragDelegate respondsToSelector:@selector(dragCompletedOnTargetView:withObjectsDictionary:)]) {
-                [dragDelegate dragCompletedOnTargetView:lastView withObjectsDictionary:nil];//TODO: fix this
+                id metadata = objc_getAssociatedObject(originalView, &dragMetadataKey);
+                [dragDelegate dragCompletedOnTargetView:lastView withObjectsDictionary:metadata];
             }
         }
         

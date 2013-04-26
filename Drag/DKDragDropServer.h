@@ -8,7 +8,7 @@
 
 @protocol DKDragDataProvider
 
-- (id)objectForView:(UIView *)dragView position:(CGPoint)point;
+- (id)dragMetadataForView:(UIView *)dragView position:(CGPoint)point;
 
 - (UIImage *)dragImageForView:(UIView *)dragView position:(CGPoint)point;
 
@@ -33,8 +33,6 @@
 - (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point withObjectsDictionary:(NSDictionary*)objectsDictionary;
 
 - (void)dragCompletedOnTargetView:(UIView *)targetView withObjectsDictionary:(NSDictionary *)objectsDictionary;
-
-- (void)dragDidChangeTargetView:(UIView *)targetView;
 
 @end
 

@@ -11,22 +11,22 @@
 
 @protocol DKDragDataProvider
 
-- (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView context:(void *)context;
+- (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView;
 
 @optional
 
-- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
-- (id)objectForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
+- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point;
+- (id)objectForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point;
 
-- (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
+- (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point;
 
 - (void)drag:(NSString *)dragID willStartForView:(UIView *)view position:(CGPoint)point;
-- (void)drag:(NSString *)dragID didStartForView:(UIView *)view position:(CGPoint)point; // (modification by dmakarenko 14.01.2013)
+- (void)drag:(NSString *)dragID didStartForView:(UIView *)view position:(CGPoint)point;
 
 - (void)drag:(NSString *)dragID willFinishForView:(UIView *)view position:(CGPoint)point;
-- (void)drag:(NSString *)dragID didFinishForView:(UIView *)view position:(CGPoint)point; // review name later (modification by pdcgomes 06.09.2012, modification by dmakarenko 14.01.2013)
+- (void)drag:(NSString *)dragID didFinishForView:(UIView *)view position:(CGPoint)point;
 
-- (BOOL)shouldStartDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point context:(void *)context; // (modification by dmakarenko 14.01.2013)
+- (BOOL)shouldStartDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point;
 
 - (BOOL)drag:(NSString*)dropID shouldUseViewAsDragImageForView:(UIView*)dragView;
 
@@ -38,10 +38,10 @@
 - (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type;
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
-- (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point withObjectsDictionary:(NSDictionary*)objectsDictionary; // (modification by sceriu 01.02.2013
-- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withObjectsDictionary:(NSDictionary *)objectsDictionary context:(void *)context;  // (modification by dmakarenko 25.01.2013)
+- (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point withObjectsDictionary:(NSDictionary*)objectsDictionary;
+- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withObjectsDictionary:(NSDictionary *)objectsDictionary;
 @optional
-- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard context:(void *)context;
+- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard;
 - (void)dragDidChangeTargetView:(UIView *)targetView;
 
 @end
@@ -56,10 +56,9 @@ extern NSString *const DKPasteboardNameDrag;
 
 + (id)sharedServer;
 
-- (void)registerApplicationWithTypes:(NSArray *)types;
 - (void)cancelDrag;
 
-- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource context:(void *)context;
+- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource;
 - (void)unmarkViewAsDraggable:(UIView *)draggableView;
 
 - (void)markViewAsDropTarget:(UIView *)dropView forTypes:(NSArray *)types withDelegate:(NSObject <DKDragDelegate> *)dropDelegate;

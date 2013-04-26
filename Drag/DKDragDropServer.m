@@ -16,7 +16,6 @@
 
 // the key for our associated object.
 static char dragKey;
-static char contextKey;
 static char dataProviderKey;
 static char dragDelegateKey;
 static char acceptedTypesKey;
@@ -36,7 +35,6 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 @property (nonatomic, strong) UIView *lastView;
 @property (nonatomic, assign) BOOL targetIsChanged;
 @property (nonatomic, assign) BOOL targetIsOriginalView;
-@property (nonatomic, strong) UIView *dk_holdingArea;
 @property (nonatomic, strong) NSArray *dk_currentDragTypes;
 @property (nonatomic, strong) NSMutableArray *dk_dropTargets;
 
@@ -64,44 +62,6 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 	return [UIApplication sharedApplication].keyWindow.rootViewController.view;
 }
 
-- (BOOL)dk_dragPasteboard:(UIPasteboard *)pasteboard conformsToTypes:(NSArray *)types
-{
-	for (NSString *type in types) {
-		for (NSArray *dragTypes in [pasteboard pasteboardTypesForItemSet:nil]) {
-
-			if ([dragTypes containsObject:@"dragkit.metadata"]) continue;
-			
-			for (NSArray *individualType in dragTypes) {
-				if (UTTypeConformsTo((__bridge CFStringRef)type, (__bridge CFStringRef)individualType)) {
-					return YES;
-				}
-			}
-		}
-	}
-	
-	return NO;
-}
-
-- (void)registerApplicationWithTypes:(NSArray *)types
-{	
-	UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
-	NSDictionary *meta = nil;
-    
-    NSData *metadata = [[dragPasteboard valuesForPasteboardType:@"dragkit.metadata" inItemSet:nil] lastObject];
-    
-    if(metadata)
-        meta = [NSKeyedUnarchiver unarchiveObjectWithData:metadata];
-	
-	if (meta) {
-		// we have a drag in progress.
-		
-		if ([self dk_dragPasteboard:dragPasteboard conformsToTypes:types]) {
-			// create and show the holding area.
-			[self dk_showHoldingAreaForPasteboard:dragPasteboard];
-		}
-	}
-}
-
 - (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer*)gestureRecognizer
 {
     [self.dragRecognizer requireGestureRecognizerToFail:gestureRecognizer];
@@ -110,10 +70,9 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 #pragma mark -
 #pragma mark Marking Views
 
-- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource context:(void *)context
+- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource
 {
 	objc_setAssociatedObject(draggableView, &dragKey, dragID, OBJC_ASSOCIATION_COPY_NONATOMIC);
-	objc_setAssociatedObject(draggableView, &contextKey, (__bridge id)(context), OBJC_ASSOCIATION_ASSIGN);
 	objc_setAssociatedObject(draggableView, &dataProviderKey, dragDataSource, OBJC_ASSOCIATION_ASSIGN);
 }
 
@@ -141,7 +100,6 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 - (void)unmarkViewAsDraggable:(UIView *)draggableView
 {
 	objc_setAssociatedObject(draggableView, &dragKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
-	objc_setAssociatedObject(draggableView, &contextKey, nil, OBJC_ASSOCIATION_ASSIGN);
 	objc_setAssociatedObject(draggableView, &dataProviderKey, nil, OBJC_ASSOCIATION_ASSIGN);
 }
 
@@ -163,7 +121,6 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 {
 	//grab the associated objects.
 	NSString *dropIdentifier = objc_getAssociatedObject(view, &dragKey);
-	void *dropContext = (__bridge void *)(objc_getAssociatedObject(view, &contextKey));
 	NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(view, &dataProviderKey);
 	
 	// if we are the data provider, that means we already have a pasteboard.
@@ -195,7 +152,7 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 	// go through each type supported by the drop target
 	// and request the data for that type from the data source.
 	
-	NSArray *advertisedTypes = [dataProvider typesSupportedForDrag:dropIdentifier forView:view context:dropContext];
+	NSArray *advertisedTypes = [dataProvider typesSupportedForDrag:dropIdentifier forView:view];
 	NSMutableArray *pasteboardTypes = [NSMutableArray array];
 	NSMutableArray *justTypes = [NSMutableArray array];
     NSMutableDictionary *objectsDictionary = [NSMutableDictionary dictionary];
@@ -204,11 +161,11 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
         NSData *data = nil;
         id object = nil;
         
-        if([dataProvider respondsToSelector:@selector(dataForType:withDrag:forView:position:context:)])
-            data = [dataProvider dataForType:type withDrag:dropIdentifier forView:view position:point context:dropContext];
+        if([dataProvider respondsToSelector:@selector(dataForType:withDrag:forView:position:)])
+            data = [dataProvider dataForType:type withDrag:dropIdentifier forView:view position:point];
         
-        if([dataProvider respondsToSelector:@selector(objectForType:withDrag:forView:position:context:)])
-            object = [dataProvider objectForType:type withDrag:dropIdentifier forView:view position:point context:dropContext];
+        if([dataProvider respondsToSelector:@selector(objectForType:withDrag:forView:position:)])
+            object = [dataProvider objectForType:type withDrag:dropIdentifier forView:view position:point];
 		
 		if (data || object)
 			[justTypes addObject:type];
@@ -238,10 +195,7 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 		case UIGestureRecognizerStateBegan: {
 			
             self.initialTouchPoint = touchPoint;
-			
-			// create the necessary view and animate it.
-			[self dk_hideHoldingArea];
-			
+
 			dragView = [self dk_dragViewUnderPoint:touchPoint];
             CGPoint positionInView = [[self dk_rootView] convertPoint:touchPoint toView:dragView];
 			
@@ -285,24 +239,22 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 			
 			if (droppedTarget) {
 				
-				if ([dragDelegate respondsToSelector:@selector(drag:completedOnTargetView:withDragPasteboard:context:)]) {
+				if ([dragDelegate respondsToSelector:@selector(drag:completedOnTargetView:withDragPasteboard:)]) {
 					
 					NSString *dropIdentifier = objc_getAssociatedObject(droppedTarget, &dragKey);
-					void *dropContext = (__bridge void *)(objc_getAssociatedObject(droppedTarget, &contextKey));
 					
 					UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:NO];
-					[dragDelegate drag:dropIdentifier completedOnTargetView:droppedTarget withDragPasteboard:dragPasteboard context:dropContext];
+					[dragDelegate drag:dropIdentifier completedOnTargetView:droppedTarget withDragPasteboard:dragPasteboard];
 					[dragPasteboard setItems:nil];
 				}
 				
-				if ([dragDelegate respondsToSelector:@selector(drag:completedOnTargetView:withObjectsDictionary:context:)]) {
+				if ([dragDelegate respondsToSelector:@selector(drag:completedOnTargetView:withObjectsDictionary:)]) {
 					
 					NSString *dropIdentifier = objc_getAssociatedObject(droppedTarget, &dragKey);
-					void *dropContext = (__bridge void *)(objc_getAssociatedObject(droppedTarget, &contextKey));
 
 					UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:NO];
                     NSDictionary *objectsDictionary = objc_getAssociatedObject(dragPasteboard, &objectsDictionaryKey);					
-					[dragDelegate drag:dropIdentifier completedOnTargetView:droppedTarget withObjectsDictionary:objectsDictionary context:dropContext];
+					[dragDelegate drag:dropIdentifier completedOnTargetView:droppedTarget withObjectsDictionary:objectsDictionary];
                     
                     objc_setAssociatedObject(dragPasteboard, &objectsDictionaryKey, nil, OBJC_ASSOCIATION_RETAIN);
 				}
@@ -478,7 +430,6 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 		
 		// transition from the dragImage to our view.
 		NSString *dropIdentifier = objc_getAssociatedObject(draggableView, &dragKey);
-		void *dropContext = (__bridge void *)(objc_getAssociatedObject(draggableView, &contextKey));
 		NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
 		
 		self.background = nil;
@@ -494,9 +445,9 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
             UIGraphicsEndImageContext();
         }
         else {
-            if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:position:context:)]) {
+            if ([dataProvider respondsToSelector:@selector(imageForDrag:forView:position:)]) {
                 CGPoint positionInView = [[self dk_rootView] convertPoint:point toView:draggableView];
-                self.background = [dataProvider imageForDrag:dropIdentifier forView:draggableView position:positionInView context:dropContext];
+                self.background = [dataProvider imageForDrag:dropIdentifier forView:draggableView position:positionInView];
             } else {
                 
                 UIPasteboard *dragPasteboard = [UIPasteboard pasteboardWithName:DKPasteboardNameDrag create:YES];
@@ -566,52 +517,12 @@ NSString * const DKPasteboardNameDrag = @"dragkit-drag";
 - (BOOL)dk_shouldStartDragForView:(UIView *)view position:(CGPoint)position
 {
 	NSString *dropIdentifier = objc_getAssociatedObject(view, &dragKey);
-	void *dropContext = (__bridge void *)(objc_getAssociatedObject(view, &contextKey));
 	NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(view, &dataProviderKey);
     
-    if([dataProvider respondsToSelector:@selector(shouldStartDrag:forView:position:context:)]) {
-        return [dataProvider shouldStartDrag:dropIdentifier forView:view position:position context:dropContext];
+    if([dataProvider respondsToSelector:@selector(shouldStartDrag:forView:position:)]) {
+        return [dataProvider shouldStartDrag:dropIdentifier forView:view position:position];
     }
     return YES;
-}
-
-#pragma mark -
-#pragma mark Holding Area Drawing
-
-- (void)dk_showHoldingAreaForPasteboard:(UIPasteboard *)pasteboard
-{	
-	UIView *mainView = [self dk_rootView];
-	
-	self.dk_holdingArea = [[UIView alloc] initWithFrame:mainView.bounds];
-	self.dk_holdingArea.backgroundColor = [UIColor blackColor];
-	self.dk_holdingArea.alpha = 0.0;
-	
-	[mainView addSubview:self.dk_holdingArea];
-	
-	[self dk_displayDragViewForView:nil atPoint:CGPointMake(mainView.frame.size.width / 2.0, mainView.frame.size.height / 2.0)];
-	self.draggedView.alpha = 0.0;
-	
-	// use associated objects to attach our drag identifier.
-	objc_setAssociatedObject(self.draggedView, &dragKey, @"DragKit-Internal", OBJC_ASSOCIATION_COPY_NONATOMIC);
-	// attach the drag delegate.
-	objc_setAssociatedObject(self.draggedView, &dataProviderKey, self, OBJC_ASSOCIATION_ASSIGN);
-	
-	UIPanGestureRecognizer *dragGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
-	[self.draggedView addGestureRecognizer:dragGesture];
-		
-    [UIView animateWithDuration:0.25f animations:^{
-        self.dk_holdingArea.alpha = 0.4;
-        self.draggedView.alpha = 1.0;
-    }];
-}
-
-- (void)dk_hideHoldingArea
-{    
-    [UIView animateWithDuration:0.25f animations:^{
-        self.dk_holdingArea.alpha = 0.0;
-    } completion:^(BOOL finished) {
-        [self.dk_holdingArea removeFromSuperview];
-    }];
 }
 
 - (void)dk_signalDragWillStartForView:(UIView *)view position:(CGPoint)point

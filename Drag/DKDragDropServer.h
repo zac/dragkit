@@ -48,8 +48,6 @@ extern NSString *const DKPasteboardNameDrag;
 
 + (id)sharedServer;
 
-- (void)cancelDrag;
-
 - (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource;
 - (void)unmarkViewAsDraggable:(UIView *)draggableView;
 

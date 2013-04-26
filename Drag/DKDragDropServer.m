@@ -26,14 +26,8 @@ static DKDragDropServer *sharedInstance = nil;
 @property (nonatomic, strong) UILongPressGestureRecognizer *dragRecognizer;
 
 @property (nonatomic, strong) UIView *lastView;
-@property (nonatomic, assign) BOOL targetIsChanged;
 @property (nonatomic, assign) BOOL targetIsOriginalView;
 @property (nonatomic, strong) NSMutableSet *dk_dropTargets;
-
-@property (nonatomic, assign) CGPoint initialTouchPoint;
-@property (nonatomic, assign) CGPoint lastPoint;
-
-@property (nonatomic, strong) UIImage *background;
 
 @end
 
@@ -112,10 +106,9 @@ static DKDragDropServer *sharedInstance = nil;
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender
 {    
 	CGPoint touchPoint = [sender locationInView:[self dk_rootView]];
-	UIView *droppedTarget = [self dk_dropTargetHitByPoint:self.lastPoint];
+	UIView *droppedTarget = [self dk_dropTargetHitByPoint:touchPoint];
     
     UIView *dragView = [self dk_viewContainingKey:&dataProviderKey forPoint:touchPoint];
-    
     if(dragView == nil) dragView = self.originalView;
     
     id<DKDragDataProvider, NSObject> dataProvider = objc_getAssociatedObject(dragView, &dataProviderKey);
@@ -123,8 +116,6 @@ static DKDragDropServer *sharedInstance = nil;
 	switch ([sender state]) {
 		case UIGestureRecognizerStateBegan: {
 			
-            self.initialTouchPoint = touchPoint;
-
             CGPoint positionInView = [[self dk_rootView] convertPoint:touchPoint toView:dragView];
 			
 			if (!dragView) {
@@ -142,18 +133,15 @@ static DKDragDropServer *sharedInstance = nil;
                 return;
             }
             
+            
 			self.originalView = dragView;
-            
-            
+
             if([dataProvider respondsToSelector:@selector(dragWillStartForView:position:)]) {
                 [dataProvider dragWillStartForView:dragView position:positionInView];
             }
             
-            
 			[self dk_displayDragViewForView:self.originalView atPoint:touchPoint];
 			
-            
-            
             if([dataProvider respondsToSelector:@selector(dragDidStartForView:position:)]) {
                 [dataProvider dragDidStartForView:dragView position:positionInView];
             }
@@ -163,35 +151,21 @@ static DKDragDropServer *sharedInstance = nil;
 		case UIGestureRecognizerStateChanged: {
 
 			[self dk_messageTargetsHitByPoint:touchPoint];
-			self.lastPoint = CGPointMake(touchPoint.x, touchPoint.y);
             self.draggedView.center = touchPoint;
 			
 			break;
         }
 		case UIGestureRecognizerStateRecognized: {
 			
-            CGPoint positionInView = [[self dk_rootView] convertPoint:self.initialTouchPoint toView:self.originalView];
+            CGPoint positionInView = [[self dk_rootView] convertPoint:touchPoint toView:self.originalView];
             
             if([dataProvider respondsToSelector:@selector(dragWillFinishForView:position:)]) {
                 [dataProvider dragWillFinishForView:dragView position:positionInView];
             }
 			
-			NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(droppedTarget, &dragDelegateKey);
-			
-			if (droppedTarget) {
+			if (droppedTarget && droppedTarget != self.originalView) {
 								
-				if ([dragDelegate respondsToSelector:@selector(dragCompletedOnTargetView:withObjectsDictionary:)]) {
-					
-					[dragDelegate dragCompletedOnTargetView:droppedTarget withObjectsDictionary:nil];//TODO: fix this
-				}
-
-				// collapse the drag view into the drop view.
-                [UIView animateWithDuration:0.25f animations:^{
-                    self.draggedView.alpha = 0.0;
-                } completion:^(BOOL finished) {
-                    [self.draggedView removeFromSuperview];
-                    self.draggedView = nil;
-                }];    
+                [self endDrag:YES];
                 
                 //Stop calling dragDidLeaveTargetView when changing drags (sceriu 22.03.2013)
                 if(self.lastView) {
@@ -200,36 +174,22 @@ static DKDragDropServer *sharedInstance = nil;
                 }
                 
 			} else {
-				[self cancelDrag];
+				[self endDrag:NO];
 			}
             self.targetIsOriginalView = NO;
-            self.targetIsChanged = NO;
             
-            
-            if([dataProvider respondsToSelector:@selector(dragDidFinishForView:position:)]) {
-                [dataProvider dragDidFinishForView:dragView position:positionInView];
-            }
-            
-            self.originalView = nil;
-			
 			break;
         }
 		case UIGestureRecognizerStateCancelled: {
 
-            CGPoint positionInView = [[self dk_rootView] convertPoint:self.initialTouchPoint toView:self.originalView];
+            CGPoint positionInView = [[self dk_rootView] convertPoint:touchPoint toView:self.originalView];
 
             if([dataProvider respondsToSelector:@selector(dragWillFinishForView:position:)]) {
                 [dataProvider dragWillFinishForView:self.originalView position:positionInView];
             }
             
-			[self cancelDrag];
+			[self endDrag:NO];
             
-            
-            if([dataProvider respondsToSelector:@selector(dragDidFinishForView:position:)]) {
-                [dataProvider dragDidFinishForView:dragView position:positionInView];
-            }
-            self.originalView = nil;
-			
 			break;
         }
 		default:
@@ -282,7 +242,6 @@ static DKDragDropServer *sharedInstance = nil;
 		
 		
 		self.lastView = nil;
-        self.targetIsChanged = NO;
         self.targetIsOriginalView = NO;
 		return;
 	} else {
@@ -306,7 +265,6 @@ static DKDragDropServer *sharedInstance = nil;
                 }
             }
         } else {
-            self.targetIsChanged = NO;
             self.targetIsOriginalView = NO;
         }
     }
@@ -326,7 +284,7 @@ static DKDragDropServer *sharedInstance = nil;
     
     self.lastView = dropTarget;
     
-    if(dropTarget) {
+    if(dropTarget) {//TODO: Rewrite this
         objc_setAssociatedObject(dropTarget, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
 }
@@ -336,59 +294,90 @@ static DKDragDropServer *sharedInstance = nil;
 
 - (void)dk_displayDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point
 {
-	if (!self.draggedView) {
-		
-		// transition from the dragImage to our view.
-		NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
-		
-		self.background = nil;
-		
-        BOOL shouldUseViewAsDragImage = NO;
-        if([dataProvider respondsToSelector:@selector(dragShouldUseViewAsDragImageForView:)])
-            shouldUseViewAsDragImage = [dataProvider dragShouldUseViewAsDragImageForView:draggableView];
-
-        if(shouldUseViewAsDragImage) {
-            UIGraphicsBeginImageContext(draggableView.bounds.size);
-            [draggableView.layer renderInContext:UIGraphicsGetCurrentContext()];
-            self.background = UIGraphicsGetImageFromCurrentImageContext();
-            UIGraphicsEndImageContext();
-        }
-        else if ([dataProvider respondsToSelector:@selector(dragImageForView:position:)]) {
-            CGPoint positionInView = [[self dk_rootView] convertPoint:point toView:draggableView];
-            self.background = [dataProvider dragImageForView:draggableView position:positionInView];
-        }
+    NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
+    
+    UIImage *backgroundImage = nil;
+    
+    BOOL shouldUseViewAsDragImage = NO;
+    if([dataProvider respondsToSelector:@selector(dragShouldUseViewAsDragImageForView:)]) {
+        shouldUseViewAsDragImage = [dataProvider dragShouldUseViewAsDragImageForView:draggableView];
+    }
+    
+    if(shouldUseViewAsDragImage) {
+        UIGraphicsBeginImageContext(draggableView.bounds.size);
+        [draggableView.layer renderInContext:UIGraphicsGetCurrentContext()];
+        backgroundImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+    }
+    else if ([dataProvider respondsToSelector:@selector(dragImageForView:position:)]) {
+        CGPoint positionInView = [[self dk_rootView] convertPoint:point toView:draggableView];
+        backgroundImage = [dataProvider dragImageForView:draggableView position:positionInView];
+    }
+    
+    UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
+    backgroundImageView.contentMode = UIViewContentModeScaleAspectFit;
+    backgroundImageView.clipsToBounds = YES;
+    
+    self.draggedView = [[UIView alloc] initWithFrame:backgroundImageView.bounds];
+    CGPoint draggablViewCenter = [[self dk_rootView] convertPoint:draggableView.center fromView:draggableView];
+    self.draggedView.center = draggablViewCenter;
+    
+    [self.draggedView addSubview:backgroundImageView];
+    [[self dk_rootView] addSubview:self.draggedView];
+    
+    if (draggableView) {
+        self.draggedView.alpha = 0.0f;
         
-        UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:self.background];
-		backgroundImageView.contentMode = UIViewContentModeScaleAspectFit;
-		backgroundImageView.clipsToBounds = YES;
-		
-		// create our drag view where we want it.
-		self.draggedView = [[UIView alloc] initWithFrame:backgroundImageView.bounds];
-        self.draggedView.center = point;
-		
-		[self.draggedView addSubview:backgroundImageView]; 
-		[[self dk_rootView] addSubview:self.draggedView];
-		
-		if (draggableView) {
-			self.draggedView.alpha = 0.0;
-            
-            [UIView animateWithDuration:0.25f animations:^{
-                self.draggedView.alpha = 1.0f;
-            }];
-        }
-	}
+        [UIView animateWithDuration:0.25f animations:^{
+            self.originalView.alpha = 0.0f;
+            self.draggedView.alpha = 1.0f;
+            self.draggedView.center = point;
+        }];
+    }
 }
 
-- (void)cancelDrag
+- (void)endDrag:(BOOL)completed
 {
-	CGPoint originalLocation = [[self.originalView superview] convertPoint:self.originalView.center toView:[self dk_rootView]];
+    UIView *draggedView = self.draggedView;
+    UIView *originalView = self.originalView;
+    UIView *lastView = self.lastView;
+    if(!lastView) {
+        lastView = originalView;
+    }
     
-    [UIView animateWithDuration:0.25f animations:^{
-        self.draggedView.center = originalLocation;
-        self.draggedView.alpha = 0.5;
+    NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(originalView, &dataProviderKey);
+    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(lastView, &dragDelegateKey);
+    
+    CGPoint endLocation;
+    
+    if(completed) {
+        endLocation = [[lastView superview] convertPoint:lastView.center toView:[self dk_rootView]];
+    } else {
+        endLocation = [[originalView superview] convertPoint:originalView.center toView:[self dk_rootView]];
+    }
+    
+    [UIView animateWithDuration:0.25f delay:0.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+        draggedView.center = endLocation;
     } completion:^(BOOL finished) {
-        [self.draggedView removeFromSuperview];
-		self.draggedView = nil;
+        
+        if(completed) {
+            if ([dragDelegate respondsToSelector:@selector(dragCompletedOnTargetView:withObjectsDictionary:)]) {
+                [dragDelegate dragCompletedOnTargetView:lastView withObjectsDictionary:nil];//TODO: fix this
+            }
+        }
+        
+        if([dataProvider respondsToSelector:@selector(dragDidFinishForView:position:)]) {
+            [dataProvider dragDidFinishForView:originalView position:endLocation];
+        }
+        
+        [UIView animateWithDuration:0.25f animations:^{
+            draggedView.alpha = 0.25f;
+            originalView.alpha = 1.0f;
+        } completion:^(BOOL finished) {
+            [draggedView removeFromSuperview];
+            self.draggedView = nil;
+            self.originalView = nil;
+        }];
     }];
 }
 

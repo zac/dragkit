@@ -6,42 +6,34 @@
 //  Copyright 2010 Zac White. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <QuartzCore/CAAnimation.h>
-
 @protocol DKDragDataProvider
 
-- (NSArray *)typesSupportedForDrag:(NSString *)dragID forView:(UIView *)dragView;
+- (id)objectForView:(UIView *)dragView position:(CGPoint)point;
 
-@optional
+- (UIImage *)dragImageForView:(UIView *)dragView position:(CGPoint)point;
 
-- (NSData *)dataForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point;
-- (id)objectForType:(NSString *)type withDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point;
+- (void)dragWillStartForView:(UIView *)view position:(CGPoint)point;
+- (void)dragDidStartForView:(UIView *)view position:(CGPoint)point;
 
-- (UIImage *)imageForDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point;
+- (void)dragWillFinishForView:(UIView *)view position:(CGPoint)point;
+- (void)dragDidFinishForView:(UIView *)view position:(CGPoint)point;
 
-- (void)drag:(NSString *)dragID willStartForView:(UIView *)view position:(CGPoint)point;
-- (void)drag:(NSString *)dragID didStartForView:(UIView *)view position:(CGPoint)point;
+- (BOOL)dragShouldStartForView:(UIView *)dragView position:(CGPoint)point;
 
-- (void)drag:(NSString *)dragID willFinishForView:(UIView *)view position:(CGPoint)point;
-- (void)drag:(NSString *)dragID didFinishForView:(UIView *)view position:(CGPoint)point;
-
-- (BOOL)shouldStartDrag:(NSString *)dragID forView:(UIView *)dragView position:(CGPoint)point;
-
-- (BOOL)drag:(NSString*)dropID shouldUseViewAsDragImageForView:(UIView*)dragView;
+- (BOOL)dragShouldUseViewAsDragImageForView:(UIView*)dragView;
 
 @end
 
 @protocol DKDragDelegate
 
-// if any of these return YES for the type, the server does its drop drawing.
-- (BOOL)targetView:(UIView *)targetView acceptsDropForType:(NSString *)type;
 - (void)dragDidEnterTargetView:(UIView *)targetView;
+
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
+
 - (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point withObjectsDictionary:(NSDictionary*)objectsDictionary;
-- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withObjectsDictionary:(NSDictionary *)objectsDictionary;
-@optional
-- (void)drag:(NSString *)dropID completedOnTargetView:(UIView *)targetView withDragPasteboard:(UIPasteboard *)dragPasteboard;
+
+- (void)dragCompletedOnTargetView:(UIView *)targetView withObjectsDictionary:(NSDictionary *)objectsDictionary;
+
 - (void)dragDidChangeTargetView:(UIView *)targetView;
 
 @end
@@ -58,10 +50,10 @@ extern NSString *const DKPasteboardNameDrag;
 
 - (void)cancelDrag;
 
-- (void)markViewAsDraggable:(UIView *)draggableView forDrag:(NSString *)dragID withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource;
+- (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource;
 - (void)unmarkViewAsDraggable:(UIView *)draggableView;
 
-- (void)markViewAsDropTarget:(UIView *)dropView forTypes:(NSArray *)types withDelegate:(NSObject <DKDragDelegate> *)dropDelegate;
+- (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDragDelegate> *)dropDelegate;
 - (void)unmarkDropTarget:(UIView *)dropView;
 
 - (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer*)gestureRecognizer;

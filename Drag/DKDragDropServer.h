@@ -44,7 +44,8 @@ extern NSString *const DKPasteboardNameDrag;
 
 @property (nonatomic, strong, readonly) UIView *originalView;
 
-+ (id)sharedServer;
+- (void)enabledDragging;
+- (void)disableDragging;
 
 - (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource;
 - (void)unmarkViewAsDraggable:(UIView *)draggableView;

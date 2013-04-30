@@ -8,31 +8,29 @@
 
 @protocol DKDragDataProvider
 
-- (id)dragMetadataForView:(UIView *)dragView position:(CGPoint)point;
-
-- (UIImage *)dragImageForView:(UIView *)dragView position:(CGPoint)point;
-
-- (void)dragWillStartForView:(UIView *)view position:(CGPoint)point;
-- (void)dragDidStartForView:(UIView *)view position:(CGPoint)point;
-
-- (void)dragWillFinishForView:(UIView *)view position:(CGPoint)point;
-- (void)dragDidFinishForView:(UIView *)view position:(CGPoint)point;
-
 - (BOOL)dragShouldStartForView:(UIView *)dragView position:(CGPoint)point;
 
-- (BOOL)dragShouldUseViewAsDragImageForView:(UIView*)dragView;
+- (id)dragMetadataForView:(UIView *)dragView position:(CGPoint)point;
+
+- (UIView *)dragPlaceholderForView:(UIView*)dragView position:(CGPoint)point;
 
 @end
 
 @protocol DKDragDelegate
 
+- (void)dragWillStartForView:(UIView *)view position:(CGPoint)point;
+- (void)dragDidStartForView:(UIView *)view position:(CGPoint)point;
+
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
 
-- (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point withObjectsDictionary:(NSDictionary*)objectsDictionary;
+- (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point withMetadata:(id)metadata;
 
-- (void)dragCompletedOnTargetView:(UIView *)targetView withObjectsDictionary:(NSDictionary *)objectsDictionary;
+- (void)dragWillFinishForView:(UIView *)view position:(CGPoint)point;
+- (void)dragDidFinishForView:(UIView *)view position:(CGPoint)point completed:(BOOL)completed;
+
+- (void)dragCompletedOnTargetView:(UIView *)targetView withMetadata:(id)metadata;
 
 @end
 
@@ -41,8 +39,6 @@
 extern NSString *const DKPasteboardNameDrag;
 
 @interface DKDragDropServer : NSObject <UIGestureRecognizerDelegate>
-
-@property (nonatomic, strong, readonly) UIView *originalView;
 
 - (void)enabledDragging;
 - (void)disableDragging;

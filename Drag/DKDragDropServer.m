@@ -12,19 +12,17 @@
 #import <QuartzCore/CALayer.h>
 #import <UIKit/UIGestureRecognizerSubclass.h>
 
-static char dataProviderKey;
+static char dragDataProviderKey;
 static char dragDelegateKey;
 static char dragMetadataKey;
 
 static char containsDragViewKey;
 
-static DKDragDropServer *sharedInstance = nil;
-
 @interface DKDragDropServer ()
 
 @property (nonatomic, strong) UIView *originalView;
 @property (nonatomic, strong) UIView *draggedView;
-@property (nonatomic, strong) UILongPressGestureRecognizer *dragRecognizer;
+@property (nonatomic, strong) UILongPressGestureRecognizer *longPressGestureRecognizer;
 
 @property (nonatomic, strong) UIView *lastView;
 @property (nonatomic, strong) NSMutableSet *dk_dropTargets;
@@ -35,19 +33,19 @@ static DKDragDropServer *sharedInstance = nil;
 
 - (void)enabledDragging
 {
-    if(self.dragRecognizer == nil) {
-        self.dragRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
-        self.dragRecognizer.minimumPressDuration = 0.25f;
-        self.dragRecognizer.delegate = self;
+    if(self.longPressGestureRecognizer == nil) {
+        self.longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
+        self.longPressGestureRecognizer.minimumPressDuration = 0.25f;
+        self.longPressGestureRecognizer.delegate = self;
         
-        [[self dk_rootView] addGestureRecognizer:self.dragRecognizer];
+        [[self dk_rootView] addGestureRecognizer:self.longPressGestureRecognizer];
     }
 }
 
 - (void)disableDragging
 {
-    [[self dk_rootView] removeGestureRecognizer:self.dragRecognizer];
-    self.dragRecognizer = nil;
+    [[self dk_rootView] removeGestureRecognizer:self.longPressGestureRecognizer];
+    self.longPressGestureRecognizer = nil;
 }
 
 - (UIView *)dk_rootView
@@ -57,7 +55,7 @@ static DKDragDropServer *sharedInstance = nil;
 
 - (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer*)gestureRecognizer
 {
-    [self.dragRecognizer requireGestureRecognizerToFail:gestureRecognizer];
+    [self.longPressGestureRecognizer requireGestureRecognizerToFail:gestureRecognizer];
 }
 
 #pragma mark -
@@ -65,7 +63,7 @@ static DKDragDropServer *sharedInstance = nil;
 
 - (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource
 {
-	objc_setAssociatedObject(draggableView, &dataProviderKey, dragDataSource, OBJC_ASSOCIATION_ASSIGN);
+	objc_setAssociatedObject(draggableView, &dragDataProviderKey, dragDataSource, OBJC_ASSOCIATION_ASSIGN);
 }
 
 - (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDragDelegate> *)dropDelegate
@@ -78,13 +76,11 @@ static DKDragDropServer *sharedInstance = nil;
     }
     
 	[self.dk_dropTargets addObject:dropView];
-    
-    
 }
 
 - (void)unmarkViewAsDraggable:(UIView *)draggableView
 {
-	objc_setAssociatedObject(draggableView, &dataProviderKey, nil, OBJC_ASSOCIATION_ASSIGN);
+	objc_setAssociatedObject(draggableView, &dragDataProviderKey, nil, OBJC_ASSOCIATION_ASSIGN);
 }
 
 - (void)unmarkDropTarget:(UIView *)dropView
@@ -102,12 +98,13 @@ static DKDragDropServer *sharedInstance = nil;
 {    
 	CGPoint touchPoint = [sender locationInView:[self dk_rootView]];
 	
-    UIView *dragView = [self dk_viewContainingKey:&dataProviderKey forPoint:touchPoint];
+    UIView *dragView = [self dk_viewContainingKey:&dragDataProviderKey forPoint:touchPoint];
     if(dragView == nil) dragView = self.originalView;
     
     CGPoint positionInView = [[self dk_rootView] convertPoint:touchPoint toView:dragView];
     
-    id<DKDragDataProvider, NSObject> dataProvider = objc_getAssociatedObject(dragView, &dataProviderKey);
+    id<DKDragDataProvider, NSObject> dataProvider = objc_getAssociatedObject(dragView, &dragDataProviderKey);
+    id<DKDragDelegate, NSObject> dragDelegate = objc_getAssociatedObject(dragView, &dragDelegateKey);
 	
     if (!dragView) {
         [sender setState:UIGestureRecognizerStateFailed];
@@ -130,17 +127,7 @@ static DKDragDropServer *sharedInstance = nil;
 		case UIGestureRecognizerStateBegan:
         {
 			self.originalView = dragView;
-
-            if([dataProvider respondsToSelector:@selector(dragWillStartForView:position:)]) {
-                [dataProvider dragWillStartForView:dragView position:positionInView];
-            }
-            
 			[self startDragViewForView:self.originalView atPoint:touchPoint];
-			
-            if([dataProvider respondsToSelector:@selector(dragDidStartForView:position:)]) {
-                [dataProvider dragDidStartForView:dragView position:positionInView];
-            }
-            
 			break;
         }
 		case UIGestureRecognizerStateChanged:
@@ -152,22 +139,18 @@ static DKDragDropServer *sharedInstance = nil;
         }
 		case UIGestureRecognizerStateRecognized:
         {
-            if([dataProvider respondsToSelector:@selector(dragWillFinishForView:position:)]) {
-                [dataProvider dragWillFinishForView:dragView position:positionInView];
-            }
-			
             BOOL completed = droppedTarget && droppedTarget != self.originalView;
-            [self endCurrentDrag:completed];
+            [self endDragForView:dragView completed:completed];
             
 			break;
         }
 		case UIGestureRecognizerStateCancelled:
         {
-            if([dataProvider respondsToSelector:@selector(dragWillFinishForView:position:)]) {
-                [dataProvider dragWillFinishForView:self.originalView position:positionInView];
+            if([dragDelegate respondsToSelector:@selector(dragWillFinishForView:position:)]) {
+                [dragDelegate dragWillFinishForView:self.originalView position:positionInView];
             }
             
-			[self endCurrentDrag:NO];
+			[self endDragForView:dragView completed:NO];
             
 			break;
         }
@@ -229,11 +212,11 @@ static DKDragDropServer *sharedInstance = nil;
     if (!containsDragView && [dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
         [dragDelegate dragDidEnterTargetView:dropTarget];
     }
-    else if(containsDragView && [dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:withObjectsDictionary:)]) {
+    else if(containsDragView && [dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:withMetadata:)]) {
         
         CGPoint positionInTargetView = [[self dk_rootView] convertPoint:point toView:dropTarget];
         id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
-        [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:positionInTargetView withObjectsDictionary:metadata];
+        [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:positionInTargetView withMetadata:metadata];
     }
     
     self.lastView = dropTarget;
@@ -248,13 +231,11 @@ static DKDragDropServer *sharedInstance = nil;
 
 - (void)startDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point
 {
-    NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dataProviderKey);
-    
-    UIImage *backgroundImage = nil;
-    
-    BOOL shouldUseViewAsDragImage = NO;
-    if([dataProvider respondsToSelector:@selector(dragShouldUseViewAsDragImageForView:)]) {
-        shouldUseViewAsDragImage = [dataProvider dragShouldUseViewAsDragImageForView:draggableView];
+    NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dragDataProviderKey);
+    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(draggableView, &dragDelegateKey);
+ 
+    if([dragDelegate respondsToSelector:@selector(dragWillStartForView:position:)]) {
+        [dragDelegate dragWillStartForView:draggableView position:point];
     }
     
     if([dataProvider respondsToSelector:@selector(dragMetadataForView:position:)]) {
@@ -262,81 +243,95 @@ static DKDragDropServer *sharedInstance = nil;
         objc_setAssociatedObject(draggableView, &dragMetadataKey, metadata, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     
-    if(shouldUseViewAsDragImage) {
+    if([dataProvider respondsToSelector:@selector(dragPlaceholderForView:position:)]) {
+        self.draggedView = [dataProvider dragPlaceholderForView:draggableView position:point];
+    }
+    
+    if(self.draggedView == nil) {
         UIGraphicsBeginImageContext(draggableView.bounds.size);
         [draggableView.layer renderInContext:UIGraphicsGetCurrentContext()];
-        backgroundImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIImage *placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
+        
+        self.draggedView = [[UIImageView alloc] initWithImage:placeholderImage];
+        self.draggedView.contentMode = UIViewContentModeScaleAspectFit;
     }
-    else if ([dataProvider respondsToSelector:@selector(dragImageForView:position:)]) {
-        CGPoint positionInView = [[self dk_rootView] convertPoint:point toView:draggableView];
-        backgroundImage = [dataProvider dragImageForView:draggableView position:positionInView];
-    }
-    
-    UIImageView *backgroundImageView = [[UIImageView alloc] initWithImage:backgroundImage];
-    backgroundImageView.contentMode = UIViewContentModeScaleAspectFit;
-    backgroundImageView.clipsToBounds = YES;
-    
-    self.draggedView = [[UIView alloc] initWithFrame:backgroundImageView.bounds];
+
     CGPoint draggablViewCenter = [[self dk_rootView] convertPoint:draggableView.center fromView:draggableView];
     self.draggedView.center = draggablViewCenter;
     
-    [self.draggedView addSubview:backgroundImageView];
     [[self dk_rootView] addSubview:self.draggedView];
     
-    if (draggableView) {
-        self.draggedView.alpha = 0.0f;
+
+    self.draggedView.alpha = 0.0f;
+    [UIView animateWithDuration:0.25f animations:^{
+        [self.draggedView setTransform:CGAffineTransformMakeScale(1.2f, 1.2f)];
         
-        [UIView animateWithDuration:0.25f animations:^{
-            self.originalView.alpha = 0.0f;
-            self.draggedView.alpha = 1.0f;
-            self.draggedView.center = point;
-        }];
-    }
+        self.draggedView.layer.masksToBounds = NO;
+        self.draggedView.layer.cornerRadius = 8;
+        self.draggedView.layer.shadowOffset = CGSizeMake(0, 2);
+        self.draggedView.layer.shadowRadius = 4;
+        self.draggedView.layer.shadowOpacity = 0.2;
+        
+        self.draggedView.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.draggedView.bounds].CGPath;
+        
+        [self.originalView setAlpha:0.0f];
+        self.draggedView.alpha = 1.0f;
+        self.draggedView.center = point;
+    } completion:^(BOOL finished) {
+        if([dragDelegate respondsToSelector:@selector(dragDidStartForView:position:)]) {
+            [dragDelegate dragDidStartForView:draggableView position:point];
+        }
+    }];
+
 }
 
-- (void)endCurrentDrag:(BOOL)completed
+- (void)endDragForView:(UIView*)dragView completed:(BOOL)completed
 {
-    UIView *draggedView = self.draggedView;
-    UIView *originalView = self.originalView;
-    UIView *lastView = self.lastView;
-    if(!lastView) {
-        lastView = originalView;
+    [self.longPressGestureRecognizer setEnabled:NO];
+    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(dragView, &dragDelegateKey);
+    
+    CGPoint endPosition;
+    if(completed) {
+        endPosition = [[self.lastView superview] convertPoint:self.lastView.center toView:[self dk_rootView]];
+    } else {
+        endPosition = [[self.originalView superview] convertPoint:self.originalView.center toView:[self dk_rootView]];
     }
     
-    NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(originalView, &dataProviderKey);
-    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(lastView, &dragDelegateKey);
-    
-    CGPoint endLocation;
-    
-    if(completed) {
-        endLocation = [[lastView superview] convertPoint:lastView.center toView:[self dk_rootView]];
-    } else {
-        endLocation = [[originalView superview] convertPoint:originalView.center toView:[self dk_rootView]];
+    if([dragDelegate respondsToSelector:@selector(dragWillFinishForView:position:)]) {
+        [dragDelegate dragWillFinishForView:self.originalView position:endPosition];
     }
     
     [UIView animateWithDuration:0.25f delay:0.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-        draggedView.center = endLocation;
+        
+        [self.draggedView setTransform:CGAffineTransformIdentity];
+
+        self.draggedView.layer.shadowPath = nil;
+        self.draggedView.center = endPosition;
+        
     } completion:^(BOOL finished) {
+
+        [self.originalView setAlpha:1.0f];
+        
+        if([dragDelegate respondsToSelector:@selector(dragDidFinishForView:position:completed:)]) {
+            [dragDelegate dragDidFinishForView:self.originalView position:endPosition completed:completed];
+        }
         
         if(completed) {
-            if ([dragDelegate respondsToSelector:@selector(dragCompletedOnTargetView:withObjectsDictionary:)]) {
-                id metadata = objc_getAssociatedObject(originalView, &dragMetadataKey);
-                [dragDelegate dragCompletedOnTargetView:lastView withObjectsDictionary:metadata];
+            if ([dragDelegate respondsToSelector:@selector(dragCompletedOnTargetView:withMetadata:)]) {
+                id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
+                [dragDelegate dragCompletedOnTargetView:self.lastView withMetadata:metadata];
             }
         }
         
-        if([dataProvider respondsToSelector:@selector(dragDidFinishForView:position:)]) {
-            [dataProvider dragDidFinishForView:originalView position:endLocation];
-        }
-        
         [UIView animateWithDuration:0.25f animations:^{
-            draggedView.alpha = 0.25f;
-            originalView.alpha = 1.0f;
+            self.draggedView.alpha = 0.1f;
         } completion:^(BOOL finished) {
-            [draggedView removeFromSuperview];
+            [self.draggedView removeFromSuperview];
             self.draggedView = nil;
             self.originalView = nil;
+            
+            [self.longPressGestureRecognizer setEnabled:YES];
         }];
     }];
 }

@@ -8,6 +8,8 @@
 
 @protocol DKDragDataProvider
 
+@optional;
+
 - (BOOL)dragShouldStartForView:(UIView *)dragView position:(CGPoint)point;
 
 - (id)dragMetadataForView:(UIView *)dragView position:(CGPoint)point;
@@ -18,11 +20,12 @@
 
 @protocol DKDragDelegate
 
+@optional
+
 - (void)dragWillStartForView:(UIView *)view position:(CGPoint)point;
 - (void)dragDidStartForView:(UIView *)view position:(CGPoint)point;
 
 - (void)dragDidEnterTargetView:(UIView *)targetView;
-
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
 
 - (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point withMetadata:(id)metadata;

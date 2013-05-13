@@ -201,7 +201,6 @@ static char containsDragViewKey;
 			[dragDelegate dragDidLeaveTargetView:dropTarget];
 		}
 		
-		self.lastView = nil;
 		return;
 	}
     
@@ -330,6 +329,7 @@ static char containsDragViewKey;
             [self.draggedView removeFromSuperview];
             self.draggedView = nil;
             self.originalView = nil;
+            self.lastView = nil;
             
             [self.longPressGestureRecognizer setEnabled:YES];
         }];

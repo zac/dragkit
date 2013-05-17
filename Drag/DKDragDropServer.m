@@ -111,41 +111,38 @@ static char containsDragViewKey;
         return;
     }
     
-    BOOL shouldStartDrag = NO;
-    if([dataProvider respondsToSelector:@selector(dragShouldStartForView:position:)]) {
-        shouldStartDrag = [dataProvider dragShouldStartForView:dragView position:positionInView];
-    }
-    
-    if(shouldStartDrag == NO) {
-        [sender setState:UIGestureRecognizerStateFailed];
-        return;
-    }
-    
     UIView *droppedTarget = [self dk_dropTargetHitByPoint:touchPoint];
     
-	switch ([sender state]) {
-		case UIGestureRecognizerStateBegan:
-        {
+	switch ([sender state])
+    {
+		case UIGestureRecognizerStateBegan: {
+            BOOL shouldStartDrag = NO;
+            if([dataProvider respondsToSelector:@selector(dragShouldStartForView:position:)]) {
+                shouldStartDrag = [dataProvider dragShouldStartForView:dragView position:positionInView];
+            }
+            
+            if(shouldStartDrag == NO) {
+                [sender setState:UIGestureRecognizerStateFailed];
+                return;
+            }
+
 			self.originalView = dragView;
-			[self startDragViewForView:self.originalView atPoint:touchPoint];
+			[self startDragViewForView:self.originalView atPoint:positionInView];
 			break;
         }
-		case UIGestureRecognizerStateChanged:
-        {
-			[self dk_messageTargetsHitByPoint:touchPoint];
-            self.draggedView.center = touchPoint;
+		case UIGestureRecognizerStateChanged: {
+			[self dk_messageTargetsHitByPoint:positionInView];
+            self.draggedView.center = positionInView;
 			
 			break;
         }
-		case UIGestureRecognizerStateRecognized:
-        {
+		case UIGestureRecognizerStateRecognized: {
             BOOL completed = droppedTarget && droppedTarget != self.originalView;
             [self endDragForView:dragView completed:completed];
             
 			break;
         }
-		case UIGestureRecognizerStateCancelled:
-        {
+		case UIGestureRecognizerStateCancelled: {
             if([dragDelegate respondsToSelector:@selector(dragWillFinishForView:position:)]) {
                 [dragDelegate dragWillFinishForView:self.originalView position:positionInView];
             }
@@ -254,10 +251,13 @@ static char containsDragViewKey;
         
         self.draggedView = [[UIImageView alloc] initWithImage:placeholderImage];
         self.draggedView.contentMode = UIViewContentModeScaleAspectFit;
+        
+        CGPoint draggablViewCenter = [[self dk_rootView] convertPoint:draggableView.center fromView:draggableView];
+        self.draggedView.center = draggablViewCenter;
     }
 
-    CGPoint draggablViewCenter = [[self dk_rootView] convertPoint:draggableView.center fromView:draggableView];
-    self.draggedView.center = draggablViewCenter;
+//    CGPoint draggablViewCenter = [[self dk_rootView] convertPoint:draggableView.center fromView:draggableView];
+//    self.draggedView.center = draggablViewCenter;
     
     [[self dk_rootView] addSubview:self.draggedView];
     
@@ -274,7 +274,7 @@ static char containsDragViewKey;
         
         self.draggedView.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.draggedView.bounds].CGPath;
         
-        [self.originalView setAlpha:0.0f];
+//        [self.originalView setAlpha:0.0f];
         self.draggedView.alpha = 1.0f;
         self.draggedView.center = point;
     } completion:^(BOOL finished) {

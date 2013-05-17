@@ -99,7 +99,9 @@ static char containsDragViewKey;
 	CGPoint touchPoint = [sender locationInView:[self dk_rootView]];
 	
     UIView *dragView = [self dk_viewContainingKey:&dragDataProviderKey forPoint:touchPoint];
-    if(dragView == nil) dragView = self.originalView;
+    if(dragView == nil) {
+        dragView = self.originalView;
+    }
     
     CGPoint positionInView = [[self dk_rootView] convertPoint:touchPoint toView:dragView];
     
@@ -127,12 +129,12 @@ static char containsDragViewKey;
             }
 
 			self.originalView = dragView;
-			[self startDragViewForView:self.originalView atPoint:positionInView];
+			[self startDragViewForView:self.originalView atPoint:touchPoint convertedPoint:positionInView];
 			break;
         }
 		case UIGestureRecognizerStateChanged: {
-			[self dk_messageTargetsHitByPoint:positionInView];
-            self.draggedView.center = positionInView;
+			[self dk_messageTargetsHitByPoint:touchPoint];
+            self.draggedView.center = touchPoint;
 			
 			break;
         }
@@ -144,7 +146,7 @@ static char containsDragViewKey;
         }
 		case UIGestureRecognizerStateCancelled: {
             if([dragDelegate respondsToSelector:@selector(dragWillFinishForView:position:)]) {
-                [dragDelegate dragWillFinishForView:self.originalView position:positionInView];
+                [dragDelegate dragWillFinishForView:self.originalView position:touchPoint];
             }
             
 			[self endDragForView:dragView completed:NO];
@@ -225,22 +227,22 @@ static char containsDragViewKey;
 #pragma mark -
 #pragma mark Drag View Creation
 
-- (void)startDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point
+- (void)startDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point convertedPoint:(CGPoint)convertedPoint
 {
     NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dragDataProviderKey);
     NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(draggableView, &dragDelegateKey);
  
     if([dragDelegate respondsToSelector:@selector(dragWillStartForView:position:)]) {
-        [dragDelegate dragWillStartForView:draggableView position:point];
+        [dragDelegate dragWillStartForView:draggableView position:convertedPoint];
     }
     
     if([dataProvider respondsToSelector:@selector(dragMetadataForView:position:)]) {
-        id metadata = [dataProvider dragMetadataForView:draggableView position:point];
+        id metadata = [dataProvider dragMetadataForView:draggableView position:convertedPoint];
         objc_setAssociatedObject(draggableView, &dragMetadataKey, metadata, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     
     if([dataProvider respondsToSelector:@selector(dragPlaceholderForView:position:)]) {
-        self.draggedView = [dataProvider dragPlaceholderForView:draggableView position:point];
+        self.draggedView = [dataProvider dragPlaceholderForView:draggableView position:convertedPoint];
     }
     
     if(self.draggedView == nil) {
@@ -272,7 +274,7 @@ static char containsDragViewKey;
         self.draggedView.layer.shadowRadius = 4;
         self.draggedView.layer.shadowOpacity = 0.2;
         
-        self.draggedView.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.draggedView.bounds].CGPath;
+//        self.draggedView.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.draggedView.bounds].CGPath;
         
 //        [self.originalView setAlpha:0.0f];
         self.draggedView.alpha = 1.0f;

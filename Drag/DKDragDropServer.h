@@ -6,18 +6,24 @@
 //  Copyright 2010 Zac White. All rights reserved.
 //
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 @protocol DKDragDataProvider
 
-@optional;
+@optional
+- (BOOL)dragShouldStartForView:(UIView *)dragView
+                      position:(CGPoint)point;
 
-- (BOOL)dragShouldStartForView:(UIView *)dragView position:(CGPoint)point;
+- (id)dragMetadataForView:(UIView *)dragView
+                 position:(CGPoint)point;
 
-- (id)dragMetadataForView:(UIView *)dragView position:(CGPoint)point;
-
-- (UIView *)dragPlaceholderForView:(UIView*)dragView position:(CGPoint)point;
+- (UIView *)dragPlaceholderForView:(UIView *)dragView
+                          position:(CGPoint)point;
 
 @end
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 @protocol DKDragDelegate
 
 @optional
@@ -35,12 +41,15 @@
 
 - (void)dragCompletedOnTargetView:(UIView *)targetView withMetadata:(id)metadata;
 
+- (BOOL)dragShouldSnapToCenterOfTargetOnCompletion;
+
 @end
 
-@class DKApplicationRegistration;
-
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 extern NSString *const DKPasteboardNameDrag;
 
+@class DKApplicationRegistration;
 @interface DKDragDropServer : NSObject <UIGestureRecognizerDelegate>
 
 - (void)enabledDragging;

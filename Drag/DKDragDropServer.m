@@ -227,7 +227,11 @@ static char containsDragViewKey;
 #pragma mark -
 #pragma mark Drag View Creation
 
-- (void)startDragViewForView:(UIView *)draggableView atPoint:(CGPoint)point convertedPoint:(CGPoint)convertedPoint
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+- (void)startDragViewForView:(UIView *)draggableView
+                     atPoint:(CGPoint)touchPoint
+              convertedPoint:(CGPoint)convertedPoint
 {
     NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dragDataProviderKey);
     NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(draggableView, &dragDelegateKey);
@@ -243,15 +247,17 @@ static char containsDragViewKey;
     
     if([dataProvider respondsToSelector:@selector(dragPlaceholderForView:position:)]) {
         self.draggedView = [dataProvider dragPlaceholderForView:draggableView position:convertedPoint];
+        
+        CGRect draggedViewRect = self.draggedView.frame;
+        CGPoint convertedOriginForDraggedView = [[self dk_rootView] convertPoint:self.draggedView.frame.origin fromView:draggableView];
+        draggedViewRect.origin = convertedOriginForDraggedView;
+        self.draggedView.frame = draggedViewRect;
     }
     
     if(self.draggedView == nil) {
-        UIGraphicsBeginImageContext(draggableView.bounds.size);
-        [draggableView.layer renderInContext:UIGraphicsGetCurrentContext()];
-        UIImage *placeholderImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
+        UIImage *imageRepresentationForView = [self _createImageRepresentationForView:draggableView];
         
-        self.draggedView = [[UIImageView alloc] initWithImage:placeholderImage];
+        self.draggedView = [[UIImageView alloc] initWithImage:imageRepresentationForView];
         self.draggedView.contentMode = UIViewContentModeScaleAspectFit;
         
         CGPoint draggablViewCenter = [[self dk_rootView] convertPoint:draggableView.center fromView:draggableView];
@@ -262,7 +268,6 @@ static char containsDragViewKey;
 //    self.draggedView.center = draggablViewCenter;
     
     [[self dk_rootView] addSubview:self.draggedView];
-    
 
     self.draggedView.alpha = 0.0f;
     [UIView animateWithDuration:0.25f animations:^{
@@ -278,25 +283,31 @@ static char containsDragViewKey;
         
 //        [self.originalView setAlpha:0.0f];
         self.draggedView.alpha = 1.0f;
-        self.draggedView.center = point;
+        self.draggedView.center = touchPoint;
     } completion:^(BOOL finished) {
         if([dragDelegate respondsToSelector:@selector(dragDidStartForView:position:)]) {
-            [dragDelegate dragDidStartForView:draggableView position:point];
+            [dragDelegate dragDidStartForView:draggableView position:touchPoint];
         }
     }];
 
 }
 
-- (void)endDragForView:(UIView*)dragView completed:(BOOL)completed
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+- (void)endDragForView:(UIView *)dragView
+             completed:(BOOL)completed
 {
     [self.longPressGestureRecognizer setEnabled:NO];
-    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(dragView, &dragDelegateKey);
+    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
     
-    CGPoint endPosition;
+    CGPoint endPosition = CGPointZero;
     if(completed) {
-        endPosition = [[self.lastView superview] convertPoint:self.lastView.center toView:[self dk_rootView]];
-    } else {
-        endPosition = [[self.originalView superview] convertPoint:self.originalView.center toView:[self dk_rootView]];
+        endPosition = [[self.lastView superview] convertPoint:self.lastView.center
+                                                       toView:[self dk_rootView]];
+    }
+    else {
+        endPosition = [[self.originalView superview] convertPoint:self.originalView.center
+                                                           toView:[self dk_rootView]];
     }
     
     if([dragDelegate respondsToSelector:@selector(dragWillFinishForView:position:)]) {
@@ -304,18 +315,25 @@ static char containsDragViewKey;
     }
     
     [UIView animateWithDuration:0.25f delay:0.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-        
         [self.draggedView setTransform:CGAffineTransformIdentity];
-
         self.draggedView.layer.shadowPath = nil;
-        self.draggedView.center = endPosition;
-        
-    } completion:^(BOOL finished) {
 
+        BOOL snapToCenterOnCompletion = YES;
+        if(completed) {
+            if([dragDelegate respondsToSelector:@selector(dragShouldSnapToCenterOfTargetOnCompletion)]) {
+                snapToCenterOnCompletion = [dragDelegate dragShouldSnapToCenterOfTargetOnCompletion];
+            }
+        }
+        if(snapToCenterOnCompletion) {
+            self.draggedView.center = endPosition;
+        }
+    } completion:^(BOOL finished) {
         [self.originalView setAlpha:1.0f];
         
         if([dragDelegate respondsToSelector:@selector(dragDidFinishForView:position:completed:)]) {
-            [dragDelegate dragDidFinishForView:self.originalView position:endPosition completed:completed];
+            [dragDelegate dragDidFinishForView:self.originalView
+                                      position:endPosition
+                                     completed:completed];
         }
         
         if(completed) {
@@ -337,5 +355,20 @@ static char containsDragViewKey;
         }];
     }];
 }
+
+#pragma mark - Helper Methods
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+- (UIImage *)_createImageRepresentationForView:(UIView *)view
+{
+    UIGraphicsBeginImageContext(view.bounds.size);
+    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *imageRepresentationForView = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return imageRepresentationForView;
+}
+
 
 @end

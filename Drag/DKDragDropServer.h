@@ -20,6 +20,9 @@
 - (UIView *)dragPlaceholderForView:(UIView *)dragView
                           position:(CGPoint)point;
 
+- (CGRect)dragCancelledFinalFrameForPlaceholder:(UIView*)placeholder
+                                withDraggedView:(UIView*)draggedView;
+
 @end
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,13 +48,11 @@
                    completed:(BOOL)completed;
 
 - (void)dragCompletedOnTargetView:(UIView *)targetView
-                     withMetadata:(id)metadata;
-
-- (void)dragCompletedOnTargetView:(UIView *)targetView
                          position:(CGPoint)point
                      withMetadata:(id)metadata;
 
-- (BOOL)dragShouldSnapToCenterOfTargetOnCompletion;
+- (CGRect)dragCompletedFinalFrameForPlaceholder:(UIView*)placeholder
+                                 withTargetView:(UIView*)targetView;
 
 @end
 

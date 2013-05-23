@@ -68,7 +68,7 @@ static char containsDragViewKey;
 
 - (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDragDelegate> *)dropDelegate
 {
-	objc_setAssociatedObject(dropView, &containsDragViewKey, [NSNumber numberWithBool:NO], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	objc_setAssociatedObject(dropView, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	objc_setAssociatedObject(dropView, &dragDelegateKey, dropDelegate, OBJC_ASSOCIATION_ASSIGN);
 	
     if(self.dk_dropTargets == nil) {
@@ -139,7 +139,7 @@ static char containsDragViewKey;
 			break;
         }
 		case UIGestureRecognizerStateRecognized: {
-            BOOL completed = droppedTarget && droppedTarget != self.originalView;
+            BOOL completed = droppedTarget != nil;
             [self endDragForView:dragView completed:completed];
             
 			break;
@@ -240,6 +240,8 @@ static char containsDragViewKey;
         [dragDelegate dragWillStartForView:draggableView position:convertedPoint];
     }
     
+    [self dk_messageTargetsHitByPoint:touchPoint];
+    
     if([dataProvider respondsToSelector:@selector(dragMetadataForView:position:)]) {
         id metadata = [dataProvider dragMetadataForView:draggableView position:convertedPoint];
         objc_setAssociatedObject(draggableView, &dragMetadataKey, metadata, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -299,6 +301,7 @@ static char containsDragViewKey;
 {
     [self.longPressGestureRecognizer setEnabled:NO];
     NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
+    NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(dragView, &dragDataProviderKey);
     
     CGPoint endPosition = CGPointZero;
     if(completed) {
@@ -318,15 +321,20 @@ static char containsDragViewKey;
         [self.draggedView setTransform:CGAffineTransformIdentity];
         self.draggedView.layer.shadowPath = nil;
 
-        BOOL snapToCenterOnCompletion = YES;
         if(completed) {
-            if([dragDelegate respondsToSelector:@selector(dragShouldSnapToCenterOfTargetOnCompletion)]) {
-                snapToCenterOnCompletion = [dragDelegate dragShouldSnapToCenterOfTargetOnCompletion];
+            if([dragDelegate respondsToSelector:@selector(dragCompletedFinalFrameForPlaceholder:withTargetView:)]) {
+                self.draggedView.frame = [[self dk_rootView]
+                                          convertRect:[dragDelegate dragCompletedFinalFrameForPlaceholder:self.draggedView withTargetView:self.lastView]
+                                          fromView:self.lastView];
+            }
+        } else {
+            if([dataProvider respondsToSelector:@selector(dragCancelledFinalFrameForPlaceholder:withDraggedView:)]) {
+                self.draggedView.frame =[[self dk_rootView]
+                                         convertRect:[dataProvider dragCancelledFinalFrameForPlaceholder:self.draggedView withDraggedView:self.originalView]
+                                         fromView:self.originalView];
             }
         }
-        if(snapToCenterOnCompletion) {
-            self.draggedView.center = endPosition;
-        }
+     
     } completion:^(BOOL finished) {
         [self.originalView setAlpha:1.0f];
         
@@ -337,10 +345,6 @@ static char containsDragViewKey;
         }
         
         if(completed) {
-            if ([dragDelegate respondsToSelector:@selector(dragCompletedOnTargetView:withMetadata:)]) {
-                id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
-                [dragDelegate dragCompletedOnTargetView:self.lastView withMetadata:metadata];
-            }
             if ([dragDelegate respondsToSelector:@selector(dragCompletedOnTargetView:position:withMetadata:)]) {
                 id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
 

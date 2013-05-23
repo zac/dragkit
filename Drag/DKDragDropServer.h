@@ -34,12 +34,22 @@
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
 
-- (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView position:(CGPoint)point withMetadata:(id)metadata;
+- (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView
+                                   position:(CGPoint)point
+                               withMetadata:(id)metadata;
 
-- (void)dragWillFinishForView:(UIView *)view position:(CGPoint)point;
-- (void)dragDidFinishForView:(UIView *)view position:(CGPoint)point completed:(BOOL)completed;
+- (void)dragWillFinishForView:(UIView *)view
+                     position:(CGPoint)point;
+- (void)dragDidFinishForView:(UIView *)view
+                    position:(CGPoint)point
+                   completed:(BOOL)completed;
 
-- (void)dragCompletedOnTargetView:(UIView *)targetView withMetadata:(id)metadata;
+- (void)dragCompletedOnTargetView:(UIView *)targetView
+                     withMetadata:(id)metadata;
+
+- (void)dragCompletedOnTargetView:(UIView *)targetView
+                         position:(CGPoint)point
+                     withMetadata:(id)metadata;
 
 - (BOOL)dragShouldSnapToCenterOfTargetOnCompletion;
 

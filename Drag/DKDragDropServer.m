@@ -341,6 +341,16 @@ static char containsDragViewKey;
                 id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
                 [dragDelegate dragCompletedOnTargetView:self.lastView withMetadata:metadata];
             }
+            if ([dragDelegate respondsToSelector:@selector(dragCompletedOnTargetView:position:withMetadata:)]) {
+                id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
+
+                CGPoint endPointInTargetView = [self.lastView convertPoint:self.draggedView.center
+                                                                  fromView:[self dk_rootView]];
+
+                [dragDelegate dragCompletedOnTargetView:self.lastView
+                                               position:endPointInTargetView
+                                           withMetadata:metadata];
+            }
         }
         
         [UIView animateWithDuration:0.25f animations:^{

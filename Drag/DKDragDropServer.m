@@ -35,7 +35,7 @@ static char containsDragViewKey;
 {
     if(self.longPressGestureRecognizer == nil) {
         self.longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
-        self.longPressGestureRecognizer.minimumPressDuration = 0.25f;
+        self.longPressGestureRecognizer.minimumPressDuration = 0.15f;
         self.longPressGestureRecognizer.delegate = self;
         
         [[self dk_rootView] addGestureRecognizer:self.longPressGestureRecognizer];

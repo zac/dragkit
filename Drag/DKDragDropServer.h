@@ -14,14 +14,23 @@
 - (BOOL)dragShouldStartForView:(UIView *)dragView
                       position:(CGPoint)point;
 
+- (void)dragWillStartForView:(UIView *)view position:(CGPoint)point;
+- (void)dragDidStartForView:(UIView *)view position:(CGPoint)point;
+
+- (void)dragWillFinishForView:(UIView *)view
+                     position:(CGPoint)point;
+- (void)dragDidFinishForView:(UIView *)view
+                    position:(CGPoint)point
+                   completed:(BOOL)completed;
+
 - (id)dragMetadataForView:(UIView *)dragView
                  position:(CGPoint)point;
 
 - (UIView *)dragPlaceholderForView:(UIView *)dragView
                           position:(CGPoint)point;
 
-- (CGRect)dragCancelledFinalFrameForPlaceholder:(UIView*)placeholder
-                                withDraggedView:(UIView*)draggedView;
+- (CGRect)dragCancelledFinalFrameForPlaceholder:(UIView *)placeholder
+                                withDraggedView:(UIView *)draggedView;
 
 @end
 
@@ -31,8 +40,6 @@
 
 @optional
 
-- (void)dragWillStartForView:(UIView *)view position:(CGPoint)point;
-- (void)dragDidStartForView:(UIView *)view position:(CGPoint)point;
 
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
@@ -40,12 +47,6 @@
 - (void)dragDidUpdatePositionOverTargetView:(UIView *)targetView
                                    position:(CGPoint)point
                                withMetadata:(id)metadata;
-
-- (void)dragWillFinishForView:(UIView *)view
-                     position:(CGPoint)point;
-- (void)dragDidFinishForView:(UIView *)view
-                    position:(CGPoint)point
-                   completed:(BOOL)completed;
 
 - (void)dragCompletedOnTargetView:(UIView *)targetView
                          position:(CGPoint)point

@@ -106,7 +106,7 @@ static char containsDragViewKey;
     CGPoint positionInView = [[self dk_rootView] convertPoint:touchPoint toView:dragView];
     
     id<DKDragDataProvider, NSObject> dataProvider = objc_getAssociatedObject(dragView, &dragDataProviderKey);
-    id<DKDragDelegate, NSObject> dragDelegate = objc_getAssociatedObject(dragView, &dragDelegateKey);
+//    id<DKDragDelegate, NSObject> dragDelegate = objc_getAssociatedObject(dragView, &dragDelegateKey);
 	
     if (!dragView) {
         [sender setState:UIGestureRecognizerStateFailed];
@@ -145,8 +145,8 @@ static char containsDragViewKey;
 			break;
         }
 		case UIGestureRecognizerStateCancelled: {
-            if([dragDelegate respondsToSelector:@selector(dragWillFinishForView:position:)]) {
-                [dragDelegate dragWillFinishForView:self.originalView position:touchPoint];
+            if([dataProvider respondsToSelector:@selector(dragWillFinishForView:position:)]) {
+                [dataProvider dragWillFinishForView:self.originalView position:touchPoint];
             }
             
 			[self endDragForView:dragView completed:NO];
@@ -234,10 +234,10 @@ static char containsDragViewKey;
               convertedPoint:(CGPoint)convertedPoint
 {
     NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dragDataProviderKey);
-    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(draggableView, &dragDelegateKey);
+//    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(draggableView, &dragDelegateKey);
  
-    if([dragDelegate respondsToSelector:@selector(dragWillStartForView:position:)]) {
-        [dragDelegate dragWillStartForView:draggableView position:convertedPoint];
+    if([dataProvider respondsToSelector:@selector(dragWillStartForView:position:)]) {
+        [dataProvider dragWillStartForView:draggableView position:convertedPoint];
     }
     
     [self dk_messageTargetsHitByPoint:touchPoint];
@@ -287,8 +287,8 @@ static char containsDragViewKey;
         self.draggedView.alpha = 1.0f;
         self.draggedView.center = touchPoint;
     } completion:^(BOOL finished) {
-        if([dragDelegate respondsToSelector:@selector(dragDidStartForView:position:)]) {
-            [dragDelegate dragDidStartForView:draggableView position:touchPoint];
+        if([dataProvider respondsToSelector:@selector(dragDidStartForView:position:)]) {
+            [dataProvider dragDidStartForView:draggableView position:convertedPoint];
         }
     }];
 
@@ -313,8 +313,8 @@ static char containsDragViewKey;
                                                            toView:[self dk_rootView]];
     }
     
-    if([dragDelegate respondsToSelector:@selector(dragWillFinishForView:position:)]) {
-        [dragDelegate dragWillFinishForView:self.originalView position:endPosition];
+    if([dataProvider respondsToSelector:@selector(dragWillFinishForView:position:)]) {
+        [dataProvider dragWillFinishForView:self.originalView position:endPosition];
     }
     
     [UIView animateWithDuration:0.25f delay:0.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
@@ -338,8 +338,8 @@ static char containsDragViewKey;
     } completion:^(BOOL finished) {
         [self.originalView setAlpha:1.0f];
         
-        if([dragDelegate respondsToSelector:@selector(dragDidFinishForView:position:completed:)]) {
-            [dragDelegate dragDidFinishForView:self.originalView
+        if([dataProvider respondsToSelector:@selector(dragDidFinishForView:position:completed:)]) {
+            [dataProvider dragDidFinishForView:self.originalView
                                       position:endPosition
                                      completed:completed];
         }

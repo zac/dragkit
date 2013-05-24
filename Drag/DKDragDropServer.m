@@ -97,6 +97,7 @@ static char containsDragViewKey;
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender
 {    
 	CGPoint touchPoint = [sender locationInView:[self dk_rootView]];
+    [self dk_messageTargetsHitByPoint:touchPoint];
 	
     UIView *dragView = [self dk_viewContainingKey:&dragDataProviderKey forPoint:touchPoint];
     if(dragView == nil) {
@@ -239,8 +240,6 @@ static char containsDragViewKey;
     if([dragDelegate respondsToSelector:@selector(dragWillStartForView:position:)]) {
         [dragDelegate dragWillStartForView:draggableView position:convertedPoint];
     }
-    
-    [self dk_messageTargetsHitByPoint:touchPoint];
     
     if([dataProvider respondsToSelector:@selector(dragMetadataForView:position:)]) {
         id metadata = [dataProvider dragMetadataForView:draggableView position:convertedPoint];

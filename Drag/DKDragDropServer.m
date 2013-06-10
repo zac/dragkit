@@ -18,7 +18,7 @@ static char dragMetadataKey;
 
 static char containsDragViewKey;
 
-@interface DKDragDropServer ()
+@interface DKDragDropServer () <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) UIView *originalView;
 @property (nonatomic, strong) UIView *draggedView;
@@ -30,6 +30,11 @@ static char containsDragViewKey;
 @end
 
 @implementation DKDragDropServer
+
+- (void)dealloc
+{
+    [self disableDragging];
+}
 
 - (void)enabledDragging
 {
@@ -45,6 +50,7 @@ static char containsDragViewKey;
 
 - (void)disableDragging
 {
+    [self.draggedView removeFromSuperview];
     [[self dk_rootView] removeGestureRecognizer:self.longPressGestureRecognizer];
     self.longPressGestureRecognizer = nil;
 }
@@ -107,7 +113,6 @@ static char containsDragViewKey;
     CGPoint positionInView = [[self dk_rootView] convertPoint:touchPoint toView:dragView];
     
     id<DKDragDataProvider, NSObject> dataProvider = objc_getAssociatedObject(dragView, &dragDataProviderKey);
-//    id<DKDragDelegate, NSObject> dragDelegate = objc_getAssociatedObject(dragView, &dragDelegateKey);
 	
     if (!dragView) {
         [sender setState:UIGestureRecognizerStateFailed];

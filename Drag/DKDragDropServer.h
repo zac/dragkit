@@ -62,7 +62,7 @@
 extern NSString *const DKPasteboardNameDrag;
 
 @class DKApplicationRegistration;
-@interface DKDragDropServer : NSObject <UIGestureRecognizerDelegate>
+@interface DKDragDropServer : NSObject
 
 - (void)enabledDragging;
 - (void)disableDragging;

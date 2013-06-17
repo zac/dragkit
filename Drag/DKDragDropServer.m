@@ -75,7 +75,6 @@ static char containsDragViewKey;
 
 - (void)markViewAsDropTarget:(UIView *)dropView withDelegate:(NSObject <DKDragDelegate> *)dropDelegate
 {
-	objc_setAssociatedObject(dropView, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	objc_setAssociatedObject(dropView, &dragDelegateKey, dropDelegate, OBJC_ASSOCIATION_ASSIGN);
 	
     if(self.dk_dropTargets == nil) {
@@ -198,35 +197,38 @@ static char containsDragViewKey;
 	
 	if (!dropTarget && self.lastView) {
 		
-		objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:NO], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-		
 		NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
 		
 		if ([dragDelegate respondsToSelector:@selector(dragDidLeaveTargetView:)]) {
-			[dragDelegate dragDidLeaveTargetView:dropTarget];
+			[dragDelegate dragDidLeaveTargetView:self.lastView];
 		}
 		
+        objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:NO], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        self.lastView = nil;
 		return;
 	}
     
-	NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(dropTarget, &dragDelegateKey);
-	BOOL containsDragView = [(NSNumber *)objc_getAssociatedObject(dropTarget, &containsDragViewKey) boolValue];
+    self.lastView = dropTarget;
+    
+    NSLog(@"!!!!! %@", self.lastView);
+    
+	NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
+	BOOL containsDragView = [(NSNumber *)objc_getAssociatedObject(self.lastView, &containsDragViewKey) boolValue];
 	
     
+    NSLog(@"Contains %d", containsDragView);
     if (!containsDragView && [dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
-        [dragDelegate dragDidEnterTargetView:dropTarget];
+        [dragDelegate dragDidEnterTargetView:self.lastView];
     }
     else if(containsDragView && [dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:withMetadata:)]) {
         
-        CGPoint positionInTargetView = [[self dk_rootView] convertPoint:point toView:dropTarget];
+        CGPoint positionInTargetView = [[self dk_rootView] convertPoint:point toView:self.lastView];
         id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
-        [dragDelegate dragDidUpdatePositionOverTargetView:dropTarget position:positionInTargetView withMetadata:metadata];
+        [dragDelegate dragDidUpdatePositionOverTargetView:self.lastView position:positionInTargetView withMetadata:metadata];
     }
-    
-    self.lastView = dropTarget;
-    
+
     if(dropTarget) {//TODO: Rewrite this
-        objc_setAssociatedObject(dropTarget, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
 }
 

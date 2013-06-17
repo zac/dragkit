@@ -195,7 +195,7 @@ static char containsDragViewKey;
 {
 	UIView *dropTarget = [self dk_dropTargetHitByPoint:point];
 	
-	if (!dropTarget && self.lastView) {
+	if ((!dropTarget && self.lastView) || (dropTarget && self.lastView && ![dropTarget isEqual:self.lastView])) {
 		
 		NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
 		
@@ -205,7 +205,10 @@ static char containsDragViewKey;
 		
         objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:NO], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         self.lastView = nil;
-		return;
+		
+        if(!dropTarget && self.lastView) {
+            return;
+        }
 	}
     
     self.lastView = dropTarget;
@@ -231,8 +234,6 @@ static char containsDragViewKey;
 #pragma mark -
 #pragma mark Drag View Creation
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 - (void)startDragViewForView:(UIView *)draggableView
                      atPoint:(CGPoint)touchPoint
               convertedPoint:(CGPoint)convertedPoint
@@ -281,9 +282,6 @@ static char containsDragViewKey;
         self.draggedView.layer.shadowRadius = 4;
         self.draggedView.layer.shadowOpacity = 0.2;
         
-//        self.draggedView.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.draggedView.bounds].CGPath;
-        
-//        [self.originalView setAlpha:0.0f];
         self.draggedView.alpha = 1.0f;
         self.draggedView.center = touchPoint;
     } completion:^(BOOL finished) {
@@ -294,8 +292,6 @@ static char containsDragViewKey;
 
 }
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 - (void)endDragForView:(UIView *)dragView
              completed:(BOOL)completed
 {
@@ -336,7 +332,6 @@ static char containsDragViewKey;
         }
      
     } completion:^(BOOL finished) {
-        [self.originalView setAlpha:1.0f];
         
         if([dataProvider respondsToSelector:@selector(dragDidFinishForView:position:completed:)]) {
             [dataProvider dragDidFinishForView:self.originalView
@@ -372,8 +367,6 @@ static char containsDragViewKey;
 
 #pragma mark - Helper Methods
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 - (UIImage *)_createImageRepresentationForView:(UIView *)view
 {
     UIGraphicsBeginImageContext(view.bounds.size);

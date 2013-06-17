@@ -210,13 +210,9 @@ static char containsDragViewKey;
     
     self.lastView = dropTarget;
     
-    NSLog(@"!!!!! %@", self.lastView);
-    
 	NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
 	BOOL containsDragView = [(NSNumber *)objc_getAssociatedObject(self.lastView, &containsDragViewKey) boolValue];
 	
-    
-    NSLog(@"Contains %d", containsDragView);
     if (!containsDragView && [dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
         [dragDelegate dragDidEnterTargetView:self.lastView];
     }
@@ -242,7 +238,6 @@ static char containsDragViewKey;
               convertedPoint:(CGPoint)convertedPoint
 {
     NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dragDataProviderKey);
-//    NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(draggableView, &dragDelegateKey);
  
     if([dataProvider respondsToSelector:@selector(dragWillStartForView:position:)]) {
         [dataProvider dragWillStartForView:draggableView position:convertedPoint];
@@ -273,9 +268,6 @@ static char containsDragViewKey;
         CGPoint draggablViewCenter = [[self dk_rootView] convertPoint:draggableView.center fromView:draggableView];
         self.draggedView.center = draggablViewCenter;
     }
-
-//    CGPoint draggablViewCenter = [[self dk_rootView] convertPoint:draggableView.center fromView:draggableView];
-//    self.draggedView.center = draggablViewCenter;
     
     [[self dk_rootView] addSubview:self.draggedView];
 

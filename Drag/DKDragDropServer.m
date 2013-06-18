@@ -215,19 +215,22 @@ static char containsDragViewKey;
     
 	NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
 	BOOL containsDragView = [(NSNumber *)objc_getAssociatedObject(self.lastView, &containsDragViewKey) boolValue];
-	
-    if (!containsDragView && [dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
-        [dragDelegate dragDidEnterTargetView:self.lastView];
+    
+    if (!containsDragView) {
+        
+        if([dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
+            [dragDelegate dragDidEnterTargetView:self.lastView];
+        }
+        
+        if(self.lastView) {
+            objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
     }
     else if(containsDragView && [dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:withMetadata:)]) {
         
         CGPoint positionInTargetView = [[self dk_rootView] convertPoint:point toView:self.lastView];
         id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
         [dragDelegate dragDidUpdatePositionOverTargetView:self.lastView position:positionInTargetView withMetadata:metadata];
-    }
-
-    if(dropTarget) {//TODO: Rewrite this
-        objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
 }
 
@@ -358,6 +361,10 @@ static char containsDragViewKey;
             [self.draggedView removeFromSuperview];
             self.draggedView = nil;
             self.originalView = nil;
+            
+            if(self.lastView) {
+                objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:NO], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            }
             self.lastView = nil;
             
             [self.longPressGestureRecognizer setEnabled:YES];

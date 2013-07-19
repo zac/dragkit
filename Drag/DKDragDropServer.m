@@ -278,13 +278,7 @@ static char containsDragViewKey;
     self.draggedView.alpha = 0.0f;
     [UIView animateWithDuration:0.25f animations:^{
         [self.draggedView setTransform:CGAffineTransformMakeScale(1.2f, 1.2f)];
-        
         self.draggedView.layer.masksToBounds = NO;
-        self.draggedView.layer.cornerRadius = 8;
-        self.draggedView.layer.shadowOffset = CGSizeMake(0, 2);
-        self.draggedView.layer.shadowRadius = 4;
-        self.draggedView.layer.shadowOpacity = 0.2;
-        
         self.draggedView.alpha = 1.0f;
         self.draggedView.center = touchPoint;
     } completion:^(BOOL finished) {

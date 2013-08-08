@@ -276,11 +276,13 @@ static char containsDragViewKey;
     [[self dk_rootView] addSubview:self.draggedView];
 
     self.draggedView.alpha = 0.0f;
+    
+    __weak typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.25f animations:^{
-        [self.draggedView setTransform:CGAffineTransformMakeScale(1.2f, 1.2f)];
-        self.draggedView.layer.masksToBounds = NO;
-        self.draggedView.alpha = 1.0f;
-        self.draggedView.center = touchPoint;
+        [weakSelf.draggedView setTransform:CGAffineTransformMakeScale(1.2f, 1.2f)];
+        weakSelf.draggedView.layer.masksToBounds = NO;
+        weakSelf.draggedView.alpha = 1.0f;
+        weakSelf.draggedView.center = touchPoint;
     } completion:^(BOOL finished) {
         if([dataProvider respondsToSelector:@selector(dragDidStartForView:position:)]) {
             [dataProvider dragDidStartForView:draggableView position:convertedPoint];
@@ -310,39 +312,40 @@ static char containsDragViewKey;
         [dataProvider dragWillFinishForView:self.originalView position:endPosition];
     }
     
+    __weak typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.25f delay:0.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-        [self.draggedView setTransform:CGAffineTransformIdentity];
-        self.draggedView.layer.shadowPath = nil;
-
+        [weakSelf.draggedView setTransform:CGAffineTransformIdentity];
+        weakSelf.draggedView.layer.shadowPath = nil;
+        
         if(completed) {
             if([dragDelegate respondsToSelector:@selector(dragCompletedFinalFrameForPlaceholder:withTargetView:)]) {
-                self.draggedView.frame = [[self dk_rootView]
-                                          convertRect:[dragDelegate dragCompletedFinalFrameForPlaceholder:self.draggedView withTargetView:self.lastView]
-                                          fromView:self.lastView];
+                weakSelf.draggedView.frame = [[weakSelf dk_rootView]
+                                              convertRect:[dragDelegate dragCompletedFinalFrameForPlaceholder:weakSelf.draggedView withTargetView:weakSelf.lastView]
+                                              fromView:weakSelf.lastView];
             }
         } else {
             if([dataProvider respondsToSelector:@selector(dragCancelledFinalFrameForPlaceholder:withDraggedView:)]) {
-                self.draggedView.frame =[[self dk_rootView]
-                                         convertRect:[dataProvider dragCancelledFinalFrameForPlaceholder:self.draggedView withDraggedView:self.originalView]
-                                         fromView:self.originalView];
+                weakSelf.draggedView.frame =[[self dk_rootView]
+                                             convertRect:[dataProvider dragCancelledFinalFrameForPlaceholder:weakSelf.draggedView withDraggedView:weakSelf.originalView]
+                                             fromView:weakSelf.originalView];
             }
         }
-     
+        
     } completion:^(BOOL finished) {
         
         if([dataProvider respondsToSelector:@selector(dragDidFinishForView:position:completed:)]) {
-            [dataProvider dragDidFinishForView:self.originalView
+            [dataProvider dragDidFinishForView:weakSelf.originalView
                                       position:endPosition
                                      completed:completed];
         }
         
         if(completed) {
             if ([dragDelegate respondsToSelector:@selector(dragCompletedOnTargetView:position:withMetadata:)]) {
-                id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
-
-                CGPoint endPointInTargetView = [self.lastView convertPoint:self.draggedView.center
-                                                                  fromView:[self dk_rootView]];
-
+                id metadata = objc_getAssociatedObject(weakSelf.originalView, &dragMetadataKey);
+                
+                CGPoint endPointInTargetView = [weakSelf.lastView convertPoint:weakSelf.draggedView.center
+                                                                      fromView:[weakSelf dk_rootView]];
+                
                 [dragDelegate dragCompletedOnTargetView:self.lastView
                                                position:endPointInTargetView
                                            withMetadata:metadata];
@@ -350,18 +353,18 @@ static char containsDragViewKey;
         }
         
         [UIView animateWithDuration:0.25f animations:^{
-            self.draggedView.alpha = 0.1f;
+            weakSelf.draggedView.alpha = 0.1f;
         } completion:^(BOOL finished) {
-            [self.draggedView removeFromSuperview];
-            self.draggedView = nil;
-            self.originalView = nil;
+            [weakSelf.draggedView removeFromSuperview];
+            weakSelf.draggedView = nil;
+            weakSelf.originalView = nil;
             
-            if(self.lastView) {
-                objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:NO], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            if(weakSelf.lastView) {
+                objc_setAssociatedObject(weakSelf.lastView, &containsDragViewKey, [NSNumber numberWithBool:NO], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             }
-            self.lastView = nil;
+            weakSelf.lastView = nil;
             
-            [self.longPressGestureRecognizer setEnabled:YES];
+            [weakSelf.longPressGestureRecognizer setEnabled:YES];
         }];
     }];
 }

@@ -6,8 +6,6 @@
 //  Copyright 2010 Zac White. All rights reserved.
 //
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 @protocol DKDragDataProvider
 
 @optional
@@ -34,13 +32,10 @@
 
 @end
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+
 @protocol DKDragDelegate
 
 @optional
-
-
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
 
@@ -53,18 +48,14 @@
                      withMetadata:(id)metadata;
 
 - (CGRect)dragCompletedFinalFrameForPlaceholder:(UIView*)placeholder
-                                 withTargetView:(UIView*)targetView;
+                                 withTargetView:(UIView*)targetView
+                                       position:(CGPoint)point;
 
 @end
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-extern NSString *const DKPasteboardNameDrag;
-
-@class DKApplicationRegistration;
 @interface DKDragDropServer : NSObject
 
-- (void)enabledDragging;
+- (void)enableDragging;
 - (void)disableDragging;
 
 - (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource;

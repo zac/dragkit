@@ -36,23 +36,30 @@ static char containsDragViewKey;
     [self disableDragging];
 }
 
-- (void)enabledDragging
+- (id)init
 {
-    if(self.longPressGestureRecognizer == nil) {
+    if(self = [super init]) {
         self.longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
         self.longPressGestureRecognizer.minimumPressDuration = 0.1f;
         self.longPressGestureRecognizer.cancelsTouchesInView = NO;
         self.longPressGestureRecognizer.delegate = self;
+        self.longPressGestureRecognizer.enabled = NO;
         
         [[self dk_rootView] addGestureRecognizer:self.longPressGestureRecognizer];
     }
+    
+    return self;
+}
+
+- (void)enableDragging
+{
+    [self.longPressGestureRecognizer setEnabled:YES];
 }
 
 - (void)disableDragging
 {
     [self.draggedView removeFromSuperview];
-    [[self dk_rootView] removeGestureRecognizer:self.longPressGestureRecognizer];
-    self.longPressGestureRecognizer = nil;
+    [self.longPressGestureRecognizer setEnabled:NO];
 }
 
 - (UIView *)dk_rootView
@@ -247,8 +254,6 @@ static char containsDragViewKey;
         [dataProvider dragWillStartForView:draggableView position:convertedPoint];
     }
     
-    [self dk_messageTargetsHitByPoint:touchPoint];
-    
     if([dataProvider respondsToSelector:@selector(dragMetadataForView:position:)]) {
         id metadata = [dataProvider dragMetadataForView:draggableView position:convertedPoint];
         objc_setAssociatedObject(draggableView, &dragMetadataKey, metadata, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -283,12 +288,13 @@ static char containsDragViewKey;
         weakSelf.draggedView.layer.masksToBounds = NO;
         weakSelf.draggedView.alpha = 1.0f;
         weakSelf.draggedView.center = touchPoint;
-    } completion:^(BOOL finished) {
-        if([dataProvider respondsToSelector:@selector(dragDidStartForView:position:)]) {
-            [dataProvider dragDidStartForView:draggableView position:convertedPoint];
-        }
-    }];
+    } completion:nil];
+    
+    if([dataProvider respondsToSelector:@selector(dragDidStartForView:position:)]) {
+        [dataProvider dragDidStartForView:draggableView position:convertedPoint];
+    }
 
+    [self dk_messageTargetsHitByPoint:touchPoint];
 }
 
 - (void)endDragForView:(UIView *)dragView
@@ -296,16 +302,16 @@ static char containsDragViewKey;
 {
     [self.longPressGestureRecognizer setEnabled:NO];
     NSObject<DKDragDelegate> *dragDelegate = objc_getAssociatedObject(self.lastView, &dragDelegateKey);
-    NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(dragView, &dragDataProviderKey);
+    NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(self.originalView, &dragDataProviderKey);
     
     CGPoint endPosition = CGPointZero;
     if(completed) {
-        endPosition = [[self.lastView superview] convertPoint:self.lastView.center
-                                                       toView:[self dk_rootView]];
+        endPosition = [self.lastView convertPoint:self.draggedView.center
+                                         fromView:[self dk_rootView]];
     }
     else {
-        endPosition = [[self.originalView superview] convertPoint:self.originalView.center
-                                                           toView:[self dk_rootView]];
+        endPosition = [self.originalView convertPoint:self.draggedView.center
+                                             fromView:[self dk_rootView]];
     }
     
     if([dataProvider respondsToSelector:@selector(dragWillFinishForView:position:)]) {
@@ -318,9 +324,9 @@ static char containsDragViewKey;
         weakSelf.draggedView.layer.shadowPath = nil;
         
         if(completed) {
-            if([dragDelegate respondsToSelector:@selector(dragCompletedFinalFrameForPlaceholder:withTargetView:)]) {
+            if([dragDelegate respondsToSelector:@selector(dragCompletedFinalFrameForPlaceholder:withTargetView:position:)]) {
                 weakSelf.draggedView.frame = [[weakSelf dk_rootView]
-                                              convertRect:[dragDelegate dragCompletedFinalFrameForPlaceholder:weakSelf.draggedView withTargetView:weakSelf.lastView]
+                                              convertRect:[dragDelegate dragCompletedFinalFrameForPlaceholder:weakSelf.draggedView withTargetView:weakSelf.lastView position:endPosition]
                                               fromView:weakSelf.lastView];
             }
         } else {

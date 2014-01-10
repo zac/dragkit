@@ -64,7 +64,12 @@ static char containsDragViewKey;
 
 - (UIView *)dk_rootView
 {
-	return [UIApplication sharedApplication].keyWindow.rootViewController.view;
+    NSArray *windows = [[UIApplication sharedApplication] windows];
+    if ([windows count]) {
+        return [windows[0] valueForKeyPath:@"rootViewController.view"];
+    }
+    
+    return nil;
 }
 
 - (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer*)gestureRecognizer

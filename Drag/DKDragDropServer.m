@@ -193,14 +193,20 @@ static char containsDragViewKey;
 
 - (UIView *)dk_dropTargetHitByPoint:(CGPoint)point
 {
+    UIView *retView = nil;
+    
 	for (UIView *dropTarget in self.dk_dropTargets) {
 		CGRect frameInRootView = [[dropTarget superview] convertRect:dropTarget.frame toView:[self dk_rootView]];
 		if (CGRectContainsPoint(frameInRootView, point)) {
-            return dropTarget;
+            if (retView) {
+                retView = [self _frontViewBetweenView:retView andView:dropTarget];
+            } else {
+                retView = dropTarget;
+            }
         }
     }
 	
-	return nil;
+	return retView;
 }
 
 - (void)dk_messageTargetsHitByPoint:(CGPoint)point
@@ -381,6 +387,49 @@ static char containsDragViewKey;
 }
 
 #pragma mark - Helper Methods
+
+- (NSArray *)_getAncestorTreeForView:(UIView *)view
+{
+    NSMutableArray *retArray = [NSMutableArray array];
+    
+    BOOL finishCondition = NO;
+    
+    UIView *currentSuperView = nil;
+    UIView *currentView = view;
+    [retArray addObject:currentView];
+    while (NO == finishCondition) {
+        currentSuperView = currentView.superview;
+        [retArray addObject:currentSuperView];
+        currentView = currentSuperView;
+        if ([currentSuperView isKindOfClass:[UIWindow class]]) {
+            finishCondition = YES;
+        }
+    }
+    return retArray;
+}
+
+- (UIView *)_frontViewBetweenView:(UIView *)view1 andView:(UIView *)view2
+{
+    NSArray *view1Tree = [self _getAncestorTreeForView:view1];
+    NSArray *view2Tree = [self _getAncestorTreeForView:view2];
+    
+    NSPredicate *relativeComplementPredicate =
+    [NSPredicate predicateWithFormat:@"SELF IN %@", view2Tree];
+    NSArray *relativeComplement =
+    [view1Tree filteredArrayUsingPredicate:relativeComplementPredicate];
+    
+    UIView *commonAncestor = relativeComplement[0];
+    NSInteger indexOfCommonAncestorView1Tree = [view1Tree indexOfObject:commonAncestor];
+    NSInteger indexOfCommonAncestorView2Tree = [view2Tree indexOfObject:commonAncestor];
+    
+    NSInteger indexOfView1 = [commonAncestor.subviews indexOfObject:view1Tree[indexOfCommonAncestorView1Tree - 1]];
+    NSInteger indexOfView2 = [commonAncestor.subviews indexOfObject:view2Tree[indexOfCommonAncestorView2Tree - 1]];
+    
+    if (indexOfView1 > indexOfView2) {
+        return view1;
+    }
+    return view2;
+}
 
 - (UIImage *)_createImageRepresentationForView:(UIView *)view
 {

@@ -388,6 +388,7 @@ static char containsDragViewKey;
 
 #pragma mark - Helper Methods
 
+
 - (NSArray *)_getAncestorTreeForView:(UIView *)view
 {
     NSMutableArray *retArray = [NSMutableArray array];
@@ -422,8 +423,12 @@ static char containsDragViewKey;
     NSInteger indexOfCommonAncestorView1Tree = [view1Tree indexOfObject:commonAncestor];
     NSInteger indexOfCommonAncestorView2Tree = [view2Tree indexOfObject:commonAncestor];
     
-    NSInteger indexOfView1 = [commonAncestor.subviews indexOfObject:view1Tree[indexOfCommonAncestorView1Tree - 1]];
-    NSInteger indexOfView2 = [commonAncestor.subviews indexOfObject:view2Tree[indexOfCommonAncestorView2Tree - 1]];
+    //if the index is zero it means that the commonAncestor is view1 or view2
+    indexOfCommonAncestorView1Tree = (indexOfCommonAncestorView1Tree > 0) ? indexOfCommonAncestorView1Tree - 1 : indexOfCommonAncestorView1Tree;
+    indexOfCommonAncestorView2Tree = (indexOfCommonAncestorView2Tree > 0) ? indexOfCommonAncestorView2Tree - 1 : indexOfCommonAncestorView2Tree;
+    
+    NSInteger indexOfView1 = [commonAncestor.subviews indexOfObject:view1Tree[indexOfCommonAncestorView1Tree]];
+    NSInteger indexOfView2 = [commonAncestor.subviews indexOfObject:view2Tree[indexOfCommonAncestorView2Tree]];
     
     if (indexOfView1 > indexOfView2) {
         return view1;

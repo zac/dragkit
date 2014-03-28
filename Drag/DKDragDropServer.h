@@ -35,8 +35,6 @@
 
 @protocol DKDragDelegate
 
-@property (nonatomic, assign) CGAffineTransform draggingElementTransform;
-
 @optional
 - (void)dragDidEnterTargetView:(UIView *)targetView;
 - (void)dragDidLeaveTargetView:(UIView *)targetView;
@@ -56,6 +54,8 @@
 @end
 
 @interface DKDragDropServer : NSObject
+
+@property (nonatomic, assign) CGAffineTransform draggingElementTransform;
 
 - (void)enableDragging;
 - (void)disableDragging;

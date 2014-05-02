@@ -60,6 +60,9 @@
 - (void)enableDragging;
 - (void)disableDragging;
 
+//FIXME: WorkAround to register a new dragView while we are dragging. It is used to avoid the weird UICollectionView animation effect
+- (void)updateOriginalView:(UIView *)originalView;
+
 - (void)markViewAsDraggable:(UIView *)draggableView withDataSource:(NSObject <DKDragDataProvider> *)dragDataSource;
 - (void)unmarkViewAsDraggable:(UIView *)draggableView;
 

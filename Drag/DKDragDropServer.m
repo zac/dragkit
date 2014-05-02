@@ -44,7 +44,7 @@ static char containsDragViewKey;
         self.longPressGestureRecognizer.cancelsTouchesInView = NO;
         self.longPressGestureRecognizer.delegate = self;
         self.longPressGestureRecognizer.enabled = NO;
-        
+        _draggingElementTransform = CGAffineTransformMakeScale(1.2f, 1.2f);
         [[self dk_rootView] addGestureRecognizer:self.longPressGestureRecognizer];
     }
     
@@ -72,7 +72,7 @@ static char containsDragViewKey;
     return nil;
 }
 
-- (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer*)gestureRecognizer
+- (void)addSimultaneousRecognitionWithGesture:(UIGestureRecognizer *)gestureRecognizer
 {
     [self.longPressGestureRecognizer requireGestureRecognizerToFail:gestureRecognizer];
 }
@@ -111,6 +111,10 @@ static char containsDragViewKey;
 
 #pragma mark -
 #pragma mark Dragging Callback
+
+- (void)updateOriginalView:(UIView *)originalView {
+    self.originalView = originalView;
+}
 
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender
 {    
@@ -239,7 +243,11 @@ static char containsDragViewKey;
         if([dragDelegate respondsToSelector:@selector(dragDidEnterTargetView:)]) {
             [dragDelegate dragDidEnterTargetView:self.lastView];
         }
-        
+        if([dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:withMetadata:)]) {
+            CGPoint positionInTargetView = [[self dk_rootView] convertPoint:point toView:self.lastView];
+            id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
+            [dragDelegate dragDidUpdatePositionOverTargetView:self.lastView position:positionInTargetView withMetadata:metadata];            
+        }
         if(self.lastView) {
             objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
@@ -295,7 +303,7 @@ static char containsDragViewKey;
     
     __weak typeof(self) weakSelf = self;
     [UIView animateWithDuration:0.25f animations:^{
-        [weakSelf.draggedView setTransform:CGAffineTransformMakeScale(1.2f, 1.2f)];
+        [weakSelf.draggedView setTransform:_draggingElementTransform];
         weakSelf.draggedView.layer.masksToBounds = NO;
         weakSelf.draggedView.alpha = 1.0f;
         weakSelf.draggedView.center = touchPoint;
@@ -388,7 +396,6 @@ static char containsDragViewKey;
 
 #pragma mark - Helper Methods
 
-
 - (NSArray *)_getAncestorTreeForView:(UIView *)view
 {
     NSMutableArray *retArray = [NSMutableArray array];
@@ -422,15 +429,15 @@ static char containsDragViewKey;
     UIView *commonAncestor = relativeComplement[0];
     NSInteger indexOfCommonAncestorView1Tree = [view1Tree indexOfObject:commonAncestor];
     NSInteger indexOfCommonAncestorView2Tree = [view2Tree indexOfObject:commonAncestor];
-    
+
     //if the index is zero it means that the commonAncestor is view1 or view2
-    
+
     if (0 == indexOfCommonAncestorView1Tree) {
         return view2;
     } else if (0 == indexOfCommonAncestorView2Tree) {
         return view1;
     }
-    
+
     NSInteger indexOfView1 = [commonAncestor.subviews indexOfObject:view1Tree[indexOfCommonAncestorView1Tree - 1]];
     NSInteger indexOfView2 = [commonAncestor.subviews indexOfObject:view2Tree[indexOfCommonAncestorView2Tree - 1]];
     

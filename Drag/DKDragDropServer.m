@@ -39,13 +39,15 @@ static char containsDragViewKey;
 - (id)init
 {
     if(self = [super init]) {
-        self.longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
-        self.longPressGestureRecognizer.minimumPressDuration = 0.1f;
-        self.longPressGestureRecognizer.cancelsTouchesInView = NO;
-        self.longPressGestureRecognizer.delegate = self;
-        self.longPressGestureRecognizer.enabled = NO;
-        _draggingElementTransform = CGAffineTransformMakeScale(1.2f, 1.2f);
+        _longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(dk_handleLongPress:)];
+        _longPressGestureRecognizer.minimumPressDuration = 0.25f;
+        _longPressGestureRecognizer.cancelsTouchesInView = YES;
+        _longPressGestureRecognizer.delegate = self;
+        _longPressGestureRecognizer.enabled = NO;
+        
         [[self dk_rootView] addGestureRecognizer:self.longPressGestureRecognizer];
+        
+        _draggingElementTransform = CGAffineTransformMakeScale(1.2f, 1.2f);
     }
     
     return self;
@@ -117,7 +119,7 @@ static char containsDragViewKey;
 }
 
 - (void)dk_handleLongPress:(UIGestureRecognizer *)sender
-{    
+{
 	CGPoint touchPoint = [sender locationInView:[self dk_rootView]];
 	
     UIView *dragView = [self dk_viewContainingKey:&dragDataProviderKey forPoint:touchPoint];
@@ -148,7 +150,9 @@ static char containsDragViewKey;
                 [sender setState:UIGestureRecognizerStateFailed];
                 return;
             }
-
+            
+            [[self dk_rootView] setUserInteractionEnabled:NO];
+            
 			self.originalView = dragView;
 			[self startDragViewForView:self.originalView atPoint:touchPoint convertedPoint:positionInView];
 			break;
@@ -162,7 +166,7 @@ static char containsDragViewKey;
 		case UIGestureRecognizerStateRecognized: {
             BOOL completed = droppedTarget != nil;
             [self endDragForView:dragView completed:completed];
-            
+            [[self dk_rootView] setUserInteractionEnabled:YES];
 			break;
         }
 		case UIGestureRecognizerStateCancelled: {
@@ -171,11 +175,13 @@ static char containsDragViewKey;
             }
             
 			[self endDragForView:dragView completed:NO];
-            
+            [[self dk_rootView] setUserInteractionEnabled:YES];
 			break;
         }
-		default:
+		default: {
+            [[self dk_rootView] setUserInteractionEnabled:YES];
 			break;
+        }
 	}
 }
 
@@ -246,7 +252,7 @@ static char containsDragViewKey;
         if([dragDelegate respondsToSelector:@selector(dragDidUpdatePositionOverTargetView:position:withMetadata:)]) {
             CGPoint positionInTargetView = [[self dk_rootView] convertPoint:point toView:self.lastView];
             id metadata = objc_getAssociatedObject(self.originalView, &dragMetadataKey);
-            [dragDelegate dragDidUpdatePositionOverTargetView:self.lastView position:positionInTargetView withMetadata:metadata];            
+            [dragDelegate dragDidUpdatePositionOverTargetView:self.lastView position:positionInTargetView withMetadata:metadata];
         }
         if(self.lastView) {
             objc_setAssociatedObject(self.lastView, &containsDragViewKey, [NSNumber numberWithBool:YES], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -268,7 +274,7 @@ static char containsDragViewKey;
               convertedPoint:(CGPoint)convertedPoint
 {
     NSObject<DKDragDataProvider> *dataProvider = objc_getAssociatedObject(draggableView, &dragDataProviderKey);
- 
+    
     if([dataProvider respondsToSelector:@selector(dragWillStartForView:position:)]) {
         [dataProvider dragWillStartForView:draggableView position:convertedPoint];
     }
@@ -298,7 +304,7 @@ static char containsDragViewKey;
     }
     
     [[self dk_rootView] addSubview:self.draggedView];
-
+    
     self.draggedView.alpha = 0.0f;
     
     __weak typeof(self) weakSelf = self;
@@ -312,7 +318,7 @@ static char containsDragViewKey;
     if([dataProvider respondsToSelector:@selector(dragDidStartForView:position:)]) {
         [dataProvider dragDidStartForView:draggableView position:convertedPoint];
     }
-
+    
     [self dk_messageTargetsHitByPoint:touchPoint];
 }
 
@@ -429,15 +435,15 @@ static char containsDragViewKey;
     UIView *commonAncestor = relativeComplement[0];
     NSInteger indexOfCommonAncestorView1Tree = [view1Tree indexOfObject:commonAncestor];
     NSInteger indexOfCommonAncestorView2Tree = [view2Tree indexOfObject:commonAncestor];
-
+    
     //if the index is zero it means that the commonAncestor is view1 or view2
-
+    
     if (0 == indexOfCommonAncestorView1Tree) {
         return view2;
     } else if (0 == indexOfCommonAncestorView2Tree) {
         return view1;
     }
-
+    
     NSInteger indexOfView1 = [commonAncestor.subviews indexOfObject:view1Tree[indexOfCommonAncestorView1Tree - 1]];
     NSInteger indexOfView2 = [commonAncestor.subviews indexOfObject:view2Tree[indexOfCommonAncestorView2Tree - 1]];
     

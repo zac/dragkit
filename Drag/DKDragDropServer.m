@@ -45,7 +45,7 @@ static char containsDragViewKey;
         _longPressGestureRecognizer.delegate = self;
         _longPressGestureRecognizer.enabled = NO;
         
-        [[self dk_rootView] addGestureRecognizer:self.longPressGestureRecognizer];
+        [[self dk_rootView] addGestureRecognizer:_longPressGestureRecognizer];
         
         _draggingElementTransform = CGAffineTransformMakeScale(1.2f, 1.2f);
     }

@@ -404,22 +404,25 @@ static char containsDragViewKey;
 
 - (NSArray *)_getAncestorTreeForView:(UIView *)view
 {
+    NSAssert(view, @"View must not be nil");
+    
     NSMutableArray *retArray = [NSMutableArray array];
     
     BOOL finishCondition = NO;
-    
-    UIView *currentSuperView = nil;
     UIView *currentView = view;
-    [retArray addObject:currentView];
-    while (NO == finishCondition) {
-        currentSuperView = currentView.superview;
-        [retArray addObject:currentSuperView];
-        currentView = currentSuperView;
-        if ([currentSuperView isKindOfClass:[UIWindow class]]) {
+    
+    do {
+        [retArray addObject:currentView];
+        
+        if ([currentView isKindOfClass:[UIWindow class]] || currentView.superview == nil) {
             finishCondition = YES;
         }
-    }
+        
+        currentView = currentView.superview;
+    } while (NO == finishCondition);
+    
     return retArray;
+
 }
 
 - (UIView *)_frontViewBetweenView:(UIView *)view1 andView:(UIView *)view2
